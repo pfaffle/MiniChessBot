@@ -36,4 +36,13 @@ public class State {
 		board[5][3] = 'Q';
 		board[5][4] = 'K';
 	}
+	
+	public void ShowBoard() {
+		for (int i = 0; i < num_rows; i++) {
+			for (int j = 0; j < num_columns; j++) {
+				System.out.print(board[i][j]);
+			}
+			System.out.println();
+		}
+	}
 }
