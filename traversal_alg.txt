@@ -1,0 +1,14 @@
+depth-first search algorithm
+
+negamax(depth,s):
+	if s is terminal:
+		return value(s)
+	best <- -(infinity)
+	for m in moves(s) do:
+		s' <- m(s)
+		v <- -dfs(s') // should be negative because we want the worst move for the opponent
+		if v > best
+		best <- v
+	done
+	return best
+end
