@@ -1,10 +1,22 @@
 
 public class State {
 	private char[][] board;
-	private int num_rows = 6;
-	private int num_columns = 5;
+	private int num_rows;
+	private int num_columns;
+	private int num_turns;
+	private int max_turns;
+	private boolean game_over;
+	private boolean white_wins;
+	private boolean white_is_next;
 	
 	public State() {
+		num_rows = 6;
+		num_columns = 5;
+		num_turns = 0;
+		max_turns = 40;
+		white_is_next = true;
+		game_over = false;
+		white_wins = false;
 		board = new char[num_rows][num_columns];
 		/* Initialize board */
 		/*	  0
