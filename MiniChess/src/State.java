@@ -121,7 +121,7 @@ public class State {
 				out.write(board[i][j]);
 			}
 			out.write('\n');
-			out.flush();
 		}
+		out.flush();
 	}
 }
