@@ -1,4 +1,3 @@
-
 public class MiniChessPlayer {
 
 	/**
@@ -7,7 +6,7 @@ public class MiniChessPlayer {
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
 		State gamestate = new State(); 
-		gamestate.ShowBoard();
+		gamestate.WriteBoard();
 	}
 
 }
