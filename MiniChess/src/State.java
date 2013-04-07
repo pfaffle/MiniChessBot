@@ -1,3 +1,4 @@
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintStream;
 
@@ -88,20 +89,33 @@ public class State {
 	}
 	
 	/* Function:
-	 *   void ReadBoard(String board)
+	 *   int ReadBoard(InputStream new_state)
 	 * Description:
-	 *   Takes a String representation of a chess board and uses it to
-	 *   construct a new board state.
+	 *   Takes a byte array representation of a chess board from an InputStream 
+	 *   and uses it to construct a new board state.
 	 */
-	public void ReadBoard(String board) {
-		return;
+	public int ReadBoard(InputStream new_state) {
+		if (new_state == null) {
+			return -1;
+		} else {
+			byte[] cur_byte = new byte[2];
+			try {
+				new_state.read(cur_byte);
+			} catch (IOException e) {
+				//e.printStackTrace();
+				return -2;
+			}
+			// Parse current turn number (if single digit, the second
+			// byte might be a ' ').
+		}
+		return 0;
 	}
 	
 	/* Function:
 	 *   String WriteBoard()
 	 * Description:
-	 *   Returns a String representation of a chess board and the current
-	 *   game state.
+	 *   Writes a byte array representation of a chess board and the current
+	 *   game state to an OutputStream.
 	 */
 	public void WriteBoard() {
 		String str_num_turns = Integer.toString(num_turns);
