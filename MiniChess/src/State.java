@@ -91,6 +91,17 @@ public class State {
 	 * Description:
 	 *   Takes a byte array representation of a chess board from an InputStream 
 	 *   and uses it to construct a new board state.
+	 * Return values:
+	 *   0 : Success.
+	 *  -1 : Cannot read new_state because it is null.
+	 *  -2 : Invalid input: No turn counter, or turn counter is in the wrong location.
+	 *  -3 : Invalid input: Current turn is greater than maximum allowed turns.
+	 *  -4 : Invalid input: No current player turn indicator, or current player turn
+	 *       indicator is in the wrong location.
+	 *  -5 : Invalid input: Current player must be 'W' for White or 'B' for Black.
+	 *  -6 : Invalid input: Not enough rows on the board.
+	 *  -7 : Invalid input: Not enough columns in a row on the board.
+	 *  -8 : Invalid input: Invalid piece on the board. 
 	 */
 	public int ReadBoard(InputStream new_state) {
 		if (new_state == null) {
@@ -112,7 +123,7 @@ public class State {
 		}
 		new_num_turns = in.nextInt();
 		/* Input validation: Check that num_turns <= max_turns. */
-		if (!(new_num_turns <= max_turns)) {
+		if (new_num_turns > max_turns) {
 			in.close();
 			return -3;
 		}
@@ -145,7 +156,7 @@ public class State {
 			/* Step 3b. Verify next row has the correct number of columns. */
 			if (!(raw_input.length() == num_columns)) {
 				in.close();
-				return -6;
+				return -7;
 			}
 			/* Step 3c. Verify that all pieces in this row are valid and
 			 * add them to the new board. */
@@ -170,7 +181,7 @@ public class State {
 				}
 				if (!(piece_is_valid)) {
 					in.close();
-					return -6;
+					return -8;
 				}
 				/* Piece is valid, add it to the new board. */
 				new_board[cur_row][cur_column] = piece;
