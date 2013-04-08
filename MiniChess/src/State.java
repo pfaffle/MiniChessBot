@@ -133,17 +133,54 @@ public class State {
 		}
 		
 		/* Step 3. Parse the layout of the board. */
-		for (int i = 0; i < num_rows; i++) {
+		char[] new_row = new char[num_columns];
+		for (int cur_row = 0; cur_row < num_rows; cur_row++) {
 			if (!(in.hasNextLine())) {
 				in.close();
 				return -6;
 			}
+			
+			/* Step 3a. Get next row. */
 			raw_input = in.nextLine();
+			/* Step 3b. Verify next row has the correct number of columns. */
 			if (!(raw_input.length() == num_columns)) {
 				in.close();
 				return -6;
 			}
+			/* Step 3c. Verify that all pieces in this row are valid and
+			 * add them to the new board. */
+			new_row = raw_input.toCharArray();
+			char[] valid_pieces = {'.','K','Q','R','B','N','P'};
+			int num_valid_pieces = valid_pieces.length;
+			
+			for (int cur_column = 0; cur_column < num_columns; cur_column++) {
+				char piece = new_row[cur_column];
+				boolean piece_is_valid = false;
+				int cur_valid_piece = 0;
+				
+				/* While we haven't confirmed that the current piece is valid,
+				 * iterate through the list of valid pieces and check if it is
+				 * one of them. */
+				while (!(piece_is_valid) && (cur_valid_piece < num_valid_pieces)) {
+					if (piece == valid_pieces[cur_valid_piece]) {
+						piece_is_valid = true;
+					} else {
+						cur_valid_piece++;
+					}
+				}
+				if (!(piece_is_valid)) {
+					in.close();
+					return -6;
+				}
+				/* Piece is valid, add it to the new board. */
+				new_board[cur_row][cur_column] = piece;
+			}
 		}
+		
+		/* Step 4. All previous steps were successful, so commit new board state. */
+		board = new_board;
+		white_is_next = new_white_is_next;
+		num_turns = new_num_turns;
 		
 		in.close();
 		return 0;
