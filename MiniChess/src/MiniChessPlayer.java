@@ -1,3 +1,7 @@
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.PrintStream;
+
 public class MiniChessPlayer {
 
 	/**
@@ -7,6 +11,6 @@ public class MiniChessPlayer {
 		// TODO Auto-generated method stub
 		State gamestate = new State(); 
 		gamestate.WriteBoard();
+		byte[] buffer;
 	}
-
 }

@@ -1,6 +1,6 @@
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintStream;
+import java.util.Scanner;
 
 /* Class:
  *   State
@@ -18,7 +18,6 @@ public class State {
 	private boolean white_wins;    // White won the game (True/False).
 	private boolean white_is_next; // It is White's turn to play (True/False).
 	private PrintStream out;
-	private InputStream in;
 	
 	/* Function:
 	 *   State()
@@ -27,7 +26,6 @@ public class State {
 	 */
 	public State() {
 		out = new PrintStream(System.out);
-		//in = new InputStream();
 		num_rows = 6;
 		num_columns = 5;
 		num_turns = 0;
@@ -97,17 +95,57 @@ public class State {
 	public int ReadBoard(InputStream new_state) {
 		if (new_state == null) {
 			return -1;
-		} else {
-			byte[] cur_byte = new byte[2];
-			try {
-				new_state.read(cur_byte);
-			} catch (IOException e) {
-				//e.printStackTrace();
-				return -2;
-			}
-			// Parse current turn number (if single digit, the second
-			// byte might be a ' ').
 		}
+		/* Initialize local variables */
+		Scanner in = new Scanner(new_state); // Input stream Scanner.
+		int new_num_turns;                   // New number of turns taken this game.
+		boolean new_white_is_next;           // New value for white_is_next (i.e. next to play).
+		String raw_input;                    // String for holding/parsing input.
+		char[][] new_board = new char[num_rows][num_columns];  // New board layout.
+		
+		/* Begin reading and parsing input */
+		
+		/* Step 1. Get new turn number. */
+		if (!(in.hasNextInt())) {
+			in.close();
+			return -2;
+		}
+		new_num_turns = in.nextInt();
+		/* Input validation: Check that num_turns <= max_turns. */
+		if (!(new_num_turns <= max_turns)) {
+			in.close();
+			return -3;
+		}
+		
+		/* Step 2. Get current player's turn. */
+		if (!(in.hasNextLine())) {
+			in.close();
+			return -4;
+		}
+		raw_input = in.nextLine();
+		if (raw_input.equalsIgnoreCase("W")) {
+			new_white_is_next = true;
+		} else if (raw_input.equalsIgnoreCase("B")) {
+			new_white_is_next = false;
+		} else {
+			in.close();
+			return -5;
+		}
+		
+		/* Step 3. Parse the layout of the board. */
+		for (int i = 0; i < num_rows; i++) {
+			if (!(in.hasNextLine())) {
+				in.close();
+				return -6;
+			}
+			raw_input = in.nextLine();
+			if (!(raw_input.length() == num_columns)) {
+				in.close();
+				return -6;
+			}
+		}
+		
+		in.close();
 		return 0;
 	}
 	
