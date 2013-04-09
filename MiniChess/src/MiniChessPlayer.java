@@ -13,7 +13,6 @@ public class MiniChessPlayer {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		// TODO Auto-generated method stub
 		State gamestate = new State();
 		
 		// Print board starting state.
@@ -24,7 +23,7 @@ public class MiniChessPlayer {
 
 		// Print ending starting state.
 		System.out.println("MiniChess board ending state:");
-		gamestate.WriteBoard();
+		gamestate.WriteBoard(null);
 
 	}
 	

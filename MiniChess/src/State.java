@@ -18,7 +18,6 @@ public class State {
 	private boolean game_over;     // Game is over (True/False).
 	private boolean white_wins;    // White won the game (True/False).
 	private boolean white_is_next; // It is White's turn to play (True/False).
-	private PrintStream out;
 	
 	/* Function:
 	 *   State()
@@ -26,7 +25,6 @@ public class State {
 	 *   Default constructor. Builds a fresh chess board for a new game.
 	 */
 	public State() {
-		out = new PrintStream(System.out);
 		num_rows = 6;
 		num_columns = 5;
 		num_turns = 0;
@@ -65,26 +63,6 @@ public class State {
 		board[5][2] = 'B';
 		board[5][3] = 'Q';
 		board[5][4] = 'K';
-	}
-	
-	/* Function:
-	 *   void ShowBoard()
-	 * Description:
-	 *   Prints the current layout of the board to stdout.
-	 */
-	public void ShowBoard() {
-		System.out.print(num_turns);
-		if (white_is_next) {
-			System.out.println(" W");
-		} else {
-			System.out.println(" B");
-		}
-		for (int i = 0; i < num_rows; i++) {
-			for (int j = 0; j < num_columns; j++) {
-				System.out.print(board[i][j]);
-			}
-			System.out.println();
-		}
 	}
 	
 	/* Function:
@@ -200,12 +178,16 @@ public class State {
 	}
 	
 	/* Function:
-	 *   String WriteBoard()
+	 *   void WriteBoard(PrintStream out)
 	 * Description:
 	 *   Writes a byte array representation of a chess board and the current
-	 *   game state to an OutputStream.
+	 *   game state to an OutputStream. If the PrintStream argument passed in is null,
+	 *   then it will print to stdout.
 	 */
-	public void WriteBoard() {
+	public void WriteBoard(PrintStream out) {
+		if (out == null) {
+			out = new PrintStream(System.out);
+		}
 		String str_num_turns = Integer.toString(num_turns);
 		char[] char_num_turns = str_num_turns.toCharArray();
 		for (int i = 0; i < char_num_turns.length; i++) {
@@ -226,4 +208,15 @@ public class State {
 		}
 		out.flush();
 	}
+	
+	/* Function:
+	 *   void WriteBoard()
+	 * Description:
+	 *   Overloaded function which calls WriteBoard(PrintStream out), passing it
+	 *   stdout.
+	 */
+	public void WriteBoard() {
+		WriteBoard(System.out);
+	}
+	
 }
