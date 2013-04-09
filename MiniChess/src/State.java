@@ -165,7 +165,7 @@ public class State {
 			int num_valid_pieces = valid_pieces.length;
 			
 			for (int cur_column = 0; cur_column < num_columns; cur_column++) {
-				char piece = new_row[cur_column];
+				char piece = Character.toUpperCase(new_row[cur_column]);
 				boolean piece_is_valid = false;
 				int cur_valid_piece = 0;
 				
