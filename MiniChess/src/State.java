@@ -167,7 +167,7 @@ public class State {
 			int num_valid_pieces = valid_pieces.length;
 			
 			for (int cur_column = 0; cur_column < num_columns; cur_column++) {
-				char piece = Character.toUpperCase(new_row[cur_column]);
+				char piece = new_row[cur_column];
 				boolean piece_is_valid = false;
 				int cur_valid_piece = 0;
 				
@@ -175,7 +175,7 @@ public class State {
 				 * iterate through the list of valid pieces and check if it is
 				 * one of them. */
 				while (!(piece_is_valid) && (cur_valid_piece < num_valid_pieces)) {
-					if (piece == valid_pieces[cur_valid_piece]) {
+					if (Character.toUpperCase(piece) == valid_pieces[cur_valid_piece]) {
 						piece_is_valid = true;
 					} else {
 						cur_valid_piece++;

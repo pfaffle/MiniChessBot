@@ -20,25 +20,12 @@ public class MiniChessPlayer {
 		System.out.println("MiniChess board starting state:");
 		gamestate.WriteBoard();
 
-		// Read new state.
-		/*Scanner in = new Scanner(System.in);
-		System.out.print("Enter turn # and current player turn: ");
-		String statusline = in.nextLine();
-		String[] board = new String[6];
-		for (int i = 0; i < 6; i++) {
-			System.out.print("Enter board row " + i + ":");
-			board[i] = in.nextLine();
-		}
-		
-		// Print board ending state.
-		System.out.println("MiniChess board ending state:");
-		System.out.println(statusline);
-		for (int i = 0; i < 6; i++) {
-			System.out.println(board[i]);
-		}
-		in.close(); */
 		test_ReadBoard(gamestate);
-		
+
+		// Print ending starting state.
+		System.out.println("MiniChess board ending state:");
+		gamestate.WriteBoard();
+
 	}
 	
 	public static void test_ReadBoard(State gamestate) {
@@ -147,6 +134,58 @@ public class MiniChessPlayer {
 			e.printStackTrace();
 		}
 		
+		System.out.print("Test 7: Not enough columns in some row.\nTest 7 Result: ");
+		test_file_path = ".\\tests\\board\\not_enough_columns.txt";
+		test_file = new File(test_file_path);
+		try {
+			test_stream = new FileInputStream(test_file);
+			retval = gamestate.ReadBoard(test_stream);
+			if (retval == -7) {
+				System.out.println("Passed.");
+			} else {
+				System.out.println("Failed! ReadBoard returned code: " + retval);
+			}
+			test_stream.close();
+		} catch (FileNotFoundException e) {
+			System.out.println("Failed to open test file " + test_file_path);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 		
+		System.out.print("Test 8: Invalid piece on the board.\nTest 8 Result: ");
+		test_file_path = ".\\tests\\board\\invalid_piece.txt";
+		test_file = new File(test_file_path);
+		try {
+			test_stream = new FileInputStream(test_file);
+			retval = gamestate.ReadBoard(test_stream);
+			if (retval == -8) {
+				System.out.println("Passed.");
+			} else {
+				System.out.println("Failed! ReadBoard returned code: " + retval);
+			}
+			test_stream.close();
+		} catch (FileNotFoundException e) {
+			System.out.println("Failed to open test file " + test_file_path);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
+		System.out.print("Test 9: Read valid board.\nTest 9 Result: ");
+		test_file_path = ".\\tests\\board\\valid_board.txt";
+		test_file = new File(test_file_path);
+		try {
+			test_stream = new FileInputStream(test_file);
+			retval = gamestate.ReadBoard(test_stream);
+			if (retval == -0) {
+				System.out.println("Passed.");
+			} else {
+				System.out.println("Failed! ReadBoard returned code: " + retval);
+			}
+			test_stream.close();
+		} catch (FileNotFoundException e) {
+			System.out.println("Failed to open test file " + test_file_path);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 }
