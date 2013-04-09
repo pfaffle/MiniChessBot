@@ -72,7 +72,6 @@ public class MiniChessPlayer {
 		} catch (FileNotFoundException e) {
 			System.out.println("Failed to open test file " + test_file_path);
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		
@@ -91,9 +90,63 @@ public class MiniChessPlayer {
 		} catch (FileNotFoundException e) {
 			System.out.println("Failed to open test file " + test_file_path);
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		
+		System.out.print("Test 4: Missing next player indicator.\nTest 4 Result: ");
+		test_file_path = ".\\tests\\board\\no_player_turn.txt";
+		test_file = new File(test_file_path);
+		try {
+			test_stream = new FileInputStream(test_file);
+			retval = gamestate.ReadBoard(test_stream);
+			if (retval == -4) {
+				System.out.println("Passed.");
+			} else {
+				System.out.println("Failed! ReadBoard returned code: " + retval);
+			}
+			test_stream.close();
+		} catch (FileNotFoundException e) {
+			System.out.println("Failed to open test file " + test_file_path);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
+		System.out.print("Test 5: Invalid next player indicator.\nTest 5 Result: ");
+		test_file_path = ".\\tests\\board\\invalid_player.txt";
+		test_file = new File(test_file_path);
+		try {
+			test_stream = new FileInputStream(test_file);
+			retval = gamestate.ReadBoard(test_stream);
+			if (retval == -5) {
+				System.out.println("Passed.");
+			} else {
+				System.out.println("Failed! ReadBoard returned code: " + retval);
+			}
+			test_stream.close();
+		} catch (FileNotFoundException e) {
+			System.out.println("Failed to open test file " + test_file_path);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
+		System.out.print("Test 6: Not enough rows on board.\nTest 6 Result: ");
+		test_file_path = ".\\tests\\board\\not_enough_rows.txt";
+		test_file = new File(test_file_path);
+		try {
+			test_stream = new FileInputStream(test_file);
+			retval = gamestate.ReadBoard(test_stream);
+			if (retval == -6) {
+				System.out.println("Passed.");
+			} else {
+				System.out.println("Failed! ReadBoard returned code: " + retval);
+			}
+			test_stream.close();
+		} catch (FileNotFoundException e) {
+			System.out.println("Failed to open test file " + test_file_path);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
 		
 	}
 }

@@ -1,6 +1,7 @@
 import java.io.InputStream;
 import java.io.PrintStream;
 import java.util.Scanner;
+import java.util.regex.Pattern;
 
 /* Class:
  *   State
@@ -129,14 +130,15 @@ public class State {
 		}
 		
 		/* Step 2. Get current player's turn. */
-		if (!(in.hasNextLine())) {
+		if (!(in.hasNext(Pattern.compile("\\w")))) {
 			in.close();
 			return -4;
 		}
 		raw_input = in.nextLine();
-		if (raw_input.equalsIgnoreCase("W")) {
+		/* Would be nice if this handled some arbitrary number of spaces. */
+		if (raw_input.equalsIgnoreCase(" W")) {
 			new_white_is_next = true;
-		} else if (raw_input.equalsIgnoreCase("B")) {
+		} else if (raw_input.equalsIgnoreCase(" B")) {
 			new_white_is_next = false;
 		} else {
 			in.close();
