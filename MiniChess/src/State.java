@@ -214,5 +214,14 @@ public class State {
 	public void WriteBoard() {
 		WriteBoard(System.out);
 	}
-	
+
+	/* Function:
+	 *   void MoveGen()
+	 * Description:
+	 *   Function which generates a list of all valid moves for the current
+	 *   board state.
+	 */
+	public void MoveGen() {
+		
+	}
 }
