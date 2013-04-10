@@ -2,10 +2,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.io.PrintStream;
-import java.util.Scanner;
 
 public class MiniChessPlayer {
 
@@ -27,6 +23,14 @@ public class MiniChessPlayer {
 
 	}
 	
+	/* Function:
+	 *   test_ReadBoard(State gamestate)
+	 * Description:
+	 *   Run a series of tests against the ReadBoard function, passing it
+	 *   differently constructed MiniChess boards that are invalid in different
+	 *   ways, to ensure that the function detects these errors and returns
+	 *   appropriate return codes. 
+	 */
 	public static void test_ReadBoard(State gamestate) {
 		int retval = 0;
 		String test_file_path;

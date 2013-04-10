@@ -15,8 +15,6 @@ public class State {
 	private int num_columns; // Number of columns in the chess board.
 	private int num_turns;   // Number of turns taken in the current game.
 	private int max_turns;   // Maximum number of turns allowed before game end.
-	private boolean game_over;     // Game is over (True/False).
-	private boolean white_wins;    // White won the game (True/False).
 	private boolean white_is_next; // It is White's turn to play (True/False).
 	
 	/* Function:
@@ -30,8 +28,6 @@ public class State {
 		num_turns = 0;
 		max_turns = 40;
 		white_is_next = true;
-		game_over = false;
-		white_wins = false;
 		board = new char[num_rows][num_columns];
 		
 		/* Initialize board */
@@ -182,7 +178,7 @@ public class State {
 	 * Description:
 	 *   Writes a byte array representation of a chess board and the current
 	 *   game state to an OutputStream. If the PrintStream argument passed in is null,
-	 *   then it will print to stdout.
+	 *   then it will print to standard out.
 	 */
 	public void WriteBoard(PrintStream out) {
 		if (out == null) {
@@ -213,7 +209,7 @@ public class State {
 	 *   void WriteBoard()
 	 * Description:
 	 *   Overloaded function which calls WriteBoard(PrintStream out), passing it
-	 *   stdout.
+	 *   standard out.
 	 */
 	public void WriteBoard() {
 		WriteBoard(System.out);
