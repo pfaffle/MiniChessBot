@@ -501,4 +501,61 @@ public class State {
 			return pieceIsValid(sq.x,sq.y);
 		}
 	}
+	
+	/* Function:
+	 *   boolean pieceIsOnMove(char ch)
+	 * Description:
+	 *   Returns true if the color of the piece given (i.e. the case) matches
+	 *   the color of the player who is next to move. Otherwise, returns false.
+	 */
+	private boolean pieceIsOnMove(char ch) {
+		if (ch == '.') {
+			return false;
+		} else if (Character.isLetter(ch)) {
+			if (Character.isUpperCase(ch) && white_is_next) {
+				return true;
+			} else if (Character.isLowerCase(ch) && !white_is_next) {
+				return true;
+			} else {
+				return false;
+			}
+		} else {
+			return false;
+		}
+	}
+	
+	/* Function:
+	 *   State executeMove(Move move)
+	 * Description:
+	 *   Verifies that the given move is valid to execute and then executes it,
+	 *   returning the new board state.
+	 */
+	public State executeMove(Move move) {
+		if (move == null) {
+			return null;
+		}
+		
+		/* Check that originating square has a valid piece in it. */
+		Square start_square = move.from_Square;
+		if (!pieceIsValid(start_square)) {
+			return null;
+		}
+		
+		/* Check that the piece in the originating square is on move. */
+		char piece = getPieceAtSquare(start_square);
+		if (!pieceIsOnMove(piece)) {
+			return null;
+		}
+		
+		/* Check that the piece in the originating square can move to the target location. */
+		Vector<Move> valid_moves = new Vector<Move>();
+		valid_moves = getMovesforPieceAtSquare(start_square);
+		if (!valid_moves.contains(move)) {
+			return null;
+		}
+		
+		/* Generate new state and return it. */
+		return null;
+		
+	}
 }
