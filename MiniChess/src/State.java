@@ -17,6 +17,9 @@ public class State implements Cloneable {
 	private int num_turns;   // Number of turns taken in the current game.
 	private int max_turns;   // Maximum number of turns allowed before game end.
 	private boolean white_is_next; // It is White's turn to play (True/False).
+	private boolean game_is_over;
+	private boolean white_wins;
+	private boolean black_wins;
 	
 	/* Function:
 	 *   State()
@@ -29,6 +32,9 @@ public class State implements Cloneable {
 		num_turns = 0;
 		max_turns = 80;
 		white_is_next = true;
+		game_is_over = false;
+		white_wins = false;
+		black_wins = false;
 		board = new char[num_columns][num_rows];
 		
 		/* Initialize board
@@ -562,7 +568,7 @@ public class State implements Cloneable {
 			throw new Exception("Move not allowed for given piece.");
 		}
 		
-		/* Generate new state and return it. */
+		/* Generate new state to return. */
 		int from_x = move.from_Square.x;
 		int from_y = move.from_Square.y;
 		int to_x = move.to_Square.x;
@@ -574,6 +580,26 @@ public class State implements Cloneable {
 		new_gamestate.num_turns += 1;
 		new_gamestate.white_is_next = !new_gamestate.white_is_next;
 		
+		/* Check for victory/draw. */
+		/* Draw condition: Too many moves. */ 
+		if (new_gamestate.num_turns > new_gamestate.max_turns) {
+			new_gamestate.game_is_over = true;
+			new_gamestate.white_wins = false;
+			new_gamestate.black_wins = false;
+		}
+		
+		/* Victory condition: Captured opposing king. */
+		char tgt_piece = this.board[to_x][to_y]; 
+		if (tgt_piece == 'k') {
+			new_gamestate.game_is_over = true;
+			new_gamestate.white_wins = true;
+			new_gamestate.black_wins = false;
+		} else if (tgt_piece == 'K') {
+			new_gamestate.game_is_over = true;
+			new_gamestate.white_wins = false;
+			new_gamestate.black_wins = true;
+		}
+
 		return new_gamestate;
 	}
 	
@@ -654,6 +680,9 @@ public class State implements Cloneable {
 		newState.num_turns = this.num_turns;
 		newState.max_turns = this.max_turns;
 		newState.white_is_next = this.white_is_next;
+		newState.game_is_over = this.game_is_over;
+		newState.white_wins = this.white_wins;
+		newState.black_wins = this.black_wins;
 		newState.board = new char[newState.num_columns][newState.num_rows];
 		
 		for (int i = 0; i < num_columns; i++) {
@@ -671,27 +700,26 @@ public class State implements Cloneable {
 	 *   Returns true if one of the game's victory conditions has been met.
 	 */
 	public boolean GameOver() {
-		if (num_turns > max_turns) {
-			return true;
-		}
-		boolean white_king = false;
-		boolean black_king = false;
-		
-		/* This algorithm could be better... */
-		for (int i = 0; i < num_columns; i++) {
-			for (int j = 0; j < num_rows; j++) {
-				if (board[i][j] == 'k') {
-					black_king = true;
-				} else if (board[i][j] == 'K') {
-					white_king = true;
-				}
-			}
-		}
-		if (!white_king || !black_king) {
-			return true;
-		} else {
-			return false;
-		}
+		return game_is_over;
 		/* Also need to scan for if there are any valid moves to be made by the current player. */
 	}
+	
+	/* Function:
+	 *   WhiteWins()
+	 * Description:
+	 *   Returns true if white is the winner.
+	 */
+	public boolean WhiteWins() {
+		return white_wins;
+	}
+	
+	/* Function:
+	 *   BlackWins()
+	 * Description:
+	 *   Returns true if black is the winner.
+	 */
+	public boolean BlackWins() {
+		return black_wins;
+	}
+	
 }

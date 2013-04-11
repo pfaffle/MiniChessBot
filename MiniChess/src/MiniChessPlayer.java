@@ -27,6 +27,14 @@ public class MiniChessPlayer {
 			gamestate.WriteBoard();
 		}
 		System.out.println("Game over!");
+		if (gamestate.WhiteWins()) {
+			System.out.println("White wins!");
+		} else if (gamestate.BlackWins()) {
+			System.out.println("Black wins!");
+		} else {
+			System.out.println("Game is a draw.");
+		}
+		scan.close();
 	}
 	
 	/* Function:
