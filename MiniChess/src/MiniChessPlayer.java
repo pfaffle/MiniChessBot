@@ -22,7 +22,7 @@ public class MiniChessPlayer {
 		System.out.println("MiniChess board ending state:");
 		gamestate.WriteBoard(null);
 		
-		test_MoveScan(gamestate);
+		//test_MoveScan(gamestate);
 		
 	}
 	

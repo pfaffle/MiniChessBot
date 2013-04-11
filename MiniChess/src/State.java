@@ -122,7 +122,7 @@ public class State {
 		
 		/* Step 3. Parse the layout of the board. */
 		char[] new_row = new char[num_columns];
-		for (int cur_row = 0; cur_row < num_rows; cur_row++) {
+		for (int cur_row = num_rows - 1; cur_row >= 0; cur_row--) {
 			if (!(in.hasNextLine())) {
 				in.close();
 				return -6;
@@ -197,7 +197,7 @@ public class State {
 			out.write('B');
 		}
 		out.write('\n');
-		for (int i = 0; i < num_rows; i++) {
+		for (int i = num_rows - 1; i >= 0; i--) {
 			for (int j = 0; j < num_columns; j++) {
 				out.write(board[i][j]);
 			}
