@@ -205,9 +205,9 @@ public class MiniChessPlayer {
 	}
 	
 	public static void test_getMovesForPieceAtIndex(State gamestate) {
-		int x = 1;
-		int y = 2;
-		System.out.println("Test 1: Scanning for moves from the bishop in square " + x + "," + y);
+		int x = 0;
+		int y = 1;
+		System.out.println("Test 1: Scanning for moves from the knight in square " + x + "," + y);
 		Vector<Move> valid_bpawn_moves = gamestate.getMovesForPieceAtIndex(x,y);
 		if (valid_bpawn_moves == null) {
 			System.out.println("Failed: MoveScan returned null.");

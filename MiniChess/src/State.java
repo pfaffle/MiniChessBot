@@ -388,6 +388,18 @@ public class State {
 			}
 			break;
 		case 'N':
+			allow_capture = true;
+			one_hop = true;
+			for (dx = -1; dx <= 1; dx += 2) {
+				for (dy = -2; dy <= 2; dy += 4) {
+					moves.addAll(MoveScan(sq,dx,dy,allow_capture,one_hop));
+				}
+			}
+			for (dx = -2; dx <= 2; dx += 4) {
+				for (dy = -1; dy <= 1; dy += 2) {
+					moves.addAll(MoveScan(sq,dx,dy,allow_capture,one_hop));
+				}
+			}
 			break;
 		case 'P':
 			break;
