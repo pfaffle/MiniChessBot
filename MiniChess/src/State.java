@@ -31,7 +31,7 @@ public class State implements Cloneable {
 		num_rows = 6;
 		num_columns = 5;
 		num_turns = 0;
-		max_turns = 80;
+		max_turns = 40;
 		white_is_next = true;
 		game_is_over = false;
 		white_wins = false;
@@ -601,6 +601,14 @@ public class State implements Cloneable {
 			new_gamestate.black_wins = false;
 		}
 		
+		/* Victory condition: Current side has no valid moves. */
+		Vector<Move> possible_moves = new_gamestate.findAllValidMoves();
+		if (possible_moves.size() == 0) {
+			new_gamestate.game_is_over = true;
+			new_gamestate.white_wins = !new_gamestate.white_is_next;
+			new_gamestate.black_wins = new_gamestate.white_is_next;
+		}
+		
 		/* Victory condition: Captured opposing king. */
 		if (tgt_piece == 'k') {
 			new_gamestate.game_is_over = true;
@@ -611,7 +619,7 @@ public class State implements Cloneable {
 			new_gamestate.white_wins = false;
 			new_gamestate.black_wins = true;
 		}
-
+		
 		return new_gamestate;
 	}
 	
@@ -744,6 +752,23 @@ public class State implements Cloneable {
 			throw new Exception("Game is over.");
 		}
 		
+		Vector<Move> possible_moves = findAllValidMoves();
+		
+		/* Select a random move to execute. */
+		Random generator = new Random();
+		int randomIndex = generator.nextInt(possible_moves.size());
+		Move selected_move = possible_moves.elementAt(randomIndex);
+		
+		return executeMove(selected_move);
+	}
+	
+	/* Function:
+	 *   Vector<Move> findAllValidMoves()
+	 * Description:
+	 *   Searches for and finds all valid moves for the player on move.
+	 */
+	private Vector<Move> findAllValidMoves() {
+		
 		/* Scan the board for all the pieces belonging to the player that is on move. */
 		Vector<Square> occupied_squares = new Vector<Square>();
 		for (int i = 0; i < num_rows; i++) {
@@ -766,14 +791,8 @@ public class State implements Cloneable {
 			possible_moves.addAll(getMovesForPieceAtSquare(occupied_squares.elementAt(i)));
 		}
 		
-		/* Select a random move to execute. */
-		Random generator = new Random();
-		int randomIndex = generator.nextInt(possible_moves.size());
-		Move selected_move = possible_moves.elementAt(randomIndex);
-		
-		return executeMove(selected_move);
+		return possible_moves;
 	}
-	
 
 	/* Function:
 	 *   WhiteOnMove()
