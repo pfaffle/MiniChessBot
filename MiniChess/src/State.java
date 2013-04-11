@@ -241,21 +241,13 @@ public class State {
 	 *    Vector<Move> : A Vector object containing all valid Moves that the piece in the given
 	 *                   Square can make in the given direction.
 	 */
-	public Vector<Move> MoveScan(Square init_position, int dx, int dy, boolean allow_capture, boolean one_hop) {
+	public Vector<Move> MoveScan(Square init_position, int dx, int dy, boolean allow_capture, boolean one_hop) { 
+		if (!pieceIsValid(init_position)) {
+			return null;
+		}
+		
 		int x = init_position.x;
-		int y = init_position.y;
-		
-		/* Ensure that the square we're checking actually exists and has a piece in it. */ 
-		if (x >= num_columns || x < 0) {
-			return null;
-		}
-		if (y >= num_rows || y < 0) {
-			return null;
-		}
-		if (!(Character.isLetter(board[x][y]))) {
-			return null;
-		}
-		
+		int y = init_position.y;		
 		boolean piece_is_white = Character.isUpperCase(board[x][y]);
 		boolean more_moves = true;
 		Vector<Move> valid_moves = new Vector<Move>(6);
@@ -295,7 +287,7 @@ public class State {
 	 *   char getPieceAtIndex(int x, int y)
 	 * Description:
 	 *   Function which returns the character representation of the piece at the
-	 *   given coordinates.
+	 *   given coordinates. Mostly for debugging purposes.
 	 */
 	public char getPieceAtIndex(int x, int y) {
 		return board[x][y];
@@ -305,7 +297,7 @@ public class State {
 	 *   char getPieceAtSquare(Square sq)
 	 * Description:
 	 *   Function which returns the character representation of the piece at the
-	 *   given Square.
+	 *   given Square. Mostly for debugging purposes.
 	 */
 	public char getPieceAtSquare(Square sq) {
 		return board[sq.x][sq.y];
@@ -318,6 +310,9 @@ public class State {
 	 *   given coordinates.
 	 */
 	public Vector<Move> getMovesForPieceAtIndex(int x, int y) {
+		if (!pieceIsValid(x,y)) {
+			return null;
+		}
 		return null;
 	}
 	
@@ -332,6 +327,38 @@ public class State {
 			return null;
 		} else {
 			return getMovesForPieceAtIndex(sq.x, sq.y);
+		}
+	}
+	
+	/* Function:
+	 *   pieceIsValid(int x, int y)
+	 * Description:
+	 *   Ensures that there is a valid piece at the given coordinates.
+	 */
+	private boolean pieceIsValid(int x, int y) {
+		/* Ensure that the square we're checking actually exists and has a piece in it. */ 
+		if (x >= num_columns || x < 0) {
+			return false;
+		}
+		if (y >= num_rows || y < 0) {
+			return false;
+		}
+		if (!(Character.isLetter(board[x][y]))) {
+			return false;
+		}
+		return true;
+	}
+	
+	/* Function:
+	 *   pieceIsValid(Square sq)
+	 * Description:
+	 *   Ensures that there is a valid piece at the given Square.
+	 */
+	private boolean pieceIsValid(Square sq) {
+		if (sq == null) {
+			return false;
+		} else {
+			return pieceIsValid(sq.x,sq.y);
 		}
 	}
 }
