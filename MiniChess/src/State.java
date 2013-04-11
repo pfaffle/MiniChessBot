@@ -255,7 +255,7 @@ public class State {
 		/* Begin scanning in the given direction for valid moves. */
 		x += dx;
 		y += dy;
-		while (x < num_columns && y < num_rows && more_moves) {
+		while (x < num_columns && x >= 0 && y < num_rows && y >= 0 && more_moves) {
 			char cur_square = board[x][y];
 			if (cur_square == '.') {
 				/* If nothing is in the target square, it's a valid place to move so add it. */
@@ -313,7 +313,44 @@ public class State {
 		if (!pieceIsValid(x,y)) {
 			return null;
 		}
-		return null;
+		
+		int dx;
+		int dy;
+		boolean allow_capture;
+		boolean one_hop;
+		Square sq = new Square(x,y);
+		Vector<Move> moves = new Vector<Move>(6,6);
+		
+		char piece = Character.toUpperCase(board[x][y]);
+		switch(piece) {
+		
+		case 'K':
+			allow_capture = true;
+			one_hop = true;
+			for (dx = -1; dx <= 1; dx++) {
+				for (dy = -1; dy <= 1; dy++) {
+					if (!(dx == 0 && dy == 0)) {
+						moves.addAll(MoveScan(sq,dx,dy,allow_capture,one_hop));
+					}
+				}
+			}
+			break;
+		case 'Q':
+			break;
+		case 'R':
+			break;
+		case 'B':
+			break;
+		case 'N':
+			break;
+		case 'P':
+			break;
+		default:
+			/* Unknown error? */
+			break;
+			
+		}
+		return moves;
 	}
 	
 	/* Function:
