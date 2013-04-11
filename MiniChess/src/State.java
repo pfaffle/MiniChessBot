@@ -1,6 +1,7 @@
 import java.io.InputStream;
 import java.io.PrintStream;
 import java.util.Scanner;
+import java.util.Vector;
 import java.util.regex.Pattern;
 
 /* Class:
@@ -216,12 +217,46 @@ public class State {
 	}
 
 	/* Function:
-	 *   void MoveGen()
+	 *   Move[] MoveScan()
 	 * Description:
-	 *   Function which generates a list of all valid moves for the current
-	 *   board state.
+	 *   Function which generates a list of valid moves for a particular piece in
+	 *   a particular direction.
 	 */
-	public void MoveGen() {
+	public Vector<Move> MoveScan(Square init_position, int dx, int dy, boolean allow_capture) {
+		int x = init_position.x;
+		int y = init_position.y;
+		boolean piece_is_white = Character.isUpperCase(board[x][y]);
+		boolean more_moves = true;
+		Vector<Move> valid_moves = new Vector<Move>(6);
 		
+		/* Ensure that the square we're checking actually has a piece in it. */ 
+		if (!(Character.isLetter(board[x][y]))) {
+			return null;
+		}
+		
+		/* Begin scanning in the given direction for valid moves. */
+		x += dx;
+		y += dy;
+		while (x < num_columns && y < num_rows && more_moves) {
+			char cur_square = board[x][y];
+			if (cur_square == '.') {
+				/* If nothing is in the target square, it's a valid place to move so add it. */
+				valid_moves.add(new Move(init_position,new Square(x,y)));
+				x += dx;
+				y += dy;
+			} else {
+				/* If there is another piece in the square, we can only move there if
+				 * we are allowed to capture it. */
+				boolean target_is_white = Character.isUpperCase(cur_square);
+				if (piece_is_white != target_is_white) {
+					if (allow_capture) {
+						valid_moves.add(new Move(init_position,new Square(x,y)));
+					}
+				}
+				more_moves = false;
+			}
+		}
+		
+		return valid_moves;
 	}
 }

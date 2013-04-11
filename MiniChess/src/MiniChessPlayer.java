@@ -2,6 +2,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.Vector;
 
 public class MiniChessPlayer {
 
@@ -20,7 +21,19 @@ public class MiniChessPlayer {
 		// Print ending starting state.
 		System.out.println("MiniChess board ending state:");
 		gamestate.WriteBoard(null);
-
+		
+		int x = 4;
+		int y = 4;
+		System.out.println("Scanning for pieces from the pawn in square " + x + "," + y);
+		Vector<Move> valid_bpawn_moves = gamestate.MoveScan(new Square(x,y),-1,0,false);
+		if (valid_bpawn_moves == null) {
+			System.out.println("Error: No piece in that space.");
+		} else { 
+			for (int i = 0; i < valid_bpawn_moves.size(); i++) {
+				System.out.println(valid_bpawn_moves.elementAt(i));
+			}
+		}
+		
 	}
 	
 	/* Function:
