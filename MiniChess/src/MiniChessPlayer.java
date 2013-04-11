@@ -204,9 +204,9 @@ public class MiniChessPlayer {
 		int dx = 0;
 		int dy = -1;
 		boolean allow_capture = false;
-		
+		boolean one_hop = false;
 		System.out.println("Test 1: Scanning for moves from the pawn in square " + x + "," + y);
-		Vector<Move> valid_bpawn_moves = gamestate.MoveScan(new Square(x,y),dx,dy,allow_capture);
+		Vector<Move> valid_bpawn_moves = gamestate.MoveScan(new Square(x,y),dx,dy,allow_capture,one_hop);
 		if (valid_bpawn_moves == null) {
 			System.out.println("Failed: MoveScan returned null.");
 		} else { 
@@ -220,8 +220,9 @@ public class MiniChessPlayer {
 		dx = 1;
 		dy = -1;
 		allow_capture = true;
+		one_hop = true;
 		System.out.println("Test 2: Scanning for moves from the king in square " + x + "," + y);
-		Vector<Move> valid_bking_moves = gamestate.MoveScan(new Square(x,y),dx,dy,allow_capture);
+		Vector<Move> valid_bking_moves = gamestate.MoveScan(new Square(x,y),dx,dy,allow_capture,one_hop);
 		if (valid_bking_moves == null) {
 			System.out.println("Failed: MoveScan returned null.");
 		} else { 

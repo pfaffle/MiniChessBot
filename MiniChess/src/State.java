@@ -220,7 +220,7 @@ public class State {
 	}
 
 	/* Function:
-	 *   Vector<Move> MoveScan(Square init_position, int dx, int dy, boolean allow_capture)
+	 *   Vector<Move> MoveScan(Square init_position, int dx, int dy, boolean allow_capture, int max_hops)
 	 * Description:
 	 *   Function which generates a list of valid moves for a particular piece in
 	 *   a particular direction.
@@ -233,13 +233,15 @@ public class State {
 	 *                   the y axis.
 	 *   allow_capture : A boolean value which indicates if we want to consider possible captures
 	 *                   by the piece in the given direction.
+	 *         one_hop : Only get moves one hop in the given direction.
+	 * 
 	 * Return values:
 	 *            null : If the given square has no piece on it (represented by a '.'), or is
 	 *                   not on the board, there are no valid moves and the function returns null.
 	 *    Vector<Move> : A Vector object containing all valid Moves that the piece in the given
 	 *                   Square can make in the given direction.
 	 */
-	public Vector<Move> MoveScan(Square init_position, int dx, int dy, boolean allow_capture) {
+	public Vector<Move> MoveScan(Square init_position, int dx, int dy, boolean allow_capture, boolean one_hop) {
 		int x = init_position.x;
 		int y = init_position.y;
 		
@@ -257,8 +259,6 @@ public class State {
 		boolean piece_is_white = Character.isUpperCase(board[x][y]);
 		boolean more_moves = true;
 		Vector<Move> valid_moves = new Vector<Move>(6);
-		
-		
 		
 		/* Begin scanning in the given direction for valid moves. */
 		x += dx;
@@ -279,6 +279,11 @@ public class State {
 						valid_moves.add(new Move(init_position,new Square(x,y)));
 					}
 				}
+				more_moves = false;
+			}
+			/* If this is a piece which only moves one hop per turn, stop after the
+			 * first iteration. */
+			if (one_hop) {
 				more_moves = false;
 			}
 		}
