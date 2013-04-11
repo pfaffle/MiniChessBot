@@ -22,17 +22,7 @@ public class MiniChessPlayer {
 		System.out.println("MiniChess board ending state:");
 		gamestate.WriteBoard(null);
 		
-		int x = 4;
-		int y = 4;
-		System.out.println("Scanning for pieces from the pawn in square " + x + "," + y);
-		Vector<Move> valid_bpawn_moves = gamestate.MoveScan(new Square(x,y),-1,0,false);
-		if (valid_bpawn_moves == null) {
-			System.out.println("Error: No piece in that space.");
-		} else { 
-			for (int i = 0; i < valid_bpawn_moves.size(); i++) {
-				System.out.println(valid_bpawn_moves.elementAt(i));
-			}
-		}
+		test_MoveScan(gamestate);
 		
 	}
 	
@@ -202,6 +192,39 @@ public class MiniChessPlayer {
 			System.out.println("Failed to open test file " + test_file_path);
 		} catch (IOException e) {
 			e.printStackTrace();
+		}
+	}
+	
+	public static void test_MoveScan(State gamestate) {
+		int x = 4;
+		int y = 4;
+		int dx = -1;
+		int dy = 0;
+		boolean allow_capture = false;
+		
+		System.out.println("Test 1: Scanning for pieces from the pawn in square " + x + "," + y);
+		Vector<Move> valid_bpawn_moves = gamestate.MoveScan(new Square(x,y),dx,dy,allow_capture);
+		if (valid_bpawn_moves == null) {
+			System.out.println("Failed: MoveScan returned null.");
+		} else { 
+			for (int i = 0; i < valid_bpawn_moves.size(); i++) {
+				System.out.println(valid_bpawn_moves.elementAt(i));
+			}
+		}
+		
+		x = 0;
+		y = 5;
+		dx = 1;
+		dy = -1;
+		allow_capture = true;
+		System.out.println("Test 2: Scanning for pieces from the king in square " + x + "," + y);
+		Vector<Move> valid_bking_moves = gamestate.MoveScan(new Square(x,y),dx,dy,allow_capture);
+		if (valid_bking_moves == null) {
+			System.out.println("Failed: MoveScan returned null.");
+		} else { 
+			for (int i = 0; i < valid_bking_moves.size(); i++) {
+				System.out.println(valid_bking_moves.elementAt(i));
+			}
 		}
 	}
 }

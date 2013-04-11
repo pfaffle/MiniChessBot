@@ -32,34 +32,34 @@ public class State {
 		board = new char[num_rows][num_columns];
 		
 		/* Initialize board */
-		/*	  0
-			0 kqbnr
+		/*	      4
+			  kqbnr 5
 			  ppppp
 			  .....
 			  .....
 			  PPPPP
-			  RNBQK 5
-		 	      4  */
-		board[0][0] = 'k';
-		board[0][1] = 'q';
-		board[0][2] = 'b';
-		board[0][3] = 'n';
-		board[0][4] = 'r';
+			0 RNBQK
+		 	  0      */
+		board[0][0] = 'R';
+		board[0][1] = 'N';
+		board[0][2] = 'B';
+		board[0][3] = 'Q';
+		board[0][4] = 'K';
 		for (int i = 0; i < num_columns; i++) {
-			board[1][i] = 'p';
+			board[1][i] = 'P';
 		}
 		for (int i = 0; i < num_columns; i++) {
 			board[2][i] = '.';
 			board[3][i] = '.';
 		}
 		for (int i = 0; i < num_columns; i++) {
-			board[4][i] = 'P';
+			board[4][i] = 'p';
 		}
-		board[5][0] = 'R';
-		board[5][1] = 'N';
-		board[5][2] = 'B';
-		board[5][3] = 'Q';
-		board[5][4] = 'K';
+		board[5][0] = 'k';
+		board[5][1] = 'q';
+		board[5][2] = 'b';
+		board[5][3] = 'n';
+		board[5][4] = 'r';
 	}
 	
 	/* Function:
@@ -231,22 +231,25 @@ public class State {
 	 *   allow_capture : A boolean value which indicates if we want to consider possible captures
 	 *                   by the piece in the given direction.
 	 * Return values:
-	 *            null : If the given square has no piece on it (represented by a '.'), there are
-	 *                   no valid moves and the function returns null.
+	 *            null : If the given square has no piece on it (represented by a '.'), or is
+	 *                   not on the board, there are no valid moves and the function returns null.
 	 *    Vector<Move> : A Vector object containing all valid Moves that the piece in the given
 	 *                   Square can make in the given direction.
 	 */
 	public Vector<Move> MoveScan(Square init_position, int dx, int dy, boolean allow_capture) {
 		int x = init_position.x;
 		int y = init_position.y;
+		
+		/* Ensure that the square we're checking actually exists and has a piece in it. */ 
+		if (x >= num_columns || y >= num_rows || !(Character.isLetter(board[x][y]))) {
+			return null;
+		}
+		
 		boolean piece_is_white = Character.isUpperCase(board[x][y]);
 		boolean more_moves = true;
 		Vector<Move> valid_moves = new Vector<Move>(6);
 		
-		/* Ensure that the square we're checking actually has a piece in it. */ 
-		if (!(Character.isLetter(board[x][y]))) {
-			return null;
-		}
+		
 		
 		/* Begin scanning in the given direction for valid moves. */
 		x += dx;
