@@ -10,7 +10,7 @@ import java.util.regex.Pattern;
  *   Tracks the current state of the chess board, what turn it is and who is next
  *   to play. Also decides when there is a winner and who it is.
  */
-public class State {
+public class State implements Cloneable {
 	private char[][] board;  // Array grid representation of the chess board.
 	private int num_rows;    // Number of rows in the chess board.
 	private int num_columns; // Number of columns in the chess board.
@@ -555,7 +555,30 @@ public class State {
 		}
 		
 		/* Generate new state and return it. */
-		return null;
+		State new_gamestate = this.clone(); 
+		return new_gamestate;	
 		
+	}
+	
+	/* Function:
+	 * (non-Javadoc)
+	 * @see java.lang.Object#clone()
+	 */
+	public State clone() {
+		State newState = new State();
+		newState.num_rows = this.num_rows;
+		newState.num_columns = this.num_columns;
+		newState.num_turns = this.num_turns;
+		newState.max_turns = this.max_turns;
+		newState.white_is_next = this.white_is_next;
+		newState.board = new char[newState.num_columns][newState.num_rows];
+		
+		for (int i = 0; i < num_columns; i++) {
+			for (int j = 0; j < num_rows; j++) {
+				newState.board[i][j] = this.board[i][j];
+			}
+		}
+		
+		return newState;
 	}
 }

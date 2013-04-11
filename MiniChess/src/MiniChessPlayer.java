@@ -16,7 +16,7 @@ public class MiniChessPlayer {
 		System.out.println("MiniChess board starting state:");
 		gamestate.WriteBoard();
 
-		test_ReadBoard(gamestate);
+		//test_ReadBoard(gamestate);
 		
 		String test_file_path = ".\\tests\\board\\piece_moves.txt";
 		File test_file = new File(test_file_path);
@@ -31,8 +31,12 @@ public class MiniChessPlayer {
 		// Print ending starting state.
 		System.out.println("MiniChess board ending state:");
 		gamestate.WriteBoard(null);
+		State newGameState = gamestate.clone();
+		System.out.println("MiniChess board state post-cloning:");
+		newGameState.WriteBoard(null);
 		
-		test_getMovesForPieceAtIndex(gamestate);		
+		
+		//test_getMovesForPieceAtIndex(gamestate);		
 	}
 	
 	/* Function:
@@ -216,6 +220,7 @@ public class MiniChessPlayer {
 				System.out.println(valid_bpawn_moves.elementAt(i));
 			}
 		}
+		//gamestate.executeMove(valid_bpawn_moves.elementAt(0));
 		
 		x = 4;
 		y = 4;
