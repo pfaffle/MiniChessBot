@@ -11,39 +11,10 @@ public class MiniChessPlayer {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		State gamestate = new State();
-		Scanner scan = new Scanner(System.in);
+
+		//play_randomVsHuman();
+		play_randomVsRandom();
 		
-		gamestate.WriteBoard();
-		// Play the game.
-		while (!gamestate.GameOver()) {
-			if (gamestate.WhiteOnMove()) {
-				System.out.print("Please enter a move in the form A1-B2: ");
-				String in = scan.nextLine();
-				try {
-					gamestate = gamestate.humanMove(in);
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			} else {
-				System.out.println("Black moves...");
-				try {
-					gamestate = gamestate.randomMove();
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			}
-			gamestate.WriteBoard();
-		}
-		System.out.println("Game over!");
-		if (gamestate.WhiteWins()) {
-			System.out.println("White wins!");
-		} else if (gamestate.BlackWins()) {
-			System.out.println("Black wins!");
-		} else {
-			System.out.println("Game is a draw.");
-		}
-		scan.close();
 	}
 	
 	/* Function:
@@ -239,6 +210,73 @@ public class MiniChessPlayer {
 			for (int i = 0; i < valid_bking_moves.size(); i++) {
 				System.out.println(valid_bking_moves.elementAt(i));
 			}
+		}
+	}
+	
+	public static void play_randomVsHuman() {
+		State gamestate = new State();
+		Scanner scan = new Scanner(System.in);
+		gamestate.WriteBoard();
+		// Play the game.
+		while (!gamestate.GameOver()) {
+			if (gamestate.WhiteOnMove()) {
+				System.out.print("Please enter a move in the form A1-B2: ");
+				String in = scan.nextLine();
+				try {
+					gamestate = gamestate.humanMove(in);
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			} else {
+				System.out.println("Black moves...");
+				try {
+					gamestate = gamestate.randomMove();
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+			gamestate.WriteBoard();
+		}
+		System.out.println("Game over!");
+		if (gamestate.WhiteWins()) {
+			System.out.println("White wins!");
+		} else if (gamestate.BlackWins()) {
+			System.out.println("Black wins!");
+		} else {
+			System.out.println("Game is a draw.");
+		}
+		scan.close();
+	}
+	
+	public static void play_randomVsRandom() {
+		State gamestate = new State();
+		gamestate.WriteBoard();
+		// Play the game.
+		while (!gamestate.GameOver()) {
+			if (gamestate.WhiteOnMove()) {
+				System.out.println("White moves...");
+				try {
+					gamestate = gamestate.randomMove();
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			} else {
+				System.out.println("Black moves...");
+				try {
+					gamestate = gamestate.randomMove();
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+			gamestate.WriteBoard();
+		}
+		System.out.println("Game over!");
+		if (gamestate.WhiteWins()) {
+			System.out.println("White wins!");
+		} else if (gamestate.BlackWins()) {
+			System.out.println("Black wins!");
+		} else {
+			System.out.println("Game is a draw.");
 		}
 	}
 }
