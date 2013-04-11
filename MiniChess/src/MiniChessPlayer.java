@@ -3,6 +3,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Vector;
+import java.util.Scanner;
 
 public class MiniChessPlayer {
 
@@ -11,27 +12,21 @@ public class MiniChessPlayer {
 	 */
 	public static void main(String[] args) {
 		State gamestate = new State();
+		Scanner scan = new Scanner(System.in);
 		
 		// Print board starting state.
 		System.out.println("MiniChess board starting state:");
 		gamestate.WriteBoard();
 
 		// Do some test moves.
-		Move newMove = new Move(new Square(3,1),new Square(3,2));
+		System.out.print("Please enter a move in the form A1-B2: ");
+		String in = scan.nextLine();
 		try {
-			gamestate = gamestate.executeMove(newMove);
+			gamestate = gamestate.humanMove(in);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		gamestate.WriteBoard();
-		
-		newMove = new Move(new Square(3,4),new Square(3,3));
-		try {
-			gamestate = gamestate.executeMove(newMove);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		
+
 		// Print ending starting state.
 		System.out.println("MiniChess board ending state:");
 		gamestate.WriteBoard(null);

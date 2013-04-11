@@ -578,6 +578,73 @@ public class State implements Cloneable {
 	}
 	
 	/* Function:
+	 *   humanMove(String move)
+	 * Description:
+	 *   Takes a String in the form "a0-b1" and attempts to execute it as a move.
+	 *   Columns (x) are parsed as A-E (0-4), and rows (y) are parsed as 0-5.
+	 */
+	public State humanMove(String rawmove) throws Exception {
+		if (rawmove == null) {
+			throw new Exception("Invalid Move.");
+		}
+		if (!rawmove.matches("\\w\\d-\\w\\d")) {
+			throw new Exception("Improperly formatted move.");
+		}
+		String[] move = rawmove.split("-");
+		
+		String fromCol = move[0].substring(0,1).toUpperCase();
+		String toCol = move[1].substring(0,1).toUpperCase();
+		
+		int from_x;
+		int to_x;
+		int from_y = Integer.parseInt(move[0].substring(1,2));
+		int to_y = Integer.parseInt(move[1].substring(1,2));
+		
+		switch(fromCol) {
+		case "A":
+			from_x = 0;
+			break;
+		case "B":
+			from_x = 1;
+			break;
+		case "C":
+			from_x = 2;
+			break;
+		case "D":
+			from_x = 3;
+			break;
+		case "E":
+			from_x = 4;
+			break;
+		default:
+			throw new Exception("Failed to parse column letter.");
+		}
+		
+		switch(toCol) {
+		case "A":
+			to_x = 0;
+			break;
+		case "B":
+			to_x = 1;
+			break;
+		case "C":
+			to_x = 2;
+			break;
+		case "D":
+			to_x = 3;
+			break;
+		case "E":
+			to_x = 4;
+			break;
+		default:
+			throw new Exception("Failed to parse row letter.");
+		}
+		Move humansMove = new Move(new Square(from_x, from_y), new Square(to_x, to_y));
+		System.out.println("Moving" + humansMove);
+		return executeMove(humansMove);
+	}
+	
+	/* Function:
 	 * (non-Javadoc)
 	 * @see java.lang.Object#clone()
 	 */
