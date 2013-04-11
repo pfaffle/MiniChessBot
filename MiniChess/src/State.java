@@ -291,10 +291,47 @@ public class State {
 		return valid_moves;
 	}
 	
+	/* Function:
+	 *   char getPieceAtIndex(int x, int y)
+	 * Description:
+	 *   Function which returns the character representation of the piece at the
+	 *   given coordinates.
+	 */
 	public char getPieceAtIndex(int x, int y) {
 		return board[x][y];
 	}
+	
+	/* Function:
+	 *   char getPieceAtSquare(Square sq)
+	 * Description:
+	 *   Function which returns the character representation of the piece at the
+	 *   given Square.
+	 */
 	public char getPieceAtSquare(Square sq) {
 		return board[sq.x][sq.y];
+	}
+	
+	/* Function:
+	 *   Vector<Move> getMovesForPieceAtIndex(int x, int y)
+	 * Description:
+	 *   Function which returns the valid moves for the piece at the
+	 *   given coordinates.
+	 */
+	public Vector<Move> getMovesForPieceAtIndex(int x, int y) {
+		return null;
+	}
+	
+	/* Function:
+	 *   Vector<Move> getMovesForPieceAtSquare(Square sq)
+	 * Description:
+	 *   Function which returns the valid moves for the piece at the
+	 *   given Square.
+	 */
+	public Vector<Move> getMovesforPieceAtSquare(Square sq) {
+		if (sq == null) {
+			return null;
+		} else {
+			return getMovesForPieceAtIndex(sq.x, sq.y);
+		}
 	}
 }
