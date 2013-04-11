@@ -530,34 +530,51 @@ public class State implements Cloneable {
 	 *   Verifies that the given move is valid to execute and then executes it,
 	 *   returning the new board state.
 	 */
-	public State executeMove(Move move) {
+	public State executeMove(Move move) throws Exception {
 		if (move == null) {
-			return null;
+			throw new Exception("Invalid Move.");
+		}
+		
+		/* Check that additional moves are allowed. */
+		if (num_turns > max_turns) {
+			throw new Exception("Game Over");
 		}
 		
 		/* Check that originating square has a valid piece in it. */
 		Square start_square = move.from_Square;
 		if (!pieceIsValid(start_square)) {
-			return null;
+			throw new Exception("Invalid piece.");
 		}
 		
 		/* Check that the piece in the originating square is on move. */
 		char piece = getPieceAtSquare(start_square);
 		if (!pieceIsOnMove(piece)) {
-			return null;
+			throw new Exception("Piece not on move.");
 		}
 		
 		/* Check that the piece in the originating square can move to the target location. */
 		Vector<Move> valid_moves = new Vector<Move>();
 		valid_moves = getMovesforPieceAtSquare(start_square);
 		if (!valid_moves.contains(move)) {
-			return null;
+			for (int i = 0; i < valid_moves.size(); i++) {
+				System.out.println(valid_moves.elementAt(i));
+			}
+			throw new Exception("Move not allowed for given piece.");
 		}
 		
 		/* Generate new state and return it. */
-		State new_gamestate = this.clone(); 
-		return new_gamestate;	
+		int from_x = move.from_Square.x;
+		int from_y = move.from_Square.y;
+		int to_x = move.to_Square.x;
+		int to_y = move.to_Square.y;
 		
+		State new_gamestate = this.clone(); 
+		new_gamestate.board[to_x][to_y] = new_gamestate.board[from_x][from_y];
+		new_gamestate.board[from_x][from_y] = '.';
+		new_gamestate.num_turns += 1;
+		new_gamestate.white_is_next = !new_gamestate.white_is_next;
+		
+		return new_gamestate;
 	}
 	
 	/* Function:
