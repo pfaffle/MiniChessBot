@@ -3,6 +3,7 @@ import java.io.PrintStream;
 import java.util.Scanner;
 import java.util.Vector;
 import java.util.regex.Pattern;
+import java.util.Random;
 
 /* Class:
  *   State
@@ -17,9 +18,9 @@ public class State implements Cloneable {
 	private int num_turns;   // Number of turns taken in the current game.
 	private int max_turns;   // Maximum number of turns allowed before game end.
 	private boolean white_is_next; // It is White's turn to play (True/False).
-	private boolean game_is_over;
-	private boolean white_wins;
-	private boolean black_wins;
+	private boolean game_is_over;  // This game is over.
+	private boolean white_wins;    // White has won this game.
+	private boolean black_wins;    // Black has won this game.
 	
 	/* Function:
 	 *   State()
@@ -468,7 +469,7 @@ public class State implements Cloneable {
 	 *   Function which returns the valid moves for the piece at the
 	 *   given Square.
 	 */
-	public Vector<Move> getMovesforPieceAtSquare(Square sq) {
+	public Vector<Move> getMovesForPieceAtSquare(Square sq) {
 		if (sq == null) {
 			return null;
 		} else {
@@ -563,7 +564,7 @@ public class State implements Cloneable {
 		
 		/* Check that the piece in the originating square can move to the target location. */
 		Vector<Move> valid_moves = new Vector<Move>();
-		valid_moves = getMovesforPieceAtSquare(start_square);
+		valid_moves = getMovesForPieceAtSquare(start_square);
 		if (!valid_moves.contains(move)) {
 			for (int i = 0; i < valid_moves.size(); i++) {
 				System.out.println(valid_moves.elementAt(i));
@@ -731,6 +732,65 @@ public class State implements Cloneable {
 	 */
 	public boolean BlackWins() {
 		return black_wins;
+	}
+	
+	/* Function:
+	 *   State randomMove()
+	 * Description:
+	 *   Select and execute a random possible move for the current side.
+	 */
+	public State randomMove() throws Exception {
+		if (GameOver()) {
+			throw new Exception("Game is over.");
+		}
+		
+		/* Scan the board for all the pieces belonging to the player that is on move. */
+		Vector<Square> occupied_squares = new Vector<Square>();
+		for (int i = 0; i < num_rows; i++) {
+			for (int j = 0; j < num_columns; j++) {
+				Square cur_square = new Square(j,i);
+				char cur_piece = getPieceAtSquare(cur_square);
+				if (cur_piece != '.') {
+					if (Character.isUpperCase(cur_piece) && white_is_next) {
+						occupied_squares.add(cur_square);
+					} else if (Character.isLowerCase(cur_piece) && !white_is_next) {
+						occupied_squares.add(cur_square);
+					}
+				}
+			}
+		}
+		
+		/* Generate all possible moves for those pieces. */
+		Vector<Move> possible_moves = new Vector<Move>();
+		for (int i = 0; i < occupied_squares.size(); i++) {
+			possible_moves.addAll(getMovesForPieceAtSquare(occupied_squares.elementAt(i)));
+		}
+		
+		/* Select a random move to execute. */
+		Random generator = new Random();
+		int randomIndex = generator.nextInt(possible_moves.size());
+		Move selected_move = possible_moves.elementAt(randomIndex);
+		
+		return executeMove(selected_move);
+	}
+	
+
+	/* Function:
+	 *   WhiteOnMove()
+	 * Description:
+	 *   Returns true if White is next to play.
+	 */
+	public boolean WhiteOnMove() {
+		return white_is_next;
+	}
+	
+	/* Function:
+	 *   BlackOnMove()
+	 * Description:
+	 *   Returns true if Black is next to play.
+	 */
+	public boolean BlackOnMove() {
+		return !white_is_next;
 	}
 	
 }

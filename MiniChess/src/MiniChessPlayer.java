@@ -17,12 +17,21 @@ public class MiniChessPlayer {
 		gamestate.WriteBoard();
 		// Play the game.
 		while (!gamestate.GameOver()) {
-			System.out.print("Please enter a move in the form A1-B2: ");
-			String in = scan.nextLine();
-			try {
-				gamestate = gamestate.humanMove(in);
-			} catch (Exception e) {
-				e.printStackTrace();
+			if (gamestate.WhiteOnMove()) {
+				System.out.print("Please enter a move in the form A1-B2: ");
+				String in = scan.nextLine();
+				try {
+					gamestate = gamestate.humanMove(in);
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			} else {
+				System.out.println("Black moves...");
+				try {
+					gamestate = gamestate.randomMove();
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
 			}
 			gamestate.WriteBoard();
 		}
