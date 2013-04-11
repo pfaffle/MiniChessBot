@@ -29,37 +29,40 @@ public class State {
 		num_turns = 0;
 		max_turns = 40;
 		white_is_next = true;
-		board = new char[num_rows][num_columns];
+		board = new char[num_columns][num_rows];
 		
-		/* Initialize board */
-		/*	      4
-			  kqbnr 5
-			  ppppp
-			  .....
-			  .....
-			  PPPPP
-			0 RNBQK
-		 	  0      */
+		/* Initialize board
+		 *	      4
+		 *    kqbnr 5
+		 *    ppppp
+		 *    .....
+		 *    .....
+		 *    PPPPP
+		 *  0 RNBQK
+		 *    0      
+		 * Indexing: [x][y]
+		 *           [col][row] 
+		 */
 		board[0][0] = 'R';
-		board[0][1] = 'N';
-		board[0][2] = 'B';
-		board[0][3] = 'Q';
-		board[0][4] = 'K';
+		board[1][0] = 'N';
+		board[2][0] = 'B';
+		board[3][0] = 'Q';
+		board[4][0] = 'K';
 		for (int i = 0; i < num_columns; i++) {
-			board[1][i] = 'P';
+			board[i][1] = 'P';
 		}
 		for (int i = 0; i < num_columns; i++) {
-			board[2][i] = '.';
-			board[3][i] = '.';
+			board[i][2] = '.';
+			board[i][3] = '.';
 		}
 		for (int i = 0; i < num_columns; i++) {
-			board[4][i] = 'p';
+			board[i][4] = 'p';
 		}
-		board[5][0] = 'k';
-		board[5][1] = 'q';
-		board[5][2] = 'b';
-		board[5][3] = 'n';
-		board[5][4] = 'r';
+		board[0][5] = 'k';
+		board[1][5] = 'q';
+		board[2][5] = 'b';
+		board[3][5] = 'n';
+		board[4][5] = 'r';
 	}
 	
 	/* Function:
@@ -88,7 +91,7 @@ public class State {
 		int new_num_turns;                   // New number of turns taken this game.
 		boolean new_white_is_next;           // New value for white_is_next (i.e. next to play).
 		String raw_input;                    // String for holding/parsing input.
-		char[][] new_board = new char[num_rows][num_columns];  // New board layout.
+		char[][] new_board = new char[num_columns][num_rows];  // New board layout.
 		
 		/* Begin reading and parsing input */
 		
@@ -161,7 +164,7 @@ public class State {
 					return -8;
 				}
 				/* Piece is valid, add it to the new board. */
-				new_board[cur_row][cur_column] = piece;
+				new_board[cur_column][cur_row] = piece;
 			}
 		}
 		
@@ -199,7 +202,7 @@ public class State {
 		out.write('\n');
 		for (int i = num_rows - 1; i >= 0; i--) {
 			for (int j = 0; j < num_columns; j++) {
-				out.write(board[i][j]);
+				out.write(board[j][i]);
 			}
 			out.write('\n');
 		}
@@ -241,7 +244,13 @@ public class State {
 		int y = init_position.y;
 		
 		/* Ensure that the square we're checking actually exists and has a piece in it. */ 
-		if (x >= num_columns || y >= num_rows || !(Character.isLetter(board[x][y]))) {
+		if (x >= num_columns || x < 0) {
+			return null;
+		}
+		if (y >= num_rows || y < 0) {
+			return null;
+		}
+		if (!(Character.isLetter(board[x][y]))) {
 			return null;
 		}
 		
@@ -275,5 +284,12 @@ public class State {
 		}
 		
 		return valid_moves;
+	}
+	
+	public char getPieceAtIndex(int x, int y) {
+		return board[x][y];
+	}
+	public char getPieceAtSquare(Square sq) {
+		return board[sq.x][sq.y];
 	}
 }
