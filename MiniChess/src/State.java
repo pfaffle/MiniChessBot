@@ -363,6 +363,29 @@ public class State {
 			}
 			break;
 		case 'B':
+			allow_capture = true;
+			one_hop = false;
+			for (dx = -1; dx <= 1; dx++) {
+				for (dy = -1; dy <= 1; dy++) {
+					if (!(dx == 0 || dy == 0)) {
+						moves.addAll(MoveScan(sq,dx,dy,allow_capture,one_hop));
+					}
+				}
+			}
+			allow_capture = false;
+			one_hop = true;
+			for (dx = -1; dx <= 1; dx++) {
+				dy = 0;
+				if (!(dx == 0)) {
+					moves.addAll(MoveScan(sq,dx,dy,allow_capture,one_hop));
+				}
+			}
+			for (dy = -1; dy <= 1; dy++) {
+				dx = 0;
+				if (!(dy == 0)) {
+					moves.addAll(MoveScan(sq,dx,dy,allow_capture,one_hop));
+				}
+			}
 			break;
 		case 'N':
 			break;
