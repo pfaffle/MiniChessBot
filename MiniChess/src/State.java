@@ -320,11 +320,13 @@ public class State {
 		boolean one_hop;
 		Square sq = new Square(x,y);
 		Vector<Move> moves = new Vector<Move>(6,6);
+		Vector<Move> pawn_possible_caps = new Vector<Move>(2);
 		
-		char piece = Character.toUpperCase(board[x][y]);
+		char piece = board[x][y];
 		switch(piece) {
 		
 		case 'K':
+		case 'k':
 			allow_capture = true;
 			one_hop = true;
 			for (dx = -1; dx <= 1; dx++) {
@@ -336,6 +338,7 @@ public class State {
 			}
 			break;
 		case 'Q':
+		case 'q':
 			allow_capture = true;
 			one_hop = false;
 			for (dx = -1; dx <= 1; dx++) {
@@ -347,6 +350,7 @@ public class State {
 			}
 			break;
 		case 'R':
+		case 'r':
 			allow_capture = true;
 			one_hop = false;
 			for (dx = -1; dx <= 1; dx++) {
@@ -363,6 +367,7 @@ public class State {
 			}
 			break;
 		case 'B':
+		case 'b':
 			allow_capture = true;
 			one_hop = false;
 			for (dx = -1; dx <= 1; dx++) {
@@ -388,6 +393,7 @@ public class State {
 			}
 			break;
 		case 'N':
+		case 'n':
 			allow_capture = true;
 			one_hop = true;
 			for (dx = -1; dx <= 1; dx += 2) {
@@ -402,9 +408,48 @@ public class State {
 			}
 			break;
 		case 'P':
+			/* Get possible forward (non-capture) movement. */
+			allow_capture = false;
+			one_hop = true;
+			dx = 0;
+			dy = 1;
+			moves.addAll(MoveScan(sq,dx,dy,allow_capture,one_hop));
+			/* Get possible diagonal (capture) movement. */
+			allow_capture = true;
+			for (dx = -1; dx <= 1; dx += 2) {
+				pawn_possible_caps.addAll(MoveScan(sq,dx,dy,allow_capture,one_hop));
+			}
+			for (int i = 0; i < pawn_possible_caps.size(); i++) {
+				Square tgt_Square = pawn_possible_caps.elementAt(i).to_Square;
+				char tgt_Piece = getPieceAtSquare(tgt_Square);
+				if (Character.isLowerCase(tgt_Piece)) {
+					moves.add(pawn_possible_caps.elementAt(i));
+				}
+			}
+			break;
+		case 'p':
+			/* Get possible forward (non-capture) movement. */
+			allow_capture = false;
+			one_hop = true;
+			dx = 0;
+			dy = -1;
+			moves.addAll(MoveScan(sq,dx,dy,allow_capture,one_hop));
+			/* Get possible diagonal (capture) movement. */
+			allow_capture = true;
+			for (dx = -1; dx <= 1; dx += 2) {
+				pawn_possible_caps.addAll(MoveScan(sq,dx,dy,allow_capture,one_hop));
+			}
+			for (int i = 0; i < pawn_possible_caps.size(); i++) {
+				Square tgt_Square = pawn_possible_caps.elementAt(i).to_Square;
+				char tgt_Piece = getPieceAtSquare(tgt_Square);
+				if (Character.isUpperCase(tgt_Piece)) {
+					moves.add(pawn_possible_caps.elementAt(i));
+				}
+			}
 			break;
 		default:
 			/* Unknown error? */
+			moves = null;
 			break;
 			
 		}
