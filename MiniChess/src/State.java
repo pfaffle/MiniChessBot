@@ -217,10 +217,24 @@ public class State {
 	}
 
 	/* Function:
-	 *   Move[] MoveScan()
+	 *   Vector<Move> MoveScan(Square init_position, int dx, int dy, boolean allow_capture)
 	 * Description:
 	 *   Function which generates a list of valid moves for a particular piece in
 	 *   a particular direction.
+	 * Arguments:
+	 *   init_position : A Square object which indicates the initial position of the
+	 *                   piece we wish to move.
+	 *              dx : Indicator of the direction and number of spaces we wish to move along
+	 *                   the x axis.
+	 *              dy : Indicator of the direction and number of spaces we wish to move along
+	 *                   the y axis.
+	 *   allow_capture : A boolean value which indicates if we want to consider possible captures
+	 *                   by the piece in the given direction.
+	 * Return values:
+	 *            null : If the given square has no piece on it (represented by a '.'), there are
+	 *                   no valid moves and the function returns null.
+	 *    Vector<Move> : A Vector object containing all valid Moves that the piece in the given
+	 *                   Square can make in the given direction.
 	 */
 	public Vector<Move> MoveScan(Square init_position, int dx, int dy, boolean allow_capture) {
 		int x = init_position.x;
