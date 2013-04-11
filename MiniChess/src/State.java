@@ -546,15 +546,18 @@ public class State implements Cloneable {
 			throw new Exception("Game Over");
 		}
 		
-		/* Check that originating square has a valid piece in it. */
 		Square start_square = move.from_Square;
+		Square end_square = move.to_Square;
+		
+		/* Check that originating square has a valid piece in it. */
 		if (!pieceIsValid(start_square)) {
 			throw new Exception("Invalid piece.");
 		}
 		
 		/* Check that the piece in the originating square is on move. */
-		char piece = getPieceAtSquare(start_square);
-		if (!pieceIsOnMove(piece)) {
+		char src_piece = getPieceAtSquare(start_square);
+		char tgt_piece = getPieceAtSquare(end_square);
+		if (!pieceIsOnMove(src_piece)) {
 			throw new Exception("Piece not on move.");
 		}
 		
@@ -568,14 +571,23 @@ public class State implements Cloneable {
 			throw new Exception("Move not allowed for given piece.");
 		}
 		
+		
+		
 		/* Generate new state to return. */
 		int from_x = move.from_Square.x;
 		int from_y = move.from_Square.y;
 		int to_x = move.to_Square.x;
 		int to_y = move.to_Square.y;
 		
+		/* Check for pawn promotion. */
+		if (src_piece == 'p' && to_y == 0) {
+			src_piece = 'q';
+		} else if (src_piece == 'P' && to_y == num_rows - 1) {
+			src_piece = 'Q';
+		}
+		
 		State new_gamestate = this.clone(); 
-		new_gamestate.board[to_x][to_y] = new_gamestate.board[from_x][from_y];
+		new_gamestate.board[to_x][to_y] = src_piece;
 		new_gamestate.board[from_x][from_y] = '.';
 		new_gamestate.num_turns += 1;
 		new_gamestate.white_is_next = !new_gamestate.white_is_next;
@@ -589,7 +601,6 @@ public class State implements Cloneable {
 		}
 		
 		/* Victory condition: Captured opposing king. */
-		char tgt_piece = this.board[to_x][to_y]; 
 		if (tgt_piece == 'k') {
 			new_gamestate.game_is_over = true;
 			new_gamestate.white_wins = true;
