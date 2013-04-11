@@ -17,6 +17,16 @@ public class MiniChessPlayer {
 		gamestate.WriteBoard();
 
 		test_ReadBoard(gamestate);
+		
+		String test_file_path = ".\\tests\\board\\piece_moves.txt";
+		File test_file = new File(test_file_path);
+		FileInputStream test_stream;
+		try {
+			test_stream = new FileInputStream(test_file);
+			gamestate.ReadBoard(test_stream);
+		} catch (FileNotFoundException e) {
+			System.out.println("Failed to open file" + test_file_path);
+		}
 
 		// Print ending starting state.
 		System.out.println("MiniChess board ending state:");
@@ -195,9 +205,9 @@ public class MiniChessPlayer {
 	}
 	
 	public static void test_getMovesForPieceAtIndex(State gamestate) {
-		int x = 4;
-		int y = 0;
-		System.out.println("Test 1: Scanning for moves from the king in square " + x + "," + y);
+		int x = 3;
+		int y = 1;
+		System.out.println("Test 1: Scanning for moves from the queen in square " + x + "," + y);
 		Vector<Move> valid_bpawn_moves = gamestate.getMovesForPieceAtIndex(x,y);
 		if (valid_bpawn_moves == null) {
 			System.out.println("Failed: MoveScan returned null.");
@@ -207,9 +217,9 @@ public class MiniChessPlayer {
 			}
 		}
 		
-		x = 0;
-		y = 5;
-		System.out.println("Test 2: Scanning for moves from the king in square " + x + "," + y);
+		x = 2;
+		y = 3;
+		System.out.println("Test 2: Scanning for moves from the rook in square " + x + "," + y);
 		Vector<Move> valid_bking_moves = gamestate.getMovesForPieceAtIndex(x,y);
 		if (valid_bking_moves == null) {
 			System.out.println("Failed: MoveScan returned null.");
