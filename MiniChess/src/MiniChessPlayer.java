@@ -14,23 +14,19 @@ public class MiniChessPlayer {
 		State gamestate = new State();
 		Scanner scan = new Scanner(System.in);
 		
-		// Print board starting state.
-		System.out.println("MiniChess board starting state:");
 		gamestate.WriteBoard();
-
-		// Do some test moves.
-		System.out.print("Please enter a move in the form A1-B2: ");
-		String in = scan.nextLine();
-		try {
-			gamestate = gamestate.humanMove(in);
-		} catch (Exception e) {
-			e.printStackTrace();
+		// Play the game.
+		while (!gamestate.GameOver()) {
+			System.out.print("Please enter a move in the form A1-B2: ");
+			String in = scan.nextLine();
+			try {
+				gamestate = gamestate.humanMove(in);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+			gamestate.WriteBoard();
 		}
-
-		// Print ending starting state.
-		System.out.println("MiniChess board ending state:");
-		gamestate.WriteBoard(null);
-		
+		System.out.println("Game over!");
 	}
 	
 	/* Function:

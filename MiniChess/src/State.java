@@ -27,7 +27,7 @@ public class State implements Cloneable {
 		num_rows = 6;
 		num_columns = 5;
 		num_turns = 0;
-		max_turns = 40;
+		max_turns = 80;
 		white_is_next = true;
 		board = new char[num_columns][num_rows];
 		
@@ -640,7 +640,6 @@ public class State implements Cloneable {
 			throw new Exception("Failed to parse row letter.");
 		}
 		Move humansMove = new Move(new Square(from_x, from_y), new Square(to_x, to_y));
-		System.out.println("Moving" + humansMove);
 		return executeMove(humansMove);
 	}
 	
@@ -664,5 +663,35 @@ public class State implements Cloneable {
 		}
 		
 		return newState;
+	}
+	
+	/* Function:
+	 *   GameOver()
+	 * Description:
+	 *   Returns true if one of the game's victory conditions has been met.
+	 */
+	public boolean GameOver() {
+		if (num_turns > max_turns) {
+			return true;
+		}
+		boolean white_king = false;
+		boolean black_king = false;
+		
+		/* This algorithm could be better... */
+		for (int i = 0; i < num_columns; i++) {
+			for (int j = 0; j < num_rows; j++) {
+				if (board[i][j] == 'k') {
+					black_king = true;
+				} else if (board[i][j] == 'K') {
+					white_king = true;
+				}
+			}
+		}
+		if (!white_king || !black_king) {
+			return true;
+		} else {
+			return false;
+		}
+		/* Also need to scan for if there are any valid moves to be made by the current player. */
 	}
 }
