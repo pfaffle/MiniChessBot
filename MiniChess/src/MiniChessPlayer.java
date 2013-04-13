@@ -34,7 +34,7 @@ public class MiniChessPlayer {
 		System.out.println("Testing ReadBoard function...");
 		
 		System.out.print("Test 1: Argument passed to ReadBoard is null.\nTest 1 Result: ");
-		retval = gamestate.ReadBoard(null);
+		retval = gamestate.readBoard(null);
 		if (retval == -1) {
 			System.out.println("Passed.");
 		} else {
@@ -46,7 +46,7 @@ public class MiniChessPlayer {
 		test_file = new File(test_file_path);
 		try {
 			test_stream = new FileInputStream(test_file);
-			retval = gamestate.ReadBoard(test_stream);
+			retval = gamestate.readBoard(test_stream);
 			if (retval == -2) {
 				System.out.println("Passed.");
 			} else {
@@ -64,7 +64,7 @@ public class MiniChessPlayer {
 		test_file = new File(test_file_path);
 		try {
 			test_stream = new FileInputStream(test_file);
-			retval = gamestate.ReadBoard(test_stream);
+			retval = gamestate.readBoard(test_stream);
 			if (retval == -3) {
 				System.out.println("Passed.");
 			} else {
@@ -82,7 +82,7 @@ public class MiniChessPlayer {
 		test_file = new File(test_file_path);
 		try {
 			test_stream = new FileInputStream(test_file);
-			retval = gamestate.ReadBoard(test_stream);
+			retval = gamestate.readBoard(test_stream);
 			if (retval == -4) {
 				System.out.println("Passed.");
 			} else {
@@ -100,7 +100,7 @@ public class MiniChessPlayer {
 		test_file = new File(test_file_path);
 		try {
 			test_stream = new FileInputStream(test_file);
-			retval = gamestate.ReadBoard(test_stream);
+			retval = gamestate.readBoard(test_stream);
 			if (retval == -5) {
 				System.out.println("Passed.");
 			} else {
@@ -118,7 +118,7 @@ public class MiniChessPlayer {
 		test_file = new File(test_file_path);
 		try {
 			test_stream = new FileInputStream(test_file);
-			retval = gamestate.ReadBoard(test_stream);
+			retval = gamestate.readBoard(test_stream);
 			if (retval == -6) {
 				System.out.println("Passed.");
 			} else {
@@ -136,7 +136,7 @@ public class MiniChessPlayer {
 		test_file = new File(test_file_path);
 		try {
 			test_stream = new FileInputStream(test_file);
-			retval = gamestate.ReadBoard(test_stream);
+			retval = gamestate.readBoard(test_stream);
 			if (retval == -7) {
 				System.out.println("Passed.");
 			} else {
@@ -154,7 +154,7 @@ public class MiniChessPlayer {
 		test_file = new File(test_file_path);
 		try {
 			test_stream = new FileInputStream(test_file);
-			retval = gamestate.ReadBoard(test_stream);
+			retval = gamestate.readBoard(test_stream);
 			if (retval == -8) {
 				System.out.println("Passed.");
 			} else {
@@ -172,7 +172,7 @@ public class MiniChessPlayer {
 		test_file = new File(test_file_path);
 		try {
 			test_stream = new FileInputStream(test_file);
-			retval = gamestate.ReadBoard(test_stream);
+			retval = gamestate.readBoard(test_stream);
 			if (retval == -0) {
 				System.out.println("Passed.");
 			} else {
@@ -216,31 +216,31 @@ public class MiniChessPlayer {
 	public static void play_randomVsHuman() {
 		State gamestate = new State();
 		Scanner scan = new Scanner(System.in);
-		gamestate.WriteBoard();
+		gamestate.writeBoard();
 		// Play the game.
-		while (!gamestate.GameOver()) {
-			if (gamestate.WhiteOnMove()) {
+		while (!gamestate.gameOver()) {
+			if (gamestate.whiteOnMove()) {
 				System.out.print("Please enter a move in the form A1-B2: ");
 				String in = scan.nextLine();
 				try {
-					gamestate = gamestate.humanMove(in);
+					gamestate = gamestate.makeHumanMove(in);
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
 			} else {
 				System.out.println("Black moves...");
 				try {
-					gamestate = gamestate.randomMove();
+					gamestate = gamestate.makeRandomMove();
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
 			}
-			gamestate.WriteBoard();
+			gamestate.writeBoard();
 		}
 		System.out.println("Game over!");
-		if (gamestate.WhiteWins()) {
+		if (gamestate.whiteWins()) {
 			System.out.println("White wins!");
-		} else if (gamestate.BlackWins()) {
+		} else if (gamestate.blackWins()) {
 			System.out.println("Black wins!");
 		} else {
 			System.out.println("Game is a draw.");
@@ -250,30 +250,30 @@ public class MiniChessPlayer {
 	
 	public static void play_randomVsRandom() {
 		State gamestate = new State();
-		gamestate.WriteBoard();
+		gamestate.writeBoard();
 		// Play the game.
-		while (!gamestate.GameOver()) {
-			if (gamestate.WhiteOnMove()) {
+		while (!gamestate.gameOver()) {
+			if (gamestate.whiteOnMove()) {
 				System.out.println("White moves...");
 				try {
-					gamestate = gamestate.randomMove();
+					gamestate = gamestate.makeRandomMove();
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
 			} else {
 				System.out.println("Black moves...");
 				try {
-					gamestate = gamestate.randomMove();
+					gamestate = gamestate.makeRandomMove();
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
 			}
-			gamestate.WriteBoard();
+			gamestate.writeBoard();
 		}
 		System.out.println("Game over!");
-		if (gamestate.WhiteWins()) {
+		if (gamestate.whiteWins()) {
 			System.out.println("White wins!");
-		} else if (gamestate.BlackWins()) {
+		} else if (gamestate.blackWins()) {
 			System.out.println("Black wins!");
 		} else {
 			System.out.println("Game is a draw.");

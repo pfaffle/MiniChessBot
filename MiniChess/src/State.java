@@ -23,9 +23,15 @@ public class State implements Cloneable {
 	private boolean black_wins;    // Black has won this game.
 	
 	/* Function:
-	 *   State()
+	 *   State
 	 * Description:
 	 *   Default constructor. Builds a fresh chess board for a new game.
+	 * Inputs:
+	 *   None.
+	 * Outputs:  
+	 *   A newly initialized board with starting game state.
+	 * Return values:
+	 *   None.
 	 */
 	public State() {
 		num_rows = 6;
@@ -73,11 +79,16 @@ public class State implements Cloneable {
 	}
 	
 	/* Function:
-	 *   int ReadBoard(InputStream new_state)
+	 *   readBoard
 	 * Description:
 	 *   Takes a byte array representation of a chess board from an InputStream 
 	 *   and uses it to construct a new board state.
-	 * Return values:
+	 * Inputs:
+	 *   new_state : An InputStream to read a new board layout from. Expects a
+	 *               specific format, which is written out by the WriteBoard function.
+	 * Outputs:
+	 *   Overwrites this instance of a State object with new data. 
+	 * Returns:
 	 *   0 : Success.
 	 *  -1 : Cannot read new_state because it is null.
 	 *  -2 : Invalid input: No turn counter, or turn counter is in the wrong location.
@@ -89,7 +100,7 @@ public class State implements Cloneable {
 	 *  -7 : Invalid input: Not enough columns in a row on the board.
 	 *  -8 : Invalid input: Invalid piece on the board. 
 	 */
-	public int ReadBoard(InputStream new_state) {
+	public int readBoard(InputStream new_state) {
 		if (new_state == null) {
 			return -1;
 		}
@@ -185,13 +196,19 @@ public class State implements Cloneable {
 	}
 	
 	/* Function:
-	 *   void WriteBoard(PrintStream out)
+	 *   writeBoard
 	 * Description:
 	 *   Writes a byte array representation of a chess board and the current
 	 *   game state to an OutputStream. If the PrintStream argument passed in is null,
 	 *   then it will print to standard out.
+	 * Inputs:
+	 *   out : A PrintStream object that a new board layout can be written out to.
+	 * Outputs:
+	 *   A stream that represents the current state of the board and game.
+	 * Return values:
+	 *   None.
 	 */
-	public void WriteBoard(PrintStream out) {
+	public void writeBoard(PrintStream out) {
 		if (out == null) {
 			out = new PrintStream(System.out);
 		}
@@ -217,21 +234,27 @@ public class State implements Cloneable {
 	}
 	
 	/* Function:
-	 *   void WriteBoard()
+	 *   writeBoard
 	 * Description:
 	 *   Overloaded function which calls WriteBoard(PrintStream out), passing it
-	 *   standard out.
+	 *   standard out as an argument.
+	 * Inputs:
+	 *   None.
+	 * Outputs:
+	 *   Writes the current state of the board through standard out.
+	 * Return values:
+	 *   None.
 	 */
-	public void WriteBoard() {
-		WriteBoard(System.out);
+	public void writeBoard() {
+		writeBoard(System.out);
 	}
 
 	/* Function:
-	 *   Vector<Move> MoveScan(Square init_position, int dx, int dy, boolean allow_capture, int max_hops)
+	 *   getMovesInDirection
 	 * Description:
 	 *   Function which generates a list of valid moves for a particular piece in
 	 *   a particular direction.
-	 * Arguments:
+	 * Inputs:
 	 *   init_position : A Square object which indicates the initial position of the
 	 *                   piece we wish to move.
 	 *              dx : Indicator of the direction and number of spaces we wish to move along
@@ -240,16 +263,18 @@ public class State implements Cloneable {
 	 *                   the y axis.
 	 *   allow_capture : A boolean value which indicates if we want to consider possible captures
 	 *                   by the piece in the given direction.
-	 *         one_hop : Only get moves one hop in the given direction.
-	 * 
+	 *         one_hop : Boolean value which, if true, instructs the function to only get moves
+	 *                   one hop in the given direction.
+	 * Outputs:
+	 *   The return values.
 	 * Return values:
 	 *            null : If the given square has no piece on it (represented by a '.'), or is
 	 *                   not on the board, there are no valid moves and the function returns null.
 	 *    Vector<Move> : A Vector object containing all valid Moves that the piece in the given
 	 *                   Square can make in the given direction.
 	 */
-	public Vector<Move> MoveScan(Square init_position, int dx, int dy, boolean allow_capture, boolean one_hop) { 
-		if (!pieceIsValid(init_position)) {
+	public Vector<Move> getMovesInDirection(Square init_position, int dx, int dy, boolean allow_capture, boolean one_hop) { 
+		if (!pieceExistsAtSquare(init_position)) {
 			return null;
 		}
 		
@@ -291,33 +316,53 @@ public class State implements Cloneable {
 	}
 	
 	/* Function:
-	 *   char getPieceAtIndex(int x, int y)
+	 *   getPieceAtIndex
 	 * Description:
 	 *   Function which returns the character representation of the piece at the
-	 *   given coordinates. Mostly for debugging purposes.
+	 *   given coordinates.
+	 * Inputs:
+	 *   x : An integer value indicating the x coordinate (column) of the piece to get.
+	 *   y : An integer value indicating the y coordinate (row) of the piece to get.
+	 * Outputs:
+	 *   The return values.
+	 * Return values:
+	 *   The character representation of the piece (or blank square) at the given indexes.
 	 */
 	public char getPieceAtIndex(int x, int y) {
 		return board[x][y];
 	}
 	
 	/* Function:
-	 *   char getPieceAtSquare(Square sq)
+	 *   getPieceAtSquare
 	 * Description:
 	 *   Function which returns the character representation of the piece at the
-	 *   given Square. Mostly for debugging purposes.
+	 *   given Square.
+	 * Inputs:
+	 *   sq : A Square object containing the x and y indexes of the piece to get.
+	 * Outputs:
+	 *   The return values.
+	 * Return values:
+	 *   The character representation of the piece (or blank square) at the given Square.
 	 */
 	public char getPieceAtSquare(Square sq) {
 		return board[sq.x][sq.y];
 	}
 	
 	/* Function:
-	 *   Vector<Move> getMovesForPieceAtIndex(int x, int y)
+	 *   getMovesForPieceAtIndex
 	 * Description:
 	 *   Function which returns the valid moves for the piece at the
 	 *   given coordinates.
+	 * Inputs:
+	 *   x : An integer value indicating the x coordinate (column) of the piece to get moves for.
+	 *   y : An integer value indicating the y coordinate (row) of the piece to get moves for.
+	 * Outputs:
+	 *   The return values.
+	 * Return values:
+	 *   A Vector object containing all valid moves for the piece at the given coordinates.
 	 */
 	public Vector<Move> getMovesForPieceAtIndex(int x, int y) {
-		if (!pieceIsValid(x,y)) {
+		if (!pieceExistsAtIndex(x,y)) {
 			return null;
 		}
 		
@@ -339,7 +384,7 @@ public class State implements Cloneable {
 			for (dx = -1; dx <= 1; dx++) {
 				for (dy = -1; dy <= 1; dy++) {
 					if (!(dx == 0 && dy == 0)) {
-						moves.addAll(MoveScan(sq,dx,dy,allow_capture,one_hop));
+						moves.addAll(getMovesInDirection(sq,dx,dy,allow_capture,one_hop));
 					}
 				}
 			}
@@ -351,7 +396,7 @@ public class State implements Cloneable {
 			for (dx = -1; dx <= 1; dx++) {
 				for (dy = -1; dy <= 1; dy++) {
 					if (!(dx == 0 && dy == 0)) {
-						moves.addAll(MoveScan(sq,dx,dy,allow_capture,one_hop));
+						moves.addAll(getMovesInDirection(sq,dx,dy,allow_capture,one_hop));
 					}
 				}
 			}
@@ -363,13 +408,13 @@ public class State implements Cloneable {
 			for (dx = -1; dx <= 1; dx++) {
 				dy = 0;
 				if (!(dx == 0)) {
-					moves.addAll(MoveScan(sq,dx,dy,allow_capture,one_hop));
+					moves.addAll(getMovesInDirection(sq,dx,dy,allow_capture,one_hop));
 				}
 			}
 			for (dy = -1; dy <= 1; dy++) {
 				dx = 0;
 				if (!(dy == 0)) {
-					moves.addAll(MoveScan(sq,dx,dy,allow_capture,one_hop));
+					moves.addAll(getMovesInDirection(sq,dx,dy,allow_capture,one_hop));
 				}
 			}
 			break;
@@ -380,7 +425,7 @@ public class State implements Cloneable {
 			for (dx = -1; dx <= 1; dx++) {
 				for (dy = -1; dy <= 1; dy++) {
 					if (!(dx == 0 || dy == 0)) {
-						moves.addAll(MoveScan(sq,dx,dy,allow_capture,one_hop));
+						moves.addAll(getMovesInDirection(sq,dx,dy,allow_capture,one_hop));
 					}
 				}
 			}
@@ -389,13 +434,13 @@ public class State implements Cloneable {
 			for (dx = -1; dx <= 1; dx++) {
 				dy = 0;
 				if (!(dx == 0)) {
-					moves.addAll(MoveScan(sq,dx,dy,allow_capture,one_hop));
+					moves.addAll(getMovesInDirection(sq,dx,dy,allow_capture,one_hop));
 				}
 			}
 			for (dy = -1; dy <= 1; dy++) {
 				dx = 0;
 				if (!(dy == 0)) {
-					moves.addAll(MoveScan(sq,dx,dy,allow_capture,one_hop));
+					moves.addAll(getMovesInDirection(sq,dx,dy,allow_capture,one_hop));
 				}
 			}
 			break;
@@ -405,12 +450,12 @@ public class State implements Cloneable {
 			one_hop = true;
 			for (dx = -1; dx <= 1; dx += 2) {
 				for (dy = -2; dy <= 2; dy += 4) {
-					moves.addAll(MoveScan(sq,dx,dy,allow_capture,one_hop));
+					moves.addAll(getMovesInDirection(sq,dx,dy,allow_capture,one_hop));
 				}
 			}
 			for (dx = -2; dx <= 2; dx += 4) {
 				for (dy = -1; dy <= 1; dy += 2) {
-					moves.addAll(MoveScan(sq,dx,dy,allow_capture,one_hop));
+					moves.addAll(getMovesInDirection(sq,dx,dy,allow_capture,one_hop));
 				}
 			}
 			break;
@@ -420,11 +465,11 @@ public class State implements Cloneable {
 			one_hop = true;
 			dx = 0;
 			dy = 1;
-			moves.addAll(MoveScan(sq,dx,dy,allow_capture,one_hop));
+			moves.addAll(getMovesInDirection(sq,dx,dy,allow_capture,one_hop));
 			/* Get possible diagonal (capture) movement. */
 			allow_capture = true;
 			for (dx = -1; dx <= 1; dx += 2) {
-				pawn_possible_caps.addAll(MoveScan(sq,dx,dy,allow_capture,one_hop));
+				pawn_possible_caps.addAll(getMovesInDirection(sq,dx,dy,allow_capture,one_hop));
 			}
 			for (int i = 0; i < pawn_possible_caps.size(); i++) {
 				Square tgt_Square = pawn_possible_caps.elementAt(i).to_Square;
@@ -440,11 +485,11 @@ public class State implements Cloneable {
 			one_hop = true;
 			dx = 0;
 			dy = -1;
-			moves.addAll(MoveScan(sq,dx,dy,allow_capture,one_hop));
+			moves.addAll(getMovesInDirection(sq,dx,dy,allow_capture,one_hop));
 			/* Get possible diagonal (capture) movement. */
 			allow_capture = true;
 			for (dx = -1; dx <= 1; dx += 2) {
-				pawn_possible_caps.addAll(MoveScan(sq,dx,dy,allow_capture,one_hop));
+				pawn_possible_caps.addAll(getMovesInDirection(sq,dx,dy,allow_capture,one_hop));
 			}
 			for (int i = 0; i < pawn_possible_caps.size(); i++) {
 				Square tgt_Square = pawn_possible_caps.elementAt(i).to_Square;
@@ -464,10 +509,16 @@ public class State implements Cloneable {
 	}
 	
 	/* Function:
-	 *   Vector<Move> getMovesForPieceAtSquare(Square sq)
+	 *   getMovesForPieceAtSquare
 	 * Description:
-	 *   Function which returns the valid moves for the piece at the
-	 *   given Square.
+	 *   Overloaded function which calls getMovesForPieceAtIndex to find the valid
+	 *   moves for the piece at the given Square.
+	 * Inputs:
+	 *   sq : A Square object containing the indexes of the piece to get moves for.
+	 * Outputs:
+	 *   The return values.
+	 * Return values:
+	 *   A Vector object containing all valid moves for the piece at the given Square.
 	 */
 	public Vector<Move> getMovesForPieceAtSquare(Square sq) {
 		if (sq == null) {
@@ -478,11 +529,19 @@ public class State implements Cloneable {
 	}
 	
 	/* Function:
-	 *   pieceIsValid(int x, int y)
+	 *   pieceExistsAtIndex
 	 * Description:
 	 *   Ensures that there is a valid piece at the given coordinates.
+	 * Inputs:
+	 *   x : An integer value indicating the x coordinate (column) of the square to check for a piece.
+	 *   y : An integer value indicating the y coordinate (row) of the square to check for a piece.
+	 * Outputs:
+	 *   The return values.
+	 * Return values:
+	 *    True : Returned if the given coordinates indicate a valid square AND there is a valid piece in it.
+	 *   False : Returned if the given coordinates indicate an invalid square OR there is no valid piece in it.
 	 */
-	private boolean pieceIsValid(int x, int y) {
+	private boolean pieceExistsAtIndex(int x, int y) {
 		/* Ensure that the square we're checking actually exists and has a piece in it. */ 
 		if (x >= num_columns || x < 0) {
 			return false;
@@ -497,23 +556,38 @@ public class State implements Cloneable {
 	}
 	
 	/* Function:
-	 *   pieceIsValid(Square sq)
+	 *   pieceExistsAtSquare
 	 * Description:
 	 *   Ensures that there is a valid piece at the given Square.
+	 * Inputs:
+	 *   sq : A Square object containing the coordinates to check for a piece.
+	 * Outputs:
+	 *   The return values.
+	 * Return values:
+	 *    True : Returned if the given square is on the board AND there is a piece there.
+	 *   False : Returned if the given square is not on the board OR there is no piece there.
 	 */
-	private boolean pieceIsValid(Square sq) {
+	private boolean pieceExistsAtSquare(Square sq) {
 		if (sq == null) {
 			return false;
 		} else {
-			return pieceIsValid(sq.x,sq.y);
+			return pieceExistsAtIndex(sq.x,sq.y);
 		}
 	}
 	
 	/* Function:
-	 *   boolean pieceIsOnMove(char ch)
+	 *   pieceIsOnMove
 	 * Description:
 	 *   Returns true if the color of the piece given (i.e. the case) matches
 	 *   the color of the player who is next to move. Otherwise, returns false.
+	 * Inputs:
+	 *   ch : The character representation of a piece.
+	 * Outputs:
+	 *   The return values.
+	 * Return values:
+	 *    True : Returned if the piece matches the color of the player who is on move.
+	 *   False : Returned if the piece is not a valid piece, OR it does not match the color
+	 *           of the player who is on move.
 	 */
 	private boolean pieceIsOnMove(char ch) {
 		if (ch == '.') {
@@ -532,10 +606,17 @@ public class State implements Cloneable {
 	}
 	
 	/* Function:
-	 *   State executeMove(Move move)
+	 *   executeMove
 	 * Description:
 	 *   Verifies that the given move is valid to execute and then executes it,
 	 *   returning the new board state.
+	 * Inputs:
+	 *   move : A Move object containing the details of the move to execute.
+	 * Outputs:
+	 *   The return values.
+	 * Return values:
+	 *   A new State object containing the altered state of the game after the move
+	 *   has been executed. 
 	 */
 	public State executeMove(Move move) throws Exception {
 		if (move == null) {
@@ -551,7 +632,7 @@ public class State implements Cloneable {
 		Square end_square = move.to_Square;
 		
 		/* Check that originating square has a valid piece in it. */
-		if (!pieceIsValid(start_square)) {
+		if (!pieceExistsAtSquare(start_square)) {
 			throw new Exception("Invalid piece.");
 		}
 		
@@ -572,9 +653,6 @@ public class State implements Cloneable {
 			throw new Exception("Move not allowed for given piece.");
 		}
 		
-		
-		
-		/* Generate new state to return. */
 		int from_x = move.from_Square.x;
 		int from_y = move.from_Square.y;
 		int to_x = move.to_Square.x;
@@ -587,6 +665,7 @@ public class State implements Cloneable {
 			src_piece = 'Q';
 		}
 		
+		/* Generate new state to return. */
 		State new_gamestate = this.clone(); 
 		new_gamestate.board[to_x][to_y] = src_piece;
 		new_gamestate.board[from_x][from_y] = '.';
@@ -624,12 +703,20 @@ public class State implements Cloneable {
 	}
 	
 	/* Function:
-	 *   humanMove(String move)
+	 *   makeHumanMove
 	 * Description:
 	 *   Takes a String in the form "a0-b1" and attempts to execute it as a move.
 	 *   Columns (x) are parsed as A-E (0-4), and rows (y) are parsed as 0-5.
+	 * Inputs:
+	 *   rawmove : A String object containing a textual representation of the move to execute.
+	 *             Expects the format L#-L# where L is a letter and # is a number as defined above.
+	 * Outputs:
+	 *   The return values.
+	 * Return values:
+	 *   A new State object containing the altered state of the game after the move
+	 *   has been executed.
 	 */
-	public State humanMove(String rawmove) throws Exception {
+	public State makeHumanMove(String rawmove) throws Exception {
 		if (rawmove == null) {
 			throw new Exception("Invalid Move.");
 		}
@@ -690,8 +777,15 @@ public class State implements Cloneable {
 	}
 	
 	/* Function:
-	 * (non-Javadoc)
-	 * @see java.lang.Object#clone()
+	 *   clone
+	 * Description:
+	 *   Generates a copy of the current object.
+	 * Inputs:
+	 *   None.
+	 * Outputs:
+	 *   The return values.
+	 * Return values:
+	 *   A new State object containing the same data as the instance this function was called on.
 	 */
 	public State clone() {
 		State newState = new State();
@@ -715,40 +809,74 @@ public class State implements Cloneable {
 	}
 	
 	/* Function:
-	 *   GameOver()
+	 *   gameOver
 	 * Description:
 	 *   Returns true if one of the game's victory conditions has been met.
+	 * Inputs:
+	 *   None.
+	 * Outputs:
+	 *   The return values.
+	 * Return values:
+	 *   True : Returned if one of the following conditions is met:
+	 *          1. One side's king has been captured. (Victory condition #1.)
+	 *          2. One side is unable to make a valid move. (Victory condition #2.)
+	 *          3. The players have taken more than the number of allowed turns (i.e.
+	 *             the game is a draw).
+	 *  False : Returned if the game has not yet reached the maximum number of allowed
+	 *          turns (i.e. it is still in progress).
 	 */
-	public boolean GameOver() {
+	public boolean gameOver() {
 		return game_is_over;
-		/* Also need to scan for if there are any valid moves to be made by the current player. */
 	}
 	
 	/* Function:
-	 *   WhiteWins()
+	 *   whiteWins
 	 * Description:
-	 *   Returns true if white is the winner.
+	 *   Returns true if White has won the game.
+	 * Inputs:
+	 *   None.
+	 * Outputs:
+	 *   The return values.
+	 * Return values:
+	 *    True : Returned if White has met one of the victory conditions shown in the
+	 *           description of GameOver.
+	 *   False : Returned if White has *not* met one of the victory conditions. 
 	 */
-	public boolean WhiteWins() {
+	public boolean whiteWins() {
 		return white_wins;
 	}
 	
 	/* Function:
-	 *   BlackWins()
+	 *   blackWins
 	 * Description:
-	 *   Returns true if black is the winner.
+	 *   Returns true if Black has won the game.
+	 * Inputs:
+	 *   None.
+	 * Outputs:
+	 *   The return values.
+	 * Return values:
+	 *    True : Returned if Black has met one of the victory conditions shown in the
+	 *           description of GameOver.
+	 *   False : Returned if Black has *not* met one of the victory conditions. 
 	 */
-	public boolean BlackWins() {
+	public boolean blackWins() {
 		return black_wins;
 	}
 	
 	/* Function:
-	 *   State randomMove()
+	 *   makeRandomMove
 	 * Description:
-	 *   Select and execute a random possible move for the current side.
+	 *   Selects and executes a random possible move for the current side.
+	 * Inputs:
+	 *   None.
+	 * Outputs:
+	 *   The return values.  
+	 * Return values:
+	 *   A new State object containing the altered state of the game after the move
+	 *   has been executed.
 	 */
-	public State randomMove() throws Exception {
-		if (GameOver()) {
+	public State makeRandomMove() throws Exception {
+		if (gameOver()) {
 			throw new Exception("Game is over.");
 		}
 		
@@ -763,12 +891,17 @@ public class State implements Cloneable {
 	}
 	
 	/* Function:
-	 *   Vector<Move> findAllValidMoves()
+	 *   findAllValidMoves
 	 * Description:
-	 *   Searches for and finds all valid moves for the player on move.
+	 *   Searches for and finds all valid moves for the pieces belonging to the player on move.
+	 * Inputs:
+	 *   None.
+	 * Outputs:
+	 *   The return values.
+	 * Return values:
+	 *   A Vector object containing all valid moves for all pieces belonging to the player on move.
 	 */
 	private Vector<Move> findAllValidMoves() {
-		
 		/* Scan the board for all the pieces belonging to the player that is on move. */
 		Vector<Square> occupied_squares = new Vector<Square>();
 		for (int i = 0; i < num_rows; i++) {
@@ -795,20 +928,34 @@ public class State implements Cloneable {
 	}
 
 	/* Function:
-	 *   WhiteOnMove()
+	 *   whiteOnMove
 	 * Description:
 	 *   Returns true if White is next to play.
+	 * Inputs:
+	 *   None.
+	 * Outputs:
+	 *   The return values.
+	 * Return values:
+	 *    True : Returned if White is next to play.
+	 *   False : Returned if White is not next to play.
 	 */
-	public boolean WhiteOnMove() {
+	public boolean whiteOnMove() {
 		return white_is_next;
 	}
 	
 	/* Function:
-	 *   BlackOnMove()
+	 *   blackOnMove
 	 * Description:
 	 *   Returns true if Black is next to play.
+	 * Inputs:
+	 *   None.
+	 * Outputs:
+	 *   The return values.
+	 * Return values:
+	 *    True : Returned if Black is next to play.
+	 *   False : Returned if Black is not next to play.
 	 */
-	public boolean BlackOnMove() {
+	public boolean blackOnMove() {
 		return !white_is_next;
 	}
 	
