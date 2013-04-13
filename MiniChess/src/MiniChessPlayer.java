@@ -12,8 +12,8 @@ public class MiniChessPlayer {
 	 */
 	public static void main(String[] args) {
 
-		//playRandomVsHuman();
-		playRandomVsRandom();
+		playRandomVsHuman();
+		//playRandomVsRandom();
 		
 	}
 	

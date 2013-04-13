@@ -827,9 +827,6 @@ public class State implements Cloneable {
 		Vector<Move> valid_moves = new Vector<Move>();
 		valid_moves = getMovesForPieceAtSquare(start_square);
 		if (!valid_moves.contains(move)) {
-			for (int i = 0; i < valid_moves.size(); i++) {
-				System.out.println(valid_moves.elementAt(i));
-			}
 			throw new Exception("Move not allowed for given piece.");
 		}
 		
