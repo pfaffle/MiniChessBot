@@ -307,7 +307,7 @@ public class State implements Cloneable {
 		if (!squareIsValid(sq)) {
 			throw new Exception("Invalid square.");
 		} else {
-			return getPieceAtIndex(sq.x,sq.y); // this should error-check.
+			return getPieceAtIndex(sq.x,sq.y);
 		}
 	}
 	
@@ -507,9 +507,6 @@ public class State implements Cloneable {
 	 *                   Square can make in the given direction.
 	 */
 	private Vector<Move> getMovesInDirection(Square init_position, int dx, int dy, boolean allow_capture, boolean one_hop) { 
-		if (!squareIsValid(init_position)) {
-			return null;
-		}
 		try {
 			if (getPieceAtSquare(init_position) == '.') {
 				return null;
@@ -570,9 +567,12 @@ public class State implements Cloneable {
 	 *   A Vector object containing all valid moves for the piece at the given coordinates.
 	 */
 	private Vector<Move> getMovesForPieceAtIndex(int x, int y) {
-		if (!indexIsValid(x,y)) {
+		char piece;
+		try {
+			piece = getPieceAtIndex(x,y);
+		} catch (Exception e) {
 			return null;
-		} // WRITE THIS SO IT ACCOUNTS FOR '.'
+		}
 		
 		int dx;
 		int dy;
@@ -582,7 +582,6 @@ public class State implements Cloneable {
 		Vector<Move> moves = new Vector<Move>(6,6);
 		Vector<Move> pawn_possible_caps = new Vector<Move>(2);
 		
-		char piece = board[x][y]; // change this to getPiece function.
 		switch(piece) {
 		
 		case 'K':
@@ -686,7 +685,7 @@ public class State implements Cloneable {
 					if (Piece.isBlack(tgt_Piece)) {
 						moves.add(pawn_possible_caps.elementAt(i));
 					}
-				} catch (Exception e) {
+				} catch (Exception e1) {
 					continue;
 				}
 			}
@@ -710,7 +709,7 @@ public class State implements Cloneable {
 					if (Piece.isWhite(tgt_Piece)) {
 						moves.add(pawn_possible_caps.elementAt(i));
 					}
-				} catch (Exception e) {
+				} catch (Exception e1) {
 					continue;
 				}
 			}
@@ -813,10 +812,6 @@ public class State implements Cloneable {
 		Square start_square = move.from_Square;
 		Square end_square = move.to_Square;
 		
-		/* Check that originating square exists and has a valid piece in it. */
-		if (!squareIsValid(start_square)) {
-			throw new Exception("Invalid square.");
-		}
 		char src_piece = getPieceAtSquare(start_square);
 		char tgt_piece = getPieceAtSquare(end_square);
 		if (src_piece == '.') {
