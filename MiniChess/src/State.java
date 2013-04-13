@@ -280,7 +280,7 @@ public class State implements Cloneable {
 		
 		int x = init_position.x;
 		int y = init_position.y;		
-		boolean piece_is_white = Character.isUpperCase(board[x][y]);
+		boolean piece_is_white = Piece.isWhite(board[x][y]);
 		boolean more_moves = true;
 		Vector<Move> valid_moves = new Vector<Move>(6);
 		
@@ -297,7 +297,7 @@ public class State implements Cloneable {
 			} else {
 				/* If there is another piece in the square, we can only move there if
 				 * we are allowed to capture it. */
-				boolean target_is_white = Character.isUpperCase(cur_square);
+				boolean target_is_white = Piece.isWhite(cur_square);
 				if (piece_is_white != target_is_white) {
 					if (allow_capture) {
 						valid_moves.add(new Move(init_position,new Square(x,y)));
@@ -474,7 +474,7 @@ public class State implements Cloneable {
 			for (int i = 0; i < pawn_possible_caps.size(); i++) {
 				Square tgt_Square = pawn_possible_caps.elementAt(i).to_Square;
 				char tgt_Piece = getPieceAtSquare(tgt_Square);
-				if (Character.isLowerCase(tgt_Piece)) {
+				if (Piece.isBlack(tgt_Piece)) {
 					moves.add(pawn_possible_caps.elementAt(i));
 				}
 			}
@@ -494,7 +494,7 @@ public class State implements Cloneable {
 			for (int i = 0; i < pawn_possible_caps.size(); i++) {
 				Square tgt_Square = pawn_possible_caps.elementAt(i).to_Square;
 				char tgt_Piece = getPieceAtSquare(tgt_Square);
-				if (Character.isUpperCase(tgt_Piece)) {
+				if (Piece.isWhite(tgt_Piece)) {
 					moves.add(pawn_possible_caps.elementAt(i));
 				}
 			}
@@ -593,9 +593,9 @@ public class State implements Cloneable {
 		if (ch == '.') {
 			return false;
 		} else if (Character.isLetter(ch)) {
-			if (Character.isUpperCase(ch) && white_is_next) {
+			if (Piece.isWhite(ch) && white_is_next) {
 				return true;
-			} else if (Character.isLowerCase(ch) && !white_is_next) {
+			} else if (Piece.isBlack(ch) && !white_is_next) {
 				return true;
 			} else {
 				return false;
@@ -909,9 +909,9 @@ public class State implements Cloneable {
 				Square cur_square = new Square(j,i);
 				char cur_piece = getPieceAtSquare(cur_square);
 				if (cur_piece != '.') {
-					if (Character.isUpperCase(cur_piece) && white_is_next) {
+					if (Piece.isWhite(cur_piece) && white_is_next) {
 						occupied_squares.add(cur_square);
-					} else if (Character.isLowerCase(cur_piece) && !white_is_next) {
+					} else if (Piece.isBlack(cur_piece) && !white_is_next) {
 						occupied_squares.add(cur_square);
 					}
 				}
