@@ -1,8 +1,8 @@
-import java.io.File;
+/*import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.util.Vector;
+import java.util.Vector;*/
 import java.util.Scanner;
 
 public class MiniChessPlayer {
@@ -12,9 +12,76 @@ public class MiniChessPlayer {
 	 */
 	public static void main(String[] args) {
 
-		//play_randomVsHuman();
-		play_randomVsRandom();
+		//playRandomVsHuman();
+		playRandomVsRandom();
 		
+	}
+	
+	public static void playRandomVsHuman() {
+		State gamestate = new State();
+		Scanner scan = new Scanner(System.in);
+		gamestate.writeBoard();
+		// Play the game.
+		while (!gamestate.gameOver()) {
+			if (gamestate.whiteOnMove()) {
+				System.out.print("Please enter a move in the form A1-B2: ");
+				String in = scan.nextLine();
+				try {
+					gamestate = gamestate.makeHumanMove(in);
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			} else {
+				System.out.println("Black moves...");
+				try {
+					gamestate = gamestate.makeRandomMove();
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+			gamestate.writeBoard();
+		}
+		System.out.println("Game over!");
+		if (gamestate.whiteWins()) {
+			System.out.println("White wins!");
+		} else if (gamestate.blackWins()) {
+			System.out.println("Black wins!");
+		} else {
+			System.out.println("Game is a draw.");
+		}
+		scan.close();
+	}
+	
+	public static void playRandomVsRandom() {
+		State gamestate = new State();
+		gamestate.writeBoard();
+		// Play the game.
+		while (!gamestate.gameOver()) {
+			if (gamestate.whiteOnMove()) {
+				System.out.println("White moves...");
+				try {
+					gamestate = gamestate.makeRandomMove();
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			} else {
+				System.out.println("Black moves...");
+				try {
+					gamestate = gamestate.makeRandomMove();
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+			gamestate.writeBoard();
+		}
+		System.out.println("Game over!");
+		if (gamestate.whiteWins()) {
+			System.out.println("White wins!");
+		} else if (gamestate.blackWins()) {
+			System.out.println("Black wins!");
+		} else {
+			System.out.println("Game is a draw.");
+		}
 	}
 	
 	/* Function:
@@ -25,7 +92,7 @@ public class MiniChessPlayer {
 	 *   ways, to ensure that the function detects these errors and returns
 	 *   appropriate return codes. 
 	 */
-	public static void test_ReadBoard(State gamestate) {
+	/*public static void test_ReadBoard(State gamestate) {
 		int retval = 0;
 		String test_file_path;
 		File test_file;
@@ -184,9 +251,9 @@ public class MiniChessPlayer {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-	}
+	}*/
 	
-	public static void test_getMovesForPieceAtIndex(State gamestate) {
+	/*public static void test_getMovesForPieceAtIndex(State gamestate) {
 		int x = 0;
 		int y = 3;
 		System.out.println("Test 1: Scanning for moves from the pawn in square " + x + "," + y);
@@ -211,72 +278,6 @@ public class MiniChessPlayer {
 				System.out.println(valid_bking_moves.elementAt(i));
 			}
 		}
-	}
-	
-	public static void play_randomVsHuman() {
-		State gamestate = new State();
-		Scanner scan = new Scanner(System.in);
-		gamestate.writeBoard();
-		// Play the game.
-		while (!gamestate.gameOver()) {
-			if (gamestate.whiteOnMove()) {
-				System.out.print("Please enter a move in the form A1-B2: ");
-				String in = scan.nextLine();
-				try {
-					gamestate = gamestate.makeHumanMove(in);
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			} else {
-				System.out.println("Black moves...");
-				try {
-					gamestate = gamestate.makeRandomMove();
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			}
-			gamestate.writeBoard();
-		}
-		System.out.println("Game over!");
-		if (gamestate.whiteWins()) {
-			System.out.println("White wins!");
-		} else if (gamestate.blackWins()) {
-			System.out.println("Black wins!");
-		} else {
-			System.out.println("Game is a draw.");
-		}
-		scan.close();
-	}
-	
-	public static void play_randomVsRandom() {
-		State gamestate = new State();
-		gamestate.writeBoard();
-		// Play the game.
-		while (!gamestate.gameOver()) {
-			if (gamestate.whiteOnMove()) {
-				System.out.println("White moves...");
-				try {
-					gamestate = gamestate.makeRandomMove();
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			} else {
-				System.out.println("Black moves...");
-				try {
-					gamestate = gamestate.makeRandomMove();
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			}
-			gamestate.writeBoard();
-		}
-		System.out.println("Game over!");
-		if (gamestate.whiteWins()) {
-			System.out.println("White wins!");
-		} else if (gamestate.blackWins()) {
-			System.out.println("Black wins!");
-		} else {
-			System.out.println("Game is a draw.");
-		}
-	}
+	}*/
+
 }

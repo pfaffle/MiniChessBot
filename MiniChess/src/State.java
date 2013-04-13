@@ -77,6 +77,235 @@ public class State implements Cloneable {
 		board[3][5] = 'n';
 		board[4][5] = 'r';
 	}
+
+	/* Function:
+	 *   clone
+	 * Description:
+	 *   Generates a copy of the current object.
+	 * Inputs:
+	 *   None.
+	 * Outputs:
+	 *   The return values.
+	 * Return values:
+	 *   A new State object containing the same data as the instance this function was called on.
+	 */
+	public State clone() {
+		State newState = new State();
+		newState.num_rows = this.num_rows;
+		newState.num_columns = this.num_columns;
+		newState.num_turns = this.num_turns;
+		newState.max_turns = this.max_turns;
+		newState.white_is_next = this.white_is_next;
+		newState.game_is_over = this.game_is_over;
+		newState.white_wins = this.white_wins;
+		newState.black_wins = this.black_wins;
+		newState.board = new char[newState.num_columns][newState.num_rows];
+		
+		for (int i = 0; i < num_columns; i++) {
+			for (int j = 0; j < num_rows; j++) {
+				newState.board[i][j] = this.board[i][j];
+			}
+		}
+		
+		return newState;
+	}
+
+	/* Function:
+	 *   whiteOnMove
+	 * Description:
+	 *   Returns true if White is next to play.
+	 * Inputs:
+	 *   None.
+	 * Outputs:
+	 *   The return values.
+	 * Return values:
+	 *    True : Returned if White is next to play.
+	 *   False : Returned if White is not next to play.
+	 */
+	public boolean whiteOnMove() {
+		return white_is_next;
+	}
+	
+	/* Function:
+	 *   blackOnMove
+	 * Description:
+	 *   Returns true if Black is next to play.
+	 * Inputs:
+	 *   None.
+	 * Outputs:
+	 *   The return values.
+	 * Return values:
+	 *    True : Returned if Black is next to play.
+	 *   False : Returned if Black is not next to play.
+	 */
+	public boolean blackOnMove() {
+		return !white_is_next;
+	}
+	
+	/* Function:
+	 *   gameOver
+	 * Description:
+	 *   Returns true if one of the game's victory conditions has been met.
+	 * Inputs:
+	 *   None.
+	 * Outputs:
+	 *   The return values.
+	 * Return values:
+	 *   True : Returned if one of the following conditions is met:
+	 *          1. One side's king has been captured. (Victory condition #1.)
+	 *          2. One side is unable to make a valid move. (Victory condition #2.)
+	 *          3. The players have taken more than the number of allowed turns (i.e.
+	 *             the game is a draw).
+	 *  False : Returned if the game has not yet reached the maximum number of allowed
+	 *          turns (i.e. it is still in progress).
+	 */
+	public boolean gameOver() {
+		return game_is_over;
+	}
+	
+	/* Function:
+	 *   whiteWins
+	 * Description:
+	 *   Returns true if White has won the game.
+	 * Inputs:
+	 *   None.
+	 * Outputs:
+	 *   The return values.
+	 * Return values:
+	 *    True : Returned if White has met one of the victory conditions shown in the
+	 *           description of GameOver.
+	 *   False : Returned if White has *not* met one of the victory conditions. 
+	 */
+	public boolean whiteWins() {
+		return white_wins;
+	}
+	
+	/* Function:
+	 *   blackWins
+	 * Description:
+	 *   Returns true if Black has won the game.
+	 * Inputs:
+	 *   None.
+	 * Outputs:
+	 *   The return values.
+	 * Return values:
+	 *    True : Returned if Black has met one of the victory conditions shown in the
+	 *           description of GameOver.
+	 *   False : Returned if Black has *not* met one of the victory conditions. 
+	 */
+	public boolean blackWins() {
+		return black_wins;
+	}
+	
+	/* Function:
+	 *   pieceIsOnMove
+	 * Description:
+	 *   Returns true if the color of the piece given (i.e. the case) matches
+	 *   the color of the player who is next to move. Otherwise, returns false.
+	 * Inputs:
+	 *   ch : The character representation of a piece.
+	 * Outputs:
+	 *   The return values.
+	 * Return values:
+	 *    True : Returned if the piece matches the color of the player who is on move.
+	 *   False : Returned if the piece is not a valid piece, OR it does not match the color
+	 *           of the player who is on move.
+	 */
+	private boolean pieceIsOnMove(char ch) {
+		if (ch == '.') {
+			return false;
+		} else if (Character.isLetter(ch)) {
+			if (Piece.isWhite(ch) && white_is_next) {
+				return true;
+			} else if (Piece.isBlack(ch) && !white_is_next) {
+				return true;
+			} else {
+				return false;
+			}
+		} else {
+			return false;
+		}
+	}	
+	
+	/* Function:
+	 *   pieceExistsAtIndex
+	 * Description:
+	 *   Ensures that there is a valid piece at the given coordinates.
+	 * Inputs:
+	 *   x : An integer value indicating the x coordinate (column) of the square to check for a piece.
+	 *   y : An integer value indicating the y coordinate (row) of the square to check for a piece.
+	 * Outputs:
+	 *   The return values.
+	 * Return values:
+	 *    True : Returned if the given coordinates indicate a valid square AND there is a valid piece in it.
+	 *   False : Returned if the given coordinates indicate an invalid square OR there is no valid piece in it.
+	 */
+	private boolean pieceExistsAtIndex(int x, int y) {
+		/* Ensure that the square we're checking actually exists and has a piece in it. */ 
+		if (x >= num_columns || x < 0) {
+			return false;
+		}
+		if (y >= num_rows || y < 0) {
+			return false;
+		}
+		if (!(Character.isLetter(board[x][y]))) {
+			return false;
+		}
+		return true;
+	}
+	
+	/* Function:
+	 *   pieceExistsAtSquare
+	 * Description:
+	 *   Ensures that there is a valid piece at the given Square.
+	 * Inputs:
+	 *   sq : A Square object containing the coordinates to check for a piece.
+	 * Outputs:
+	 *   The return values.
+	 * Return values:
+	 *    True : Returned if the given square is on the board AND there is a piece there.
+	 *   False : Returned if the given square is not on the board OR there is no piece there.
+	 */
+	private boolean pieceExistsAtSquare(Square sq) {
+		if (sq == null) {
+			return false;
+		} else {
+			return pieceExistsAtIndex(sq.x,sq.y);
+		}
+	}
+
+	/* Function:
+	 *   getPieceAtIndex
+	 * Description:
+	 *   Function which returns the character representation of the piece at the
+	 *   given coordinates.
+	 * Inputs:
+	 *   x : An integer value indicating the x coordinate (column) of the piece to get.
+	 *   y : An integer value indicating the y coordinate (row) of the piece to get.
+	 * Outputs:
+	 *   The return values.
+	 * Return values:
+	 *   The character representation of the piece (or blank square) at the given indexes.
+	 */
+	private char getPieceAtIndex(int x, int y) {
+		return board[x][y];
+	}
+	
+	/* Function:
+	 *   getPieceAtSquare
+	 * Description:
+	 *   Function which returns the character representation of the piece at the
+	 *   given Square.
+	 * Inputs:
+	 *   sq : A Square object containing the x and y indexes of the piece to get.
+	 * Outputs:
+	 *   The return values.
+	 * Return values:
+	 *   The character representation of the piece (or blank square) at the given Square.
+	 */
+	private char getPieceAtSquare(Square sq) {
+		return board[sq.x][sq.y];
+	}
 	
 	/* Function:
 	 *   readBoard
@@ -248,6 +477,43 @@ public class State implements Cloneable {
 	public void writeBoard() {
 		writeBoard(System.out);
 	}
+	
+	/* Function:
+	 *   findAllValidMoves
+	 * Description:
+	 *   Searches for and finds all valid moves for the pieces belonging to the player on move.
+	 * Inputs:
+	 *   None.
+	 * Outputs:
+	 *   The return values.
+	 * Return values:
+	 *   A Vector object containing all valid moves for all pieces belonging to the player on move.
+	 */
+	private Vector<Move> findAllValidMoves() {
+		/* Scan the board for all the pieces belonging to the player that is on move. */
+		Vector<Square> occupied_squares = new Vector<Square>();
+		for (int i = 0; i < num_rows; i++) {
+			for (int j = 0; j < num_columns; j++) {
+				Square cur_square = new Square(j,i);
+				char cur_piece = getPieceAtSquare(cur_square);
+				if (cur_piece != '.') {
+					if (Piece.isWhite(cur_piece) && white_is_next) {
+						occupied_squares.add(cur_square);
+					} else if (Piece.isBlack(cur_piece) && !white_is_next) {
+						occupied_squares.add(cur_square);
+					}
+				}
+			}
+		}
+		
+		/* Generate all possible moves for those pieces. */
+		Vector<Move> possible_moves = new Vector<Move>();
+		for (int i = 0; i < occupied_squares.size(); i++) {
+			possible_moves.addAll(getMovesForPieceAtSquare(occupied_squares.elementAt(i)));
+		}
+		
+		return possible_moves;
+	}
 
 	/* Function:
 	 *   getMovesInDirection
@@ -273,7 +539,7 @@ public class State implements Cloneable {
 	 *    Vector<Move> : A Vector object containing all valid Moves that the piece in the given
 	 *                   Square can make in the given direction.
 	 */
-	public Vector<Move> getMovesInDirection(Square init_position, int dx, int dy, boolean allow_capture, boolean one_hop) { 
+	private Vector<Move> getMovesInDirection(Square init_position, int dx, int dy, boolean allow_capture, boolean one_hop) { 
 		if (!pieceExistsAtSquare(init_position)) {
 			return null;
 		}
@@ -315,38 +581,6 @@ public class State implements Cloneable {
 		return valid_moves;
 	}
 	
-	/* Function:
-	 *   getPieceAtIndex
-	 * Description:
-	 *   Function which returns the character representation of the piece at the
-	 *   given coordinates.
-	 * Inputs:
-	 *   x : An integer value indicating the x coordinate (column) of the piece to get.
-	 *   y : An integer value indicating the y coordinate (row) of the piece to get.
-	 * Outputs:
-	 *   The return values.
-	 * Return values:
-	 *   The character representation of the piece (or blank square) at the given indexes.
-	 */
-	public char getPieceAtIndex(int x, int y) {
-		return board[x][y];
-	}
-	
-	/* Function:
-	 *   getPieceAtSquare
-	 * Description:
-	 *   Function which returns the character representation of the piece at the
-	 *   given Square.
-	 * Inputs:
-	 *   sq : A Square object containing the x and y indexes of the piece to get.
-	 * Outputs:
-	 *   The return values.
-	 * Return values:
-	 *   The character representation of the piece (or blank square) at the given Square.
-	 */
-	public char getPieceAtSquare(Square sq) {
-		return board[sq.x][sq.y];
-	}
 	
 	/* Function:
 	 *   getMovesForPieceAtIndex
@@ -361,7 +595,7 @@ public class State implements Cloneable {
 	 * Return values:
 	 *   A Vector object containing all valid moves for the piece at the given coordinates.
 	 */
-	public Vector<Move> getMovesForPieceAtIndex(int x, int y) {
+	private Vector<Move> getMovesForPieceAtIndex(int x, int y) {
 		if (!pieceExistsAtIndex(x,y)) {
 			return null;
 		}
@@ -520,90 +754,14 @@ public class State implements Cloneable {
 	 * Return values:
 	 *   A Vector object containing all valid moves for the piece at the given Square.
 	 */
-	public Vector<Move> getMovesForPieceAtSquare(Square sq) {
+	private Vector<Move> getMovesForPieceAtSquare(Square sq) {
 		if (sq == null) {
 			return null;
 		} else {
 			return getMovesForPieceAtIndex(sq.x, sq.y);
 		}
 	}
-	
-	/* Function:
-	 *   pieceExistsAtIndex
-	 * Description:
-	 *   Ensures that there is a valid piece at the given coordinates.
-	 * Inputs:
-	 *   x : An integer value indicating the x coordinate (column) of the square to check for a piece.
-	 *   y : An integer value indicating the y coordinate (row) of the square to check for a piece.
-	 * Outputs:
-	 *   The return values.
-	 * Return values:
-	 *    True : Returned if the given coordinates indicate a valid square AND there is a valid piece in it.
-	 *   False : Returned if the given coordinates indicate an invalid square OR there is no valid piece in it.
-	 */
-	private boolean pieceExistsAtIndex(int x, int y) {
-		/* Ensure that the square we're checking actually exists and has a piece in it. */ 
-		if (x >= num_columns || x < 0) {
-			return false;
-		}
-		if (y >= num_rows || y < 0) {
-			return false;
-		}
-		if (!(Character.isLetter(board[x][y]))) {
-			return false;
-		}
-		return true;
-	}
-	
-	/* Function:
-	 *   pieceExistsAtSquare
-	 * Description:
-	 *   Ensures that there is a valid piece at the given Square.
-	 * Inputs:
-	 *   sq : A Square object containing the coordinates to check for a piece.
-	 * Outputs:
-	 *   The return values.
-	 * Return values:
-	 *    True : Returned if the given square is on the board AND there is a piece there.
-	 *   False : Returned if the given square is not on the board OR there is no piece there.
-	 */
-	private boolean pieceExistsAtSquare(Square sq) {
-		if (sq == null) {
-			return false;
-		} else {
-			return pieceExistsAtIndex(sq.x,sq.y);
-		}
-	}
-	
-	/* Function:
-	 *   pieceIsOnMove
-	 * Description:
-	 *   Returns true if the color of the piece given (i.e. the case) matches
-	 *   the color of the player who is next to move. Otherwise, returns false.
-	 * Inputs:
-	 *   ch : The character representation of a piece.
-	 * Outputs:
-	 *   The return values.
-	 * Return values:
-	 *    True : Returned if the piece matches the color of the player who is on move.
-	 *   False : Returned if the piece is not a valid piece, OR it does not match the color
-	 *           of the player who is on move.
-	 */
-	private boolean pieceIsOnMove(char ch) {
-		if (ch == '.') {
-			return false;
-		} else if (Character.isLetter(ch)) {
-			if (Piece.isWhite(ch) && white_is_next) {
-				return true;
-			} else if (Piece.isBlack(ch) && !white_is_next) {
-				return true;
-			} else {
-				return false;
-			}
-		} else {
-			return false;
-		}
-	}
+
 	
 	/* Function:
 	 *   executeMove
@@ -618,7 +776,7 @@ public class State implements Cloneable {
 	 *   A new State object containing the altered state of the game after the move
 	 *   has been executed. 
 	 */
-	public State executeMove(Move move) throws Exception {
+	private State executeMove(Move move) throws Exception {
 		if (move == null) {
 			throw new Exception("Invalid Move.");
 		}
@@ -777,93 +935,6 @@ public class State implements Cloneable {
 	}
 	
 	/* Function:
-	 *   clone
-	 * Description:
-	 *   Generates a copy of the current object.
-	 * Inputs:
-	 *   None.
-	 * Outputs:
-	 *   The return values.
-	 * Return values:
-	 *   A new State object containing the same data as the instance this function was called on.
-	 */
-	public State clone() {
-		State newState = new State();
-		newState.num_rows = this.num_rows;
-		newState.num_columns = this.num_columns;
-		newState.num_turns = this.num_turns;
-		newState.max_turns = this.max_turns;
-		newState.white_is_next = this.white_is_next;
-		newState.game_is_over = this.game_is_over;
-		newState.white_wins = this.white_wins;
-		newState.black_wins = this.black_wins;
-		newState.board = new char[newState.num_columns][newState.num_rows];
-		
-		for (int i = 0; i < num_columns; i++) {
-			for (int j = 0; j < num_rows; j++) {
-				newState.board[i][j] = this.board[i][j];
-			}
-		}
-		
-		return newState;
-	}
-	
-	/* Function:
-	 *   gameOver
-	 * Description:
-	 *   Returns true if one of the game's victory conditions has been met.
-	 * Inputs:
-	 *   None.
-	 * Outputs:
-	 *   The return values.
-	 * Return values:
-	 *   True : Returned if one of the following conditions is met:
-	 *          1. One side's king has been captured. (Victory condition #1.)
-	 *          2. One side is unable to make a valid move. (Victory condition #2.)
-	 *          3. The players have taken more than the number of allowed turns (i.e.
-	 *             the game is a draw).
-	 *  False : Returned if the game has not yet reached the maximum number of allowed
-	 *          turns (i.e. it is still in progress).
-	 */
-	public boolean gameOver() {
-		return game_is_over;
-	}
-	
-	/* Function:
-	 *   whiteWins
-	 * Description:
-	 *   Returns true if White has won the game.
-	 * Inputs:
-	 *   None.
-	 * Outputs:
-	 *   The return values.
-	 * Return values:
-	 *    True : Returned if White has met one of the victory conditions shown in the
-	 *           description of GameOver.
-	 *   False : Returned if White has *not* met one of the victory conditions. 
-	 */
-	public boolean whiteWins() {
-		return white_wins;
-	}
-	
-	/* Function:
-	 *   blackWins
-	 * Description:
-	 *   Returns true if Black has won the game.
-	 * Inputs:
-	 *   None.
-	 * Outputs:
-	 *   The return values.
-	 * Return values:
-	 *    True : Returned if Black has met one of the victory conditions shown in the
-	 *           description of GameOver.
-	 *   False : Returned if Black has *not* met one of the victory conditions. 
-	 */
-	public boolean blackWins() {
-		return black_wins;
-	}
-	
-	/* Function:
 	 *   makeRandomMove
 	 * Description:
 	 *   Selects and executes a random possible move for the current side.
@@ -889,74 +960,5 @@ public class State implements Cloneable {
 		
 		return executeMove(selected_move);
 	}
-	
-	/* Function:
-	 *   findAllValidMoves
-	 * Description:
-	 *   Searches for and finds all valid moves for the pieces belonging to the player on move.
-	 * Inputs:
-	 *   None.
-	 * Outputs:
-	 *   The return values.
-	 * Return values:
-	 *   A Vector object containing all valid moves for all pieces belonging to the player on move.
-	 */
-	private Vector<Move> findAllValidMoves() {
-		/* Scan the board for all the pieces belonging to the player that is on move. */
-		Vector<Square> occupied_squares = new Vector<Square>();
-		for (int i = 0; i < num_rows; i++) {
-			for (int j = 0; j < num_columns; j++) {
-				Square cur_square = new Square(j,i);
-				char cur_piece = getPieceAtSquare(cur_square);
-				if (cur_piece != '.') {
-					if (Piece.isWhite(cur_piece) && white_is_next) {
-						occupied_squares.add(cur_square);
-					} else if (Piece.isBlack(cur_piece) && !white_is_next) {
-						occupied_squares.add(cur_square);
-					}
-				}
-			}
-		}
 		
-		/* Generate all possible moves for those pieces. */
-		Vector<Move> possible_moves = new Vector<Move>();
-		for (int i = 0; i < occupied_squares.size(); i++) {
-			possible_moves.addAll(getMovesForPieceAtSquare(occupied_squares.elementAt(i)));
-		}
-		
-		return possible_moves;
-	}
-
-	/* Function:
-	 *   whiteOnMove
-	 * Description:
-	 *   Returns true if White is next to play.
-	 * Inputs:
-	 *   None.
-	 * Outputs:
-	 *   The return values.
-	 * Return values:
-	 *    True : Returned if White is next to play.
-	 *   False : Returned if White is not next to play.
-	 */
-	public boolean whiteOnMove() {
-		return white_is_next;
-	}
-	
-	/* Function:
-	 *   blackOnMove
-	 * Description:
-	 *   Returns true if Black is next to play.
-	 * Inputs:
-	 *   None.
-	 * Outputs:
-	 *   The return values.
-	 * Return values:
-	 *    True : Returned if Black is next to play.
-	 *   False : Returned if Black is not next to play.
-	 */
-	public boolean blackOnMove() {
-		return !white_is_next;
-	}
-	
 }
