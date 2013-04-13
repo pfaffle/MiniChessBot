@@ -228,49 +228,45 @@ public class State implements Cloneable {
 	}	
 	
 	/* Function:
-	 *   pieceExistsAtIndex
+	 *   indexIsValid
 	 * Description:
-	 *   Ensures that there is a valid piece at the given coordinates.
+	 *   Ensures that the given coordinates reference a square on the board.
 	 * Inputs:
-	 *   x : An integer value indicating the x coordinate (column) of the square to check for a piece.
-	 *   y : An integer value indicating the y coordinate (row) of the square to check for a piece.
+	 *   x : An integer value indicating the x coordinate (column) of the square to check.
+	 *   y : An integer value indicating the y coordinate (row) of the square to check.
 	 * Outputs:
 	 *   The return values.
 	 * Return values:
-	 *    True : Returned if the given coordinates indicate a valid square AND there is a valid piece in it.
-	 *   False : Returned if the given coordinates indicate an invalid square OR there is no valid piece in it.
+	 *    True : Returned if the given coordinates indicate a valid square.
+	 *   False : Returned if the given coordinates indicate an invalid square.
 	 */
-	private boolean pieceExistsAtIndex(int x, int y) {
-		/* Ensure that the square we're checking actually exists and has a piece in it. */ 
+	private boolean indexIsValid(int x, int y) {
 		if (x >= num_columns || x < 0) {
 			return false;
-		}
-		if (y >= num_rows || y < 0) {
+		} else if (y >= num_rows || y < 0) {
 			return false;
+		} else {
+			return true;
 		}
-		if (!(Character.isLetter(board[x][y]))) {
-			return false;
-		}
-		return true;
 	}
 	
 	/* Function:
-	 *   pieceExistsAtSquare
+	 *   squareIsValid
 	 * Description:
-	 *   Ensures that there is a valid piece at the given Square.
+	 *   Ensures that the given square exists on the board.
 	 * Inputs:
-	 *   sq : A Square object containing the coordinates to check for a piece.
+	 *   sq : A Square object containing the coordinates to check.
 	 * Outputs:
 	 *   The return values.
 	 * Return values:
-	 *    True : Returned if the given square is on the board AND there is a piece there.
-	 *   False : Returned if the given square is not on the board OR there is no piece there.
+	 *    True : Returned if the given square is on the board.
+	 *   False : Returned if the given square is not on the board.
 	 */
-	private boolean pieceExistsAtSquare(Square sq) {
+	private boolean squareIsValid(Square sq) {
 		if (sq == null) {
 			return false;
 		} else {
-			return pieceExistsAtIndex(sq.x,sq.y);
+			return indexIsValid(sq.x,sq.y);
 		}
 	}
 
@@ -288,7 +284,7 @@ public class State implements Cloneable {
 	 *   The character representation of the piece (or blank square) at the given indexes.
 	 */
 	private char getPieceAtIndex(int x, int y) {
-		return board[x][y];
+		return board[x][y]; // this should error-check.
 	}
 	
 	/* Function:
@@ -304,7 +300,7 @@ public class State implements Cloneable {
 	 *   The character representation of the piece (or blank square) at the given Square.
 	 */
 	private char getPieceAtSquare(Square sq) {
-		return board[sq.x][sq.y];
+		return getPieceAtIndex(sq.x,sq.y); // this should error-check.
 	}
 	
 	/* Function:
@@ -540,12 +536,16 @@ public class State implements Cloneable {
 	 *                   Square can make in the given direction.
 	 */
 	private Vector<Move> getMovesInDirection(Square init_position, int dx, int dy, boolean allow_capture, boolean one_hop) { 
-		if (!pieceExistsAtSquare(init_position)) {
+		if (!squareIsValid(init_position)) {
+			return null;
+		}
+		char piece_to_move = getPieceAtSquare(init_position);
+		if (piece_to_move == '.') {
 			return null;
 		}
 		
 		int x = init_position.x;
-		int y = init_position.y;		
+		int y = init_position.y;	
 		boolean piece_is_white = Piece.isWhite(board[x][y]);
 		boolean more_moves = true;
 		Vector<Move> valid_moves = new Vector<Move>(6);
@@ -596,9 +596,9 @@ public class State implements Cloneable {
 	 *   A Vector object containing all valid moves for the piece at the given coordinates.
 	 */
 	private Vector<Move> getMovesForPieceAtIndex(int x, int y) {
-		if (!pieceExistsAtIndex(x,y)) {
+		if (!indexIsValid(x,y)) {
 			return null;
-		}
+		} // WRITE THIS SO IT ACCOUNTS FOR '.'
 		
 		int dx;
 		int dy;
@@ -608,7 +608,7 @@ public class State implements Cloneable {
 		Vector<Move> moves = new Vector<Move>(6,6);
 		Vector<Move> pawn_possible_caps = new Vector<Move>(2);
 		
-		char piece = board[x][y];
+		char piece = board[x][y]; // change this to getPiece function.
 		switch(piece) {
 		
 		case 'K':
@@ -734,7 +734,7 @@ public class State implements Cloneable {
 			}
 			break;
 		default:
-			/* Unknown error? */
+			/* Empty space or something else. */
 			moves = null;
 			break;
 			
@@ -789,14 +789,17 @@ public class State implements Cloneable {
 		Square start_square = move.from_Square;
 		Square end_square = move.to_Square;
 		
-		/* Check that originating square has a valid piece in it. */
-		if (!pieceExistsAtSquare(start_square)) {
-			throw new Exception("Invalid piece.");
+		/* Check that originating square exists and has a valid piece in it. */
+		if (!squareIsValid(start_square)) {
+			throw new Exception("Invalid square.");
+		}
+		char src_piece = getPieceAtSquare(start_square);
+		char tgt_piece = getPieceAtSquare(end_square);
+		if (src_piece == '.') {
+			throw new Exception("No piece at location.");
 		}
 		
 		/* Check that the piece in the originating square is on move. */
-		char src_piece = getPieceAtSquare(start_square);
-		char tgt_piece = getPieceAtSquare(end_square);
 		if (!pieceIsOnMove(src_piece)) {
 			throw new Exception("Piece not on move.");
 		}
