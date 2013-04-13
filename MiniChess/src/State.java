@@ -283,8 +283,12 @@ public class State implements Cloneable {
 	 * Return values:
 	 *   The character representation of the piece (or blank square) at the given indexes.
 	 */
-	private char getPieceAtIndex(int x, int y) {
-		return board[x][y]; // this should error-check.
+	private char getPieceAtIndex(int x, int y) throws Exception {
+		if (!indexIsValid(x,y)) {
+			throw new Exception("Invalid coordinates.");
+		} else {
+			return board[x][y];
+		}
 	}
 	
 	/* Function:
@@ -299,8 +303,12 @@ public class State implements Cloneable {
 	 * Return values:
 	 *   The character representation of the piece (or blank square) at the given Square.
 	 */
-	private char getPieceAtSquare(Square sq) {
-		return getPieceAtIndex(sq.x,sq.y); // this should error-check.
+	private char getPieceAtSquare(Square sq) throws Exception {
+		if (!squareIsValid(sq)) {
+			throw new Exception("Invalid square.");
+		} else {
+			return getPieceAtIndex(sq.x,sq.y); // this should error-check.
+		}
 	}
 	
 	/* Function:
@@ -475,43 +483,6 @@ public class State implements Cloneable {
 	}
 	
 	/* Function:
-	 *   findAllValidMoves
-	 * Description:
-	 *   Searches for and finds all valid moves for the pieces belonging to the player on move.
-	 * Inputs:
-	 *   None.
-	 * Outputs:
-	 *   The return values.
-	 * Return values:
-	 *   A Vector object containing all valid moves for all pieces belonging to the player on move.
-	 */
-	private Vector<Move> findAllValidMoves() {
-		/* Scan the board for all the pieces belonging to the player that is on move. */
-		Vector<Square> occupied_squares = new Vector<Square>();
-		for (int i = 0; i < num_rows; i++) {
-			for (int j = 0; j < num_columns; j++) {
-				Square cur_square = new Square(j,i);
-				char cur_piece = getPieceAtSquare(cur_square);
-				if (cur_piece != '.') {
-					if (Piece.isWhite(cur_piece) && white_is_next) {
-						occupied_squares.add(cur_square);
-					} else if (Piece.isBlack(cur_piece) && !white_is_next) {
-						occupied_squares.add(cur_square);
-					}
-				}
-			}
-		}
-		
-		/* Generate all possible moves for those pieces. */
-		Vector<Move> possible_moves = new Vector<Move>();
-		for (int i = 0; i < occupied_squares.size(); i++) {
-			possible_moves.addAll(getMovesForPieceAtSquare(occupied_squares.elementAt(i)));
-		}
-		
-		return possible_moves;
-	}
-
-	/* Function:
 	 *   getMovesInDirection
 	 * Description:
 	 *   Function which generates a list of valid moves for a particular piece in
@@ -539,8 +510,11 @@ public class State implements Cloneable {
 		if (!squareIsValid(init_position)) {
 			return null;
 		}
-		char piece_to_move = getPieceAtSquare(init_position);
-		if (piece_to_move == '.') {
+		try {
+			if (getPieceAtSquare(init_position) == '.') {
+				return null;
+			}
+		} catch (Exception e) {
 			return null;
 		}
 		
@@ -707,9 +681,13 @@ public class State implements Cloneable {
 			}
 			for (int i = 0; i < pawn_possible_caps.size(); i++) {
 				Square tgt_Square = pawn_possible_caps.elementAt(i).to_Square;
-				char tgt_Piece = getPieceAtSquare(tgt_Square);
-				if (Piece.isBlack(tgt_Piece)) {
-					moves.add(pawn_possible_caps.elementAt(i));
+				try {
+					char tgt_Piece = getPieceAtSquare(tgt_Square);
+					if (Piece.isBlack(tgt_Piece)) {
+						moves.add(pawn_possible_caps.elementAt(i));
+					}
+				} catch (Exception e) {
+					continue;
 				}
 			}
 			break;
@@ -727,9 +705,13 @@ public class State implements Cloneable {
 			}
 			for (int i = 0; i < pawn_possible_caps.size(); i++) {
 				Square tgt_Square = pawn_possible_caps.elementAt(i).to_Square;
-				char tgt_Piece = getPieceAtSquare(tgt_Square);
-				if (Piece.isWhite(tgt_Piece)) {
-					moves.add(pawn_possible_caps.elementAt(i));
+				try {
+					char tgt_Piece = getPieceAtSquare(tgt_Square);
+					if (Piece.isWhite(tgt_Piece)) {
+						moves.add(pawn_possible_caps.elementAt(i));
+					}
+				} catch (Exception e) {
+					continue;
 				}
 			}
 			break;
@@ -761,7 +743,49 @@ public class State implements Cloneable {
 			return getMovesForPieceAtIndex(sq.x, sq.y);
 		}
 	}
-
+	
+	/* Function:
+	 *   findAllValidMoves
+	 * Description:
+	 *   Searches for and finds all valid moves for the pieces belonging to the player on move.
+	 * Inputs:
+	 *   None.
+	 * Outputs:
+	 *   The return values.
+	 * Return values:
+	 *   A Vector object containing all valid moves for all pieces belonging to the player on move.
+	 */
+	private Vector<Move> findAllValidMoves() {
+		/* Scan the board for all the pieces belonging to the player that is on move. */
+		Vector<Square> occupied_squares = new Vector<Square>();
+		for (int i = 0; i < num_rows; i++) {
+			for (int j = 0; j < num_columns; j++) {
+				Square cur_square = new Square(j,i);
+				try {
+					char cur_piece = getPieceAtSquare(cur_square);
+					if (cur_piece != '.') {
+						if (Piece.isWhite(cur_piece) && white_is_next) {
+							occupied_squares.add(cur_square);
+						} else if (Piece.isBlack(cur_piece) && !white_is_next) {
+							occupied_squares.add(cur_square);
+						}
+					}
+				} catch (Exception e) {
+					/* This shouldn't happen since we should only loop through
+					 * existing squares above. */
+					e.getStackTrace();
+				}
+			}
+		}
+		
+		/* Generate all possible moves for those pieces. */
+		Vector<Move> possible_moves = new Vector<Move>();
+		for (int i = 0; i < occupied_squares.size(); i++) {
+			possible_moves.addAll(getMovesForPieceAtSquare(occupied_squares.elementAt(i)));
+		}
+		
+		return possible_moves;
+	}
 	
 	/* Function:
 	 *   executeMove
