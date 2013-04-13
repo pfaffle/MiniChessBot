@@ -506,9 +506,11 @@ public class State implements Cloneable {
 	 *    Vector<Move> : A Vector object containing all valid Moves that the piece in the given
 	 *                   Square can make in the given direction.
 	 */
-	private Vector<Move> getMovesInDirection(Square init_position, int dx, int dy, boolean allow_capture, boolean one_hop) { 
+	private Vector<Move> getMovesInDirection(Square init_position, int dx, int dy, boolean allow_capture, boolean one_hop) {
+		char piece;
 		try {
-			if (getPieceAtSquare(init_position) == '.') {
+			piece = getPieceAtSquare(init_position);
+			if (piece == '.') {
 				return null;
 			}
 		} catch (Exception e) {
@@ -517,7 +519,7 @@ public class State implements Cloneable {
 		
 		int x = init_position.x;
 		int y = init_position.y;	
-		boolean piece_is_white = Piece.isWhite(board[x][y]);
+		boolean piece_is_white = Piece.isWhite(piece);
 		boolean more_moves = true;
 		Vector<Move> valid_moves = new Vector<Move>(6);
 		
