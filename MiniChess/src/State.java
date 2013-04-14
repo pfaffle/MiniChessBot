@@ -502,6 +502,7 @@ public class State implements Cloneable {
 		int bishopValue = 300;
 		int rookValue = 500;
 		int queenValue = 900;
+		int centerPieceValue = 10;
 		boolean black_king_taken = true;
 		boolean white_king_taken = true;
 		
@@ -510,6 +511,8 @@ public class State implements Cloneable {
 				Square cur_square = new Square(j,i);
 				try {
 					char cur_piece = getPieceAtSquare(cur_square);
+					
+					/* Sum up the values of all pieces left on the board. */
 					if (cur_piece != '.') {
 						switch (cur_piece) {
 						case 'K':
@@ -579,6 +582,25 @@ public class State implements Cloneable {
 								stateValue -= pawnValue;
 							break;
 						}
+						
+						/* Assign some value to having pieces in the center squares of the board. */
+						if (cur_square.y == 2 || cur_square.y == 3) {
+							if (cur_square.x == 1 || cur_square.x == 2 || cur_square.x == 3) {
+								if (whiteOnMove()) {
+									if (Piece.isWhite(cur_piece))
+										stateValue += centerPieceValue;
+									else
+										stateValue -= centerPieceValue;
+								} else {
+									if (Piece.isBlack(cur_piece))
+										stateValue += centerPieceValue;
+									else
+										stateValue -= centerPieceValue;
+								}								
+							}
+						}
+						
+						/* Add any other state valuations here... */
 					}
 				} catch (Exception e) {
 					/* This shouldn't happen since we should only loop through
