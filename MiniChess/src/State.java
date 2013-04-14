@@ -981,5 +981,126 @@ public class State implements Cloneable {
 		
 		return executeMove(selected_move);
 	}
+	
+	/* Function:
+	 *   getStateValue
+	 * Description:
+	 *   Uses heuristics to generate an integer value that represents how advantageous the current
+	 *   state of the game is for the current player.
+	 * Inputs:
+	 *   None.
+	 * Outputs:
+	 *   The return values.
+	 * Return values:
+	 *   An integer value between -10,000 and 10,000. A higher number means the game state is more
+	 *   advantageous to the player that is on move. A 10,000 (or -10,000) means a sure win (or loss).
+	 */
+	private int getStateValue() {
+		int stateValue = 0;
+		int pawnValue = 100;
+		int knightValue = 300;
+		int bishopValue = 300;
+		int rookValue = 500;
+		int queenValue = 900;
+		boolean black_king_taken = true;
+		boolean white_king_taken = true;
 		
+		for (int i = 0; i < num_rows; i++) {
+			for (int j = 0; j < num_columns; j++) {
+				Square cur_square = new Square(j,i);
+				try {
+					char cur_piece = getPieceAtSquare(cur_square);
+					if (cur_piece != '.') {
+						switch (cur_piece) {
+						case 'K':
+							white_king_taken = false;
+							break;
+						case 'k':
+							black_king_taken = false;
+							break;
+						case 'Q':
+							if (whiteOnMove())
+								stateValue += queenValue;
+							else
+								stateValue -= queenValue;
+							break;
+						case 'q':
+							if (blackOnMove())
+								stateValue += queenValue;
+							else
+								stateValue -= queenValue;
+							break;
+						case 'R':
+							if (whiteOnMove())
+								stateValue += rookValue;
+							else
+								stateValue -= rookValue;
+							break;
+						case 'r':
+							if (blackOnMove())
+								stateValue += rookValue;
+							else
+								stateValue -= rookValue;
+							break;
+						case 'B':
+							if (whiteOnMove())
+								stateValue += bishopValue;
+							else
+								stateValue -= bishopValue;
+							break;
+						case 'b':
+							if (blackOnMove())
+								stateValue += bishopValue;
+							else
+								stateValue -= bishopValue;
+							break;
+						case 'N':
+							if (whiteOnMove())
+								stateValue += knightValue;
+							else
+								stateValue -= knightValue;
+							break;
+						case 'n':
+							if (blackOnMove())
+								stateValue += knightValue;
+							else
+								stateValue -= knightValue;
+							break;
+						case 'P':
+							if (whiteOnMove())
+								stateValue += pawnValue;
+							else
+								stateValue -= pawnValue;
+							break;
+						case 'p':
+							if (blackOnMove())
+								stateValue += pawnValue;
+							else
+								stateValue -= pawnValue;
+							break;
+						}
+					}
+				} catch (Exception e) {
+					/* This shouldn't happen since we should only loop through
+					 * existing squares above. */
+					e.getStackTrace();
+				}		
+			}
+		}
+		
+		/* Check for game-winning states. */
+		if (white_king_taken) {
+			if (blackOnMove())
+				stateValue = 10000;
+			else
+				stateValue = -10000;
+		} else if (black_king_taken) {
+			if (whiteOnMove())
+				stateValue = 10000;
+			else
+				stateValue = -10000;
+		}
+		
+		return stateValue;
+	}
 }
