@@ -584,8 +584,8 @@ public class State implements Cloneable {
 						}
 						
 						/* Assign some value to having pieces in the center squares of the board. */
-						if (cur_square.y == 2 || cur_square.y == 3) {
-							if (cur_square.x == 1 || cur_square.x == 2 || cur_square.x == 3) {
+						if (cur_square.y > 1 && cur_square.y < 4) {
+							if (cur_square.x > 0 && cur_square.x < 4) {
 								if (whiteOnMove()) {
 									if (Piece.isWhite(cur_piece))
 										stateValue += centerPieceValue;
