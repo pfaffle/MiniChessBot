@@ -483,6 +483,128 @@ public class State implements Cloneable {
 	}
 	
 	/* Function:
+	 *   getStateValue
+	 * Description:
+	 *   Uses heuristics to generate an integer value that represents how advantageous the current
+	 *   state of the game is for the current player.
+	 * Inputs:
+	 *   None.
+	 * Outputs:
+	 *   The return values.
+	 * Return values:
+	 *   An integer value between -10,000 and 10,000. A higher number means the game state is more
+	 *   advantageous to the player that is on move. A 10,000 (or -10,000) means a sure win (or loss).
+	 */
+	private int getStateValue() {
+		int stateValue = 0;
+		int pawnValue = 100;
+		int knightValue = 300;
+		int bishopValue = 300;
+		int rookValue = 500;
+		int queenValue = 900;
+		boolean black_king_taken = true;
+		boolean white_king_taken = true;
+		
+		for (int i = 0; i < num_rows; i++) {
+			for (int j = 0; j < num_columns; j++) {
+				Square cur_square = new Square(j,i);
+				try {
+					char cur_piece = getPieceAtSquare(cur_square);
+					if (cur_piece != '.') {
+						switch (cur_piece) {
+						case 'K':
+							white_king_taken = false;
+							break;
+						case 'k':
+							black_king_taken = false;
+							break;
+						case 'Q':
+							if (whiteOnMove())
+								stateValue += queenValue;
+							else
+								stateValue -= queenValue;
+							break;
+						case 'q':
+							if (blackOnMove())
+								stateValue += queenValue;
+							else
+								stateValue -= queenValue;
+							break;
+						case 'R':
+							if (whiteOnMove())
+								stateValue += rookValue;
+							else
+								stateValue -= rookValue;
+							break;
+						case 'r':
+							if (blackOnMove())
+								stateValue += rookValue;
+							else
+								stateValue -= rookValue;
+							break;
+						case 'B':
+							if (whiteOnMove())
+								stateValue += bishopValue;
+							else
+								stateValue -= bishopValue;
+							break;
+						case 'b':
+							if (blackOnMove())
+								stateValue += bishopValue;
+							else
+								stateValue -= bishopValue;
+							break;
+						case 'N':
+							if (whiteOnMove())
+								stateValue += knightValue;
+							else
+								stateValue -= knightValue;
+							break;
+						case 'n':
+							if (blackOnMove())
+								stateValue += knightValue;
+							else
+								stateValue -= knightValue;
+							break;
+						case 'P':
+							if (whiteOnMove())
+								stateValue += pawnValue;
+							else
+								stateValue -= pawnValue;
+							break;
+						case 'p':
+							if (blackOnMove())
+								stateValue += pawnValue;
+							else
+								stateValue -= pawnValue;
+							break;
+						}
+					}
+				} catch (Exception e) {
+					/* This shouldn't happen since we should only loop through
+					 * existing squares above. */
+					e.getStackTrace();
+				}		
+			}
+		}
+		
+		/* Check for game-winning states. */
+		if (white_king_taken) {
+			if (blackOnMove())
+				stateValue = 10000;
+			else
+				stateValue = -10000;
+		} else if (black_king_taken) {
+			if (whiteOnMove())
+				stateValue = 10000;
+			else
+				stateValue = -10000;
+		}
+		
+		return stateValue;
+	}
+	
+	/* Function:
 	 *   getMovesInDirection
 	 * Description:
 	 *   Function which generates a list of valid moves for a particular piece in
@@ -898,10 +1020,12 @@ public class State implements Cloneable {
 	public State makeHumanMove(String rawmove) throws Exception {
 		if (rawmove == null) {
 			throw new Exception("Invalid Move.");
-		}
-		if (!rawmove.matches("\\w\\d-\\w\\d")) {
+		} else if (!rawmove.matches("\\w\\d-\\w\\d")) {
 			throw new Exception("Improperly formatted move.");
+		} else if (gameOver()) {
+			throw new Exception("Game is over.");
 		}
+		
 		String[] move = rawmove.split("-");
 		
 		String fromCol = move[0].substring(0,1).toUpperCase();
@@ -983,124 +1107,57 @@ public class State implements Cloneable {
 	}
 	
 	/* Function:
-	 *   getStateValue
+	 *   makeRandomGoodMove
 	 * Description:
-	 *   Uses heuristics to generate an integer value that represents how advantageous the current
-	 *   state of the game is for the current player.
+	 *   Selects and executes a good move for the current side, using heuristics
+	 *   to determine the best next move.
 	 * Inputs:
 	 *   None.
 	 * Outputs:
-	 *   The return values.
+	 *   The return values.  
 	 * Return values:
-	 *   An integer value between -10,000 and 10,000. A higher number means the game state is more
-	 *   advantageous to the player that is on move. A 10,000 (or -10,000) means a sure win (or loss).
+	 *   A new State object containing the altered state of the game after the move
+	 *   has been executed.
 	 */
-	private int getStateValue() {
-		int stateValue = 0;
-		int pawnValue = 100;
-		int knightValue = 300;
-		int bishopValue = 300;
-		int rookValue = 500;
-		int queenValue = 900;
-		boolean black_king_taken = true;
-		boolean white_king_taken = true;
+	public State makeRandomGoodMove() throws Exception {
+		if (gameOver()) {
+			throw new Exception("Game is over.");
+		}
 		
-		for (int i = 0; i < num_rows; i++) {
-			for (int j = 0; j < num_columns; j++) {
-				Square cur_square = new Square(j,i);
-				try {
-					char cur_piece = getPieceAtSquare(cur_square);
-					if (cur_piece != '.') {
-						switch (cur_piece) {
-						case 'K':
-							white_king_taken = false;
-							break;
-						case 'k':
-							black_king_taken = false;
-							break;
-						case 'Q':
-							if (whiteOnMove())
-								stateValue += queenValue;
-							else
-								stateValue -= queenValue;
-							break;
-						case 'q':
-							if (blackOnMove())
-								stateValue += queenValue;
-							else
-								stateValue -= queenValue;
-							break;
-						case 'R':
-							if (whiteOnMove())
-								stateValue += rookValue;
-							else
-								stateValue -= rookValue;
-							break;
-						case 'r':
-							if (blackOnMove())
-								stateValue += rookValue;
-							else
-								stateValue -= rookValue;
-							break;
-						case 'B':
-							if (whiteOnMove())
-								stateValue += bishopValue;
-							else
-								stateValue -= bishopValue;
-							break;
-						case 'b':
-							if (blackOnMove())
-								stateValue += bishopValue;
-							else
-								stateValue -= bishopValue;
-							break;
-						case 'N':
-							if (whiteOnMove())
-								stateValue += knightValue;
-							else
-								stateValue -= knightValue;
-							break;
-						case 'n':
-							if (blackOnMove())
-								stateValue += knightValue;
-							else
-								stateValue -= knightValue;
-							break;
-						case 'P':
-							if (whiteOnMove())
-								stateValue += pawnValue;
-							else
-								stateValue -= pawnValue;
-							break;
-						case 'p':
-							if (blackOnMove())
-								stateValue += pawnValue;
-							else
-								stateValue -= pawnValue;
-							break;
-						}
-					}
-				} catch (Exception e) {
-					/* This shouldn't happen since we should only loop through
-					 * existing squares above. */
-					e.getStackTrace();
-				}		
+		Vector<Move> possibleMoves = findAllValidMoves();
+		/* Iterate through the list of all possible moves, and generate a list of all 
+		 * board states that result from executing those moves. */
+		Vector<State> possibleStates = new Vector<State>();
+		for (int i = 0; i < possibleMoves.size(); i++) {
+			possibleStates.add(executeMove(possibleMoves.elementAt(i)));
+		}
+		
+		int bestStateValue = 10000;
+		Vector<State> bestStates = new Vector<State>();
+		for (int i = 0; i < possibleStates.size(); i++) {
+			State curState = possibleStates.elementAt(i);
+			int curStateValue = curState.getStateValue();
+			if (curStateValue < bestStateValue) {
+				/* This state is better than the previous best. */
+				bestStateValue = curStateValue;
+				bestStates = new Vector<State>();
+				bestStates.add(curState);
+			} else if (curStateValue == bestStateValue) {
+				/* This state is as good as the previous best. */
+				bestStates.add(curState);
 			}
 		}
 		
-		/* Check for game-winning states. */
-		if (white_king_taken) {
-			if (blackOnMove())
-				stateValue = 10000;
-			else
-				stateValue = -10000;
-		} else if (black_king_taken) {
-			if (whiteOnMove())
-				stateValue = 10000;
-			else
-				stateValue = -10000;
+		if (bestStates.isEmpty()) {
+			/* If we didn't find anything better than average, just pick something. */
+			bestStates.addAll(possibleStates);
 		}
 		
-		return stateValue;
+		/* Pick a random State from the best available. */
+		Random generator = new Random();
+		int randomIndex = generator.nextInt(bestStates.size());
+		
+		return bestStates.elementAt(randomIndex);
 	}
+	
 }

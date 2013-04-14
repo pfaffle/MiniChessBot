@@ -60,14 +60,14 @@ public class MiniChessPlayer {
 			if (gamestate.whiteOnMove()) {
 				System.out.println("White moves...");
 				try {
-					gamestate = gamestate.makeRandomMove();
+					gamestate = gamestate.makeRandomGoodMove();
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
 			} else {
 				System.out.println("Black moves...");
 				try {
-					gamestate = gamestate.makeRandomMove();
+					gamestate = gamestate.makeRandomGoodMove();
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
