@@ -12,8 +12,9 @@ public class MiniChessPlayer {
 	 */
 	public static void main(String[] args) {
 
+		playSmartVsHuman();
 		//playRandomVsHuman();
-		playRandomVsRandom();
+		//playRandomVsRandom();
 		
 	}
 	
@@ -34,7 +35,7 @@ public class MiniChessPlayer {
 			} else {
 				System.out.println("Black moves...");
 				try {
-					gamestate = gamestate.makeRandomMove();
+					gamestate = gamestate.makeRandomGoodMove();
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
@@ -82,6 +83,41 @@ public class MiniChessPlayer {
 		} else {
 			System.out.println("Game is a draw.");
 		}
+	}
+	
+	public static void playSmartVsHuman() {
+		State gamestate = new State();
+		Scanner scan = new Scanner(System.in);
+		gamestate.writeBoard();
+		// Play the game.
+		while (!gamestate.gameOver()) {
+			if (gamestate.whiteOnMove()) {
+				System.out.print("Please enter a move in the form A1-B2: ");
+				String in = scan.nextLine();
+				try {
+					gamestate = gamestate.makeHumanMove(in);
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			} else {
+				System.out.println("Black moves...");
+				try {
+					gamestate = gamestate.makeSmartMove();
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+			gamestate.writeBoard();
+		}
+		System.out.println("Game over!");
+		if (gamestate.whiteWins()) {
+			System.out.println("White wins!");
+		} else if (gamestate.blackWins()) {
+			System.out.println("Black wins!");
+		} else {
+			System.out.println("Game is a draw.");
+		}
+		scan.close();
 	}
 	
 	/* Function:

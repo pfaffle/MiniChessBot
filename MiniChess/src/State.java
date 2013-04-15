@@ -21,6 +21,7 @@ public class State implements Cloneable {
 	private boolean game_is_over;  // This game is over.
 	private boolean white_wins;    // White has won this game.
 	private boolean black_wins;    // Black has won this game.
+	private Move best_move;
 	
 	/* Function:
 	 *   State
@@ -37,11 +38,12 @@ public class State implements Cloneable {
 		num_rows = 6;
 		num_columns = 5;
 		num_turns = 0;
-		max_turns = 40;
+		max_turns = 80;
 		white_is_next = true;
 		game_is_over = false;
 		white_wins = false;
 		black_wins = false;
+		best_move = null;
 		board = new char[num_columns][num_rows];
 		
 		/* Initialize board
@@ -195,120 +197,6 @@ public class State implements Cloneable {
 	 */
 	public boolean blackWins() {
 		return black_wins;
-	}
-	
-	/* Function:
-	 *   pieceIsOnMove
-	 * Description:
-	 *   Returns true if the color of the piece given (i.e. the case) matches
-	 *   the color of the player who is next to move. Otherwise, returns false.
-	 * Inputs:
-	 *   ch : The character representation of a piece.
-	 * Outputs:
-	 *   The return values.
-	 * Return values:
-	 *    True : Returned if the piece matches the color of the player who is on move.
-	 *   False : Returned if the piece is not a valid piece, OR it does not match the color
-	 *           of the player who is on move.
-	 */
-	private boolean pieceIsOnMove(char ch) {
-		if (ch == '.') {
-			return false;
-		} else if (Character.isLetter(ch)) {
-			if (Piece.isWhite(ch) && white_is_next) {
-				return true;
-			} else if (Piece.isBlack(ch) && !white_is_next) {
-				return true;
-			} else {
-				return false;
-			}
-		} else {
-			return false;
-		}
-	}	
-	
-	/* Function:
-	 *   indexIsValid
-	 * Description:
-	 *   Ensures that the given coordinates reference a square on the board.
-	 * Inputs:
-	 *   x : An integer value indicating the x coordinate (column) of the square to check.
-	 *   y : An integer value indicating the y coordinate (row) of the square to check.
-	 * Outputs:
-	 *   The return values.
-	 * Return values:
-	 *    True : Returned if the given coordinates indicate a valid square.
-	 *   False : Returned if the given coordinates indicate an invalid square.
-	 */
-	private boolean indexIsValid(int x, int y) {
-		if (x >= num_columns || x < 0) {
-			return false;
-		} else if (y >= num_rows || y < 0) {
-			return false;
-		} else {
-			return true;
-		}
-	}
-	
-	/* Function:
-	 *   squareIsValid
-	 * Description:
-	 *   Ensures that the given square exists on the board.
-	 * Inputs:
-	 *   sq : A Square object containing the coordinates to check.
-	 * Outputs:
-	 *   The return values.
-	 * Return values:
-	 *    True : Returned if the given square is on the board.
-	 *   False : Returned if the given square is not on the board.
-	 */
-	private boolean squareIsValid(Square sq) {
-		if (sq == null) {
-			return false;
-		} else {
-			return indexIsValid(sq.x,sq.y);
-		}
-	}
-
-	/* Function:
-	 *   getPieceAtIndex
-	 * Description:
-	 *   Function which returns the character representation of the piece at the
-	 *   given coordinates.
-	 * Inputs:
-	 *   x : An integer value indicating the x coordinate (column) of the piece to get.
-	 *   y : An integer value indicating the y coordinate (row) of the piece to get.
-	 * Outputs:
-	 *   The return values.
-	 * Return values:
-	 *   The character representation of the piece (or blank square) at the given indexes.
-	 */
-	private char getPieceAtIndex(int x, int y) throws Exception {
-		if (!indexIsValid(x,y)) {
-			throw new Exception("Invalid coordinates.");
-		} else {
-			return board[x][y];
-		}
-	}
-	
-	/* Function:
-	 *   getPieceAtSquare
-	 * Description:
-	 *   Function which returns the character representation of the piece at the
-	 *   given Square.
-	 * Inputs:
-	 *   sq : A Square object containing the x and y indexes of the piece to get.
-	 * Outputs:
-	 *   The return values.
-	 * Return values:
-	 *   The character representation of the piece (or blank square) at the given Square.
-	 */
-	private char getPieceAtSquare(Square sq) throws Exception {
-		if (!squareIsValid(sq)) {
-			throw new Exception("Invalid square.");
-		} else {
-			return getPieceAtIndex(sq.x,sq.y);
-		}
 	}
 	
 	/* Function:
@@ -481,6 +369,302 @@ public class State implements Cloneable {
 	public void writeBoard() {
 		writeBoard(System.out);
 	}
+	
+	/* Function:
+	 *   makeHumanMove
+	 * Description:
+	 *   Takes a String in the form "a0-b1" and attempts to execute it as a move.
+	 *   Columns (x) are parsed as A-E (0-4), and rows (y) are parsed as 0-5.
+	 * Inputs:
+	 *   rawmove : A String object containing a textual representation of the move to execute.
+	 *             Expects the format L#-L# where L is a letter and # is a number as defined above.
+	 * Outputs:
+	 *   The return values.
+	 * Return values:
+	 *   A new State object containing the altered state of the game after the move
+	 *   has been executed.
+	 */
+	public State makeHumanMove(String rawmove) throws Exception {
+		if (rawmove == null) {
+			throw new Exception("Invalid Move.");
+		} else if (!rawmove.matches("\\w\\d-\\w\\d")) {
+			throw new Exception("Improperly formatted move.");
+		} else if (gameOver()) {
+			throw new Exception("Game is over.");
+		}
+		
+		String[] move = rawmove.split("-");
+		
+		String fromCol = move[0].substring(0,1).toUpperCase();
+		String toCol = move[1].substring(0,1).toUpperCase();
+		
+		int from_x;
+		int to_x;
+		int from_y = Integer.parseInt(move[0].substring(1,2));
+		int to_y = Integer.parseInt(move[1].substring(1,2));
+		
+		switch(fromCol) {
+		case "A":
+			from_x = 0;
+			break;
+		case "B":
+			from_x = 1;
+			break;
+		case "C":
+			from_x = 2;
+			break;
+		case "D":
+			from_x = 3;
+			break;
+		case "E":
+			from_x = 4;
+			break;
+		default:
+			throw new Exception("Failed to parse column letter.");
+		}
+		
+		switch(toCol) {
+		case "A":
+			to_x = 0;
+			break;
+		case "B":
+			to_x = 1;
+			break;
+		case "C":
+			to_x = 2;
+			break;
+		case "D":
+			to_x = 3;
+			break;
+		case "E":
+			to_x = 4;
+			break;
+		default:
+			throw new Exception("Failed to parse row letter.");
+		}
+		Move humansMove = new Move(new Square(from_x, from_y), new Square(to_x, to_y));
+		return executeMove(humansMove);
+	}
+	
+	/* Function:
+	 *   makeRandomMove
+	 * Description:
+	 *   Selects and executes a random possible move for the current side.
+	 * Inputs:
+	 *   None.
+	 * Outputs:
+	 *   The return values.  
+	 * Return values:
+	 *   A new State object containing the altered state of the game after the move
+	 *   has been executed.
+	 */
+	public State makeRandomMove() throws Exception {
+		if (gameOver()) {
+			throw new Exception("Game is over.");
+		}
+		
+		Vector<Move> possible_moves = getAllValidMoves();
+		
+		/* Select a random move to execute. */
+		Random generator = new Random();
+		int randomIndex = generator.nextInt(possible_moves.size());
+		Move selected_move = possible_moves.elementAt(randomIndex);
+		
+		return executeMove(selected_move);
+	}
+	
+	/* Function:
+	 *   makeRandomGoodMove
+	 * Description:
+	 *   Selects and executes a good move for the current side, using heuristics
+	 *   to determine the best next move.
+	 * Inputs:
+	 *   None.
+	 * Outputs:
+	 *   The return values.  
+	 * Return values:
+	 *   A new State object containing the altered state of the game after the move
+	 *   has been executed.
+	 */
+	public State makeRandomGoodMove() throws Exception {
+		if (gameOver()) {
+			throw new Exception("Game is over.");
+		}
+		
+		Vector<Move> possibleMoves = getAllValidMoves();
+		/* Iterate through the list of all possible moves, and generate a list of all 
+		 * board states that result from executing those moves. */
+		Vector<State> possibleStates = new Vector<State>();
+		for (int i = 0; i < possibleMoves.size(); i++) {
+			possibleStates.add(executeMove(possibleMoves.elementAt(i)));
+		}
+		
+		int bestStateValue = 10000;
+		Vector<State> bestStates = new Vector<State>();
+		for (int i = 0; i < possibleStates.size(); i++) {
+			State curState = possibleStates.elementAt(i);
+			int curStateValue = curState.getStateValue();
+			if (curStateValue < bestStateValue) {
+				/* This state is better than the previous best. */
+				bestStateValue = curStateValue;
+				bestStates = new Vector<State>();
+				bestStates.add(curState);
+			} else if (curStateValue == bestStateValue) {
+				/* This state is as good as the previous best. */
+				bestStates.add(curState);
+			}
+		}
+		
+		if (bestStates.isEmpty()) {
+			/* If we didn't find anything better than average, just pick something. */
+			bestStates.addAll(possibleStates);
+		}
+		
+		/* Pick a random State from the best available. */
+		Random generator = new Random();
+		int randomIndex = generator.nextInt(bestStates.size());
+		
+		return bestStates.elementAt(randomIndex);
+	}
+	
+	/* Function:
+	 *   makeSmartMove
+	 * Description:
+	 *   Uses the negamax algorithm to explore move possibilities, then selects and executes a good
+	 *   move for the current side.
+	 * Inputs:
+	 *   None.
+	 * Outputs:
+	 *   The return values.  
+	 * Return values:
+	 *   A new State object containing the altered state of the game after the move
+	 *   has been executed.
+	 */
+	public State makeSmartMove() throws Exception {
+		if (gameOver()) {
+			throw new Exception("Game is over.");
+		}
+	
+		State curState = this.clone();
+		int searchDepth = 2;
+		negamax(curState,searchDepth,true);
+		
+		return executeMove(best_move);
+	}
+	
+	/* Function:
+	 *   pieceIsOnMove
+	 * Description:
+	 *   Returns true if the color of the piece given (i.e. the case) matches
+	 *   the color of the player who is next to move. Otherwise, returns false.
+	 * Inputs:
+	 *   ch : The character representation of a piece.
+	 * Outputs:
+	 *   The return values.
+	 * Return values:
+	 *    True : Returned if the piece matches the color of the player who is on move.
+	 *   False : Returned if the piece is not a valid piece, OR it does not match the color
+	 *           of the player who is on move.
+	 */
+	private boolean pieceIsOnMove(char ch) {
+		if (ch == '.') {
+			return false;
+		} else if (Character.isLetter(ch)) {
+			if (Piece.isWhite(ch) && white_is_next) {
+				return true;
+			} else if (Piece.isBlack(ch) && !white_is_next) {
+				return true;
+			} else {
+				return false;
+			}
+		} else {
+			return false;
+		}
+	}	
+	
+	/* Function:
+	 *   indexIsValid
+	 * Description:
+	 *   Ensures that the given coordinates reference a square on the board.
+	 * Inputs:
+	 *   x : An integer value indicating the x coordinate (column) of the square to check.
+	 *   y : An integer value indicating the y coordinate (row) of the square to check.
+	 * Outputs:
+	 *   The return values.
+	 * Return values:
+	 *    True : Returned if the given coordinates indicate a valid square.
+	 *   False : Returned if the given coordinates indicate an invalid square.
+	 */
+	private boolean indexIsValid(int x, int y) {
+		if (x >= num_columns || x < 0) {
+			return false;
+		} else if (y >= num_rows || y < 0) {
+			return false;
+		} else {
+			return true;
+		}
+	}
+	
+	/* Function:
+	 *   squareIsValid
+	 * Description:
+	 *   Ensures that the given square exists on the board.
+	 * Inputs:
+	 *   sq : A Square object containing the coordinates to check.
+	 * Outputs:
+	 *   The return values.
+	 * Return values:
+	 *    True : Returned if the given square is on the board.
+	 *   False : Returned if the given square is not on the board.
+	 */
+	private boolean squareIsValid(Square sq) {
+		if (sq == null) {
+			return false;
+		} else {
+			return indexIsValid(sq.x,sq.y);
+		}
+	}
+
+	/* Function:
+	 *   getPieceAtIndex
+	 * Description:
+	 *   Function which returns the character representation of the piece at the
+	 *   given coordinates.
+	 * Inputs:
+	 *   x : An integer value indicating the x coordinate (column) of the piece to get.
+	 *   y : An integer value indicating the y coordinate (row) of the piece to get.
+	 * Outputs:
+	 *   The return values.
+	 * Return values:
+	 *   The character representation of the piece (or blank square) at the given indexes.
+	 */
+	private char getPieceAtIndex(int x, int y) throws Exception {
+		if (!indexIsValid(x,y)) {
+			throw new Exception("Invalid coordinates.");
+		} else {
+			return board[x][y];
+		}
+	}
+	
+	/* Function:
+	 *   getPieceAtSquare
+	 * Description:
+	 *   Function which returns the character representation of the piece at the
+	 *   given Square.
+	 * Inputs:
+	 *   sq : A Square object containing the x and y indexes of the piece to get.
+	 * Outputs:
+	 *   The return values.
+	 * Return values:
+	 *   The character representation of the piece (or blank square) at the given Square.
+	 */
+	private char getPieceAtSquare(Square sq) throws Exception {
+		if (!squareIsValid(sq)) {
+			throw new Exception("Invalid square.");
+		} else {
+			return getPieceAtIndex(sq.x,sq.y);
+		}
+	}	
 	
 	/* Function:
 	 *   getStateValue
@@ -890,7 +1074,7 @@ public class State implements Cloneable {
 	}
 	
 	/* Function:
-	 *   findAllValidMoves
+	 *   getAllValidMoves
 	 * Description:
 	 *   Searches for and finds all valid moves for the pieces belonging to the player on move.
 	 * Inputs:
@@ -900,7 +1084,7 @@ public class State implements Cloneable {
 	 * Return values:
 	 *   A Vector object containing all valid moves for all pieces belonging to the player on move.
 	 */
-	private Vector<Move> findAllValidMoves() {
+	private Vector<Move> getAllValidMoves() {
 		/* Scan the board for all the pieces belonging to the player that is on move. */
 		Vector<Square> occupied_squares = new Vector<Square>();
 		for (int i = 0; i < num_rows; i++) {
@@ -1004,7 +1188,7 @@ public class State implements Cloneable {
 		}
 		
 		/* Victory condition: Current side has no valid moves. */
-		Vector<Move> possible_moves = new_gamestate.findAllValidMoves();
+		Vector<Move> possible_moves = new_gamestate.getAllValidMoves();
 		if (possible_moves.size() == 0) {
 			new_gamestate.game_is_over = true;
 			new_gamestate.white_wins = !new_gamestate.white_is_next;
@@ -1026,160 +1210,53 @@ public class State implements Cloneable {
 	}
 	
 	/* Function:
-	 *   makeHumanMove
+	 *   negamax
 	 * Description:
-	 *   Takes a String in the form "a0-b1" and attempts to execute it as a move.
-	 *   Columns (x) are parsed as A-E (0-4), and rows (y) are parsed as 0-5.
+	 *   Recursively looks ahead at future possible moves to determine what the best
+	 *   move is for now. Returns that State's integer valuation.
 	 * Inputs:
-	 *   rawmove : A String object containing a textual representation of the move to execute.
-	 *             Expects the format L#-L# where L is a letter and # is a number as defined above.
+	 *       s : A State object to examine.
+	 *   depth : The maximum depth to traverse before evaluating a State's value early
+	 *           (i.e. before game-end).
+	 *     top : A boolean value indicating if this is the top of the "tree" of possible
+	 *           States.
 	 * Outputs:
 	 *   The return values.
 	 * Return values:
-	 *   A new State object containing the altered state of the game after the move
-	 *   has been executed.
+	 *   An integer value representing how advantageous pursuing this direction of moves
+	 *   will be for the current player.
 	 */
-	public State makeHumanMove(String rawmove) throws Exception {
-		if (rawmove == null) {
-			throw new Exception("Invalid Move.");
-		} else if (!rawmove.matches("\\w\\d-\\w\\d")) {
-			throw new Exception("Improperly formatted move.");
-		} else if (gameOver()) {
-			throw new Exception("Game is over.");
-		}
+	private int negamax(State s, int depth, boolean top) {
+		if (gameOver() || depth <= 0)
+			return s.getStateValue();
 		
-		String[] move = rawmove.split("-");
+		Vector<Move> possibleMoves = s.getAllValidMoves();
+		Move curMove = possibleMoves.elementAt(0);
+		State newState = null;
+		int value = 0;
 		
-		String fromCol = move[0].substring(0,1).toUpperCase();
-		String toCol = move[1].substring(0,1).toUpperCase();
-		
-		int from_x;
-		int to_x;
-		int from_y = Integer.parseInt(move[0].substring(1,2));
-		int to_y = Integer.parseInt(move[1].substring(1,2));
-		
-		switch(fromCol) {
-		case "A":
-			from_x = 0;
-			break;
-		case "B":
-			from_x = 1;
-			break;
-		case "C":
-			from_x = 2;
-			break;
-		case "D":
-			from_x = 3;
-			break;
-		case "E":
-			from_x = 4;
-			break;
-		default:
-			throw new Exception("Failed to parse column letter.");
-		}
-		
-		switch(toCol) {
-		case "A":
-			to_x = 0;
-			break;
-		case "B":
-			to_x = 1;
-			break;
-		case "C":
-			to_x = 2;
-			break;
-		case "D":
-			to_x = 3;
-			break;
-		case "E":
-			to_x = 4;
-			break;
-		default:
-			throw new Exception("Failed to parse row letter.");
-		}
-		Move humansMove = new Move(new Square(from_x, from_y), new Square(to_x, to_y));
-		return executeMove(humansMove);
-	}
-	
-	/* Function:
-	 *   makeRandomMove
-	 * Description:
-	 *   Selects and executes a random possible move for the current side.
-	 * Inputs:
-	 *   None.
-	 * Outputs:
-	 *   The return values.  
-	 * Return values:
-	 *   A new State object containing the altered state of the game after the move
-	 *   has been executed.
-	 */
-	public State makeRandomMove() throws Exception {
-		if (gameOver()) {
-			throw new Exception("Game is over.");
-		}
-		
-		Vector<Move> possible_moves = findAllValidMoves();
-		
-		/* Select a random move to execute. */
-		Random generator = new Random();
-		int randomIndex = generator.nextInt(possible_moves.size());
-		Move selected_move = possible_moves.elementAt(randomIndex);
-		
-		return executeMove(selected_move);
-	}
-	
-	/* Function:
-	 *   makeRandomGoodMove
-	 * Description:
-	 *   Selects and executes a good move for the current side, using heuristics
-	 *   to determine the best next move.
-	 * Inputs:
-	 *   None.
-	 * Outputs:
-	 *   The return values.  
-	 * Return values:
-	 *   A new State object containing the altered state of the game after the move
-	 *   has been executed.
-	 */
-	public State makeRandomGoodMove() throws Exception {
-		if (gameOver()) {
-			throw new Exception("Game is over.");
-		}
-		
-		Vector<Move> possibleMoves = findAllValidMoves();
-		/* Iterate through the list of all possible moves, and generate a list of all 
-		 * board states that result from executing those moves. */
-		Vector<State> possibleStates = new Vector<State>();
-		for (int i = 0; i < possibleMoves.size(); i++) {
-			possibleStates.add(executeMove(possibleMoves.elementAt(i)));
-		}
-		
-		int bestStateValue = 10000;
-		Vector<State> bestStates = new Vector<State>();
-		for (int i = 0; i < possibleStates.size(); i++) {
-			State curState = possibleStates.elementAt(i);
-			int curStateValue = curState.getStateValue();
-			if (curStateValue < bestStateValue) {
-				/* This state is better than the previous best. */
-				bestStateValue = curStateValue;
-				bestStates = new Vector<State>();
-				bestStates.add(curState);
-			} else if (curStateValue == bestStateValue) {
-				/* This state is as good as the previous best. */
-				bestStates.add(curState);
+		try {
+			newState = s.executeMove(curMove);
+			value = -(negamax(newState,depth - 1, false));
+			if (top)
+				best_move = curMove;
+			for (int i = 1; i < possibleMoves.size(); i++) {
+				curMove = possibleMoves.elementAt(i);
+				newState = s.executeMove(curMove);
+				int curValue = -(negamax(newState,depth - 1, false)); 
+		        if (curValue > value) { 
+		            value = curValue;
+		            if (top) 
+		                best_move = curMove;
+		        }
 			}
+		} catch (Exception e) {
+			/* This should not be possible, because if it were, gameOver()
+			 * should have returned true. */
+			e.getStackTrace();
 		}
 		
-		if (bestStates.isEmpty()) {
-			/* If we didn't find anything better than average, just pick something. */
-			bestStates.addAll(possibleStates);
-		}
-		
-		/* Pick a random State from the best available. */
-		Random generator = new Random();
-		int randomIndex = generator.nextInt(bestStates.size());
-		
-		return bestStates.elementAt(randomIndex);
+		return value;	
 	}
 	
 }
