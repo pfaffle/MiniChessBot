@@ -12,7 +12,8 @@ public class MiniChessPlayer {
 	 */
 	public static void main(String[] args) {
 
-		playSmartVsHuman();
+		//playSmartVsHuman();
+		playSmartVsSmart();
 		//playRandomVsHuman();
 		//playRandomVsRandom();
 		
@@ -102,7 +103,7 @@ public class MiniChessPlayer {
 			} else {
 				System.out.println("Black moves...");
 				try {
-					gamestate = gamestate.makeSmartMove();
+					gamestate = gamestate.makeSmartMove(4);
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
@@ -118,6 +119,38 @@ public class MiniChessPlayer {
 			System.out.println("Game is a draw.");
 		}
 		scan.close();
+	}
+	
+	public static void playSmartVsSmart() {
+		State gamestate = new State();
+		gamestate.writeBoard();
+		// Play the game.
+		while (!gamestate.gameOver()) {
+			if (gamestate.whiteOnMove()) {
+				System.out.println("White moves...");
+				try {
+					gamestate = gamestate.makeSmartMove(1);
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			} else {
+				System.out.println("Black moves...");
+				try {
+					gamestate = gamestate.makeSmartMove(4);
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+			gamestate.writeBoard();
+		}
+		System.out.println("Game over!");
+		if (gamestate.whiteWins()) {
+			System.out.println("White wins!");
+		} else if (gamestate.blackWins()) {
+			System.out.println("Black wins!");
+		} else {
+			System.out.println("Game is a draw.");
+		}
 	}
 	
 	/* Function:
