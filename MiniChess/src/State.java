@@ -1244,11 +1244,11 @@ public class State implements Cloneable {
 				curMove = possibleMoves.elementAt(i);
 				newState = s.executeMove(curMove);
 				int curValue = -(negamax(newState,depth - 1, false)); 
-		        if (curValue > value) { 
-		            value = curValue;
-		            if (top) 
-		                best_move = curMove;
-		        }
+				if (curValue > value) { 
+					value = curValue;
+					if (top) 
+						best_move = curMove;
+				}
 			}
 		} catch (Exception e) {
 			/* This should not be possible, because if it were, gameOver()
