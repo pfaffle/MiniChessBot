@@ -103,7 +103,7 @@ public class MiniChessPlayer {
 			} else {
 				System.out.println("Black moves...");
 				try {
-					gamestate = gamestate.makeSmartMove(4);
+					gamestate = gamestate.makeSmartMove();
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
@@ -129,14 +129,14 @@ public class MiniChessPlayer {
 			if (gamestate.whiteOnMove()) {
 				System.out.println("White moves...");
 				try {
-					gamestate = gamestate.makeSmartMove(4);
+					gamestate = gamestate.makeSmartMove();
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
 			} else {
 				System.out.println("Black moves...");
 				try {
-					gamestate = gamestate.makeSmartMove(4);
+					gamestate = gamestate.makeSmartMove();
 				} catch (Exception e) {
 					e.printStackTrace();
 				}

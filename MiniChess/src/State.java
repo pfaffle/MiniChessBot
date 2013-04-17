@@ -535,24 +535,34 @@ public class State implements Cloneable {
 	 *   Uses the negamax algorithm to explore move possibilities, then selects and executes a good
 	 *   move for the current side.
 	 * Inputs:
-	 *   depth : Depth of the tree of moves to search with negamax.
+	 *   None.
 	 * Outputs:
 	 *   The return values.  
 	 * Return values:
 	 *   A new State object containing the altered state of the game after the move
 	 *   has been executed.
 	 */
-	public State makeSmartMove(int depth) throws Exception {
+	public State makeSmartMove() throws Exception {
 		if (gameOver()) {
 			throw new Exception("Game is over.");
 		}
 		num_states_evaluated = 0;
 	
-		State curState = this.clone();
-		int searchDepth = depth;
-		negamax(curState,searchDepth,true);
+		State curState = this;
+		int searchDepth = 1;
+		long startTime = System.nanoTime();
+		double elapsedTime = 0.0;
+		while (elapsedTime < 1.0) {
+			negamax(curState,searchDepth,true);
+			searchDepth++;
+			elapsedTime = (System.nanoTime() - startTime) * 1.0e-9;
+		}
+		System.out.println("Search depth: " + searchDepth);
 		System.out.println("Number of states evaluated: " + num_states_evaluated);
-		return executeMove(best_move);
+		State returnState = executeMove(best_move);
+		System.out.println("Value of selected state: " + returnState.getStateValue());
+		System.out.println("Time elapsed: " + elapsedTime + " sec");
+		return returnState;
 	}
 	
 	/* Function:
