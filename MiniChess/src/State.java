@@ -17,12 +17,14 @@ public class State implements Cloneable {
 	private int num_columns; // Number of columns in the chess board.
 	private int num_turns;   // Number of turns taken in the current game.
 	private int max_turns;   // Maximum number of turns allowed before game end.
-	private int num_states_evaluated;
-	private boolean white_is_next; // It is White's turn to play (True/False).
-	private boolean game_is_over;  // This game is over.
-	private boolean white_wins;    // White has won this game.
-	private boolean black_wins;    // Black has won this game.
-	private Move best_move;
+	private int num_states_evaluated;  // Number of states looked at during recursive calls (just for stats).
+	private boolean white_is_next;     // It is White's turn to play (True/False).
+	private boolean game_is_over;      // This game is over.
+	private boolean white_wins;        // White has won this game.
+	private boolean black_wins;        // Black has won this game.
+	private Move best_move;            // Best move found in the time elapsed.
+	private long searchStartTime;      // When the move search timer was started.
+	private double searchElapsedTime;  // How much time has elapsed since the move search timer was started.
 	
 	/* Function:
 	 *   State
@@ -41,6 +43,8 @@ public class State implements Cloneable {
 		num_turns = 0;
 		max_turns = 80;
 		num_states_evaluated = 0;
+		searchStartTime = 0;
+		searchElapsedTime = 0;
 		white_is_next = true;
 		game_is_over = false;
 		white_wins = false;
@@ -547,21 +551,19 @@ public class State implements Cloneable {
 			throw new Exception("Game is over.");
 		}
 		num_states_evaluated = 0;
-	
 		State curState = this;
 		int searchDepth = 1;
-		long startTime = System.nanoTime();
-		double elapsedTime = 0.0;
-		while (elapsedTime < 1.0) {
+		searchElapsedTime = 0.0;
+		searchStartTime = System.nanoTime();
+		do {
 			negamax(curState,searchDepth,true);
 			searchDepth++;
-			elapsedTime = (System.nanoTime() - startTime) * 1.0e-9;
-		}
+		} while (searchElapsedTime < 1.0); // This gets updated within the recursive function.
 		System.out.println("Search depth: " + searchDepth);
 		System.out.println("Number of states evaluated: " + num_states_evaluated);
 		State returnState = executeMove(best_move);
 		System.out.println("Value of selected state: " + returnState.getStateValue());
-		System.out.println("Time elapsed: " + elapsedTime + " sec");
+		System.out.println("Time elapsed: " + searchElapsedTime + " sec");
 		return returnState;
 	}
 	
@@ -1241,7 +1243,8 @@ public class State implements Cloneable {
 	 */
 	private int negamax(State s, int depth, boolean top) {
 		num_states_evaluated++;
-		if (s.gameOver() || depth <= 0)
+		searchElapsedTime = (System.nanoTime() - searchStartTime) * 1.0e-9;
+		if (s.gameOver() || depth <= 0 || searchElapsedTime >= 1.0)
 			return s.getStateValue();
 		
 		Vector<Move> possibleMoves = s.getAllValidMoves();
