@@ -129,7 +129,7 @@ public class MiniChessPlayer {
 			if (gamestate.whiteOnMove()) {
 				System.out.println("White moves...");
 				try {
-					gamestate = gamestate.makeSmartMove(1);
+					gamestate = gamestate.makeSmartMove(4);
 				} catch (Exception e) {
 					e.printStackTrace();
 				}

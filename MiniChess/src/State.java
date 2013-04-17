@@ -17,6 +17,7 @@ public class State implements Cloneable {
 	private int num_columns; // Number of columns in the chess board.
 	private int num_turns;   // Number of turns taken in the current game.
 	private int max_turns;   // Maximum number of turns allowed before game end.
+	private int num_states_evaluated;
 	private boolean white_is_next; // It is White's turn to play (True/False).
 	private boolean game_is_over;  // This game is over.
 	private boolean white_wins;    // White has won this game.
@@ -39,6 +40,7 @@ public class State implements Cloneable {
 		num_columns = 5;
 		num_turns = 0;
 		max_turns = 80;
+		num_states_evaluated = 0;
 		white_is_next = true;
 		game_is_over = false;
 		white_wins = false;
@@ -544,11 +546,12 @@ public class State implements Cloneable {
 		if (gameOver()) {
 			throw new Exception("Game is over.");
 		}
+		num_states_evaluated = 0;
 	
 		State curState = this.clone();
 		int searchDepth = depth;
 		negamax(curState,searchDepth,true);
-		
+		System.out.println("Number of states evaluated: " + num_states_evaluated);
 		return executeMove(best_move);
 	}
 	
@@ -1227,7 +1230,8 @@ public class State implements Cloneable {
 	 *   will be for the current player.
 	 */
 	private int negamax(State s, int depth, boolean top) {
-		if (gameOver() || depth <= 0)
+		num_states_evaluated++;
+		if (s.gameOver() || depth <= 0)
 			return s.getStateValue();
 		
 		Vector<Move> possibleMoves = s.getAllValidMoves();
