@@ -13,9 +13,18 @@ public class MiniChessPlayer {
 	public static void main(String[] args) {
 
 		//playSmartVsHuman();
-		playSmartVsSmart();
+		//playSmartVsSmart();
 		//playRandomVsHuman();
 		//playRandomVsRandom();
+		System.out.println("Connecting to server.");
+		Client connection = new Client("imcs.svcs.cs.pdx.edu","3589","pfaffle","foo");
+		try {
+			String resp = connection.expectResponse();
+			System.out.println("Response received: " + resp);
+		} catch (IOException e) {
+			System.out.println("Failed to connect to server.");
+			e.printStackTrace();
+		}
 		
 	}
 	
