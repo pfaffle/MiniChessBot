@@ -33,9 +33,9 @@ public class MiniChessPlayer {
 		
 		try {
 			Client connection = new Client(server,port,user,pass);
-			connection.offer('B');
-			
-			while (!gamestate.gameOver()) {
+			connection.list();
+			//connection.offer('B');			
+			/*while (!gamestate.gameOver()) {
 				String opp_move = connection.getMove();
 				System.out.println("White moves: " + opp_move);
 				gamestate = gamestate.makeImcsMove(opp_move);
@@ -45,20 +45,20 @@ public class MiniChessPlayer {
 				gamestate = gamestate.makeImcsMove(my_move);
 				connection.sendMove(my_move);
 				gamestate.writeBoard();
-			}
+			}*/
 			connection.close();
 		} catch (Exception e) {
 			System.out.println("Failed to connect to server.");
 			e.printStackTrace();
 		}
-		System.out.println("Game over!");
+		/*System.out.println("Game over!");
 		if (gamestate.whiteWins()) {
 			System.out.println("White wins!");
 		} else if (gamestate.blackWins()) {
 			System.out.println("Black wins!");
 		} else {
 			System.out.println("Game is a draw.");
-		}
+		}*/
 	}
 	
 	public static void playRandomVsHuman() {

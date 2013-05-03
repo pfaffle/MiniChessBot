@@ -1,9 +1,35 @@
 // Copyright (c) 2012 Bart Massey <bart@cs.pdx.edu>
 // Licensed under the "MIT License"
-// Please see the file COPYING in this distribution
+// Copyright ¦ 2009 Bart Massey
+// ALL RIGHTS RESERVED
+// 
+// [This program is licensed under the "MIT License"]
+// 
+// Permission is hereby granted, free of charge, to any person
+// obtaining a copy of this software and associated
+// documentation files (the "Software"), to deal in the
+// Software without restriction, including without limitation
+// the rights to use, copy, modify, merge, publish, distribute,
+// sublicense, and/or sell copies of the Software, and to
+// permit persons to whom the Software is furnished to do so,
+// subject to the following conditions:
+// 
+// The above copyright notice and this permission notice shall
+// be included in all copies or substantial portions of the
+// Software.
+// 
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY
+// KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE
+// WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
+// PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS
+// OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR
+// OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
+// OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
+// SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 import java.io.*;
 import java.net.*;
+import java.util.Vector;
 
 /**
  * Provides an interface to the Internet MiniChess Server.
@@ -226,6 +252,39 @@ public class Client {
 	if (code.equals("106"))
 	    return 'B';
 	throw new IOException("accept: unknown response code");
+    }
+    
+    /**
+     * Queries the server for all offered games.
+     * If color is "?", allow the other side
+     * or the server to pick the color.
+     * @return  a vector of games that the client can accept.
+     */
+    public Vector<Game> list()
+      throws IOException {
+    	String line;
+    	send("list",false);
+    	String code = responseCode(expectResponse(true));
+    	if (!code.equals("211"))
+    	    throw new IOException("accept: unknown response code");
+    	
+    	char ch;
+    	while (true) {
+    	    line = in.readLine();
+    	    if (line == null)
+    		return null;
+    	    System.out.println(line);
+    	    if (line.length() == 0)
+    		continue;
+    	    
+    	    // assemble list of games and return them.
+    	    // example game: 7140 mcwurst B 5:00 5:00 985 [offer]
+    	    
+    	    ch = line.charAt(0);
+    	    if (ch == '.')
+    		break;
+    	}
+    	return null;
     }
 
     /**
