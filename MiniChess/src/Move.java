@@ -17,7 +17,7 @@ public class Move {
 		to_Square = newto;
 	}
 	public String toString() {
-		String str = from_Square + " -> " + to_Square;
+		String str = from_Square + "-" + to_Square;
 		return str;
 	}
 	/* Had some trouble with Vector.contains() working as expected, so to fix it I've

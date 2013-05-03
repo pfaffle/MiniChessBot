@@ -375,7 +375,117 @@ public class State implements Cloneable {
 	public void writeBoard() {
 		writeBoard(System.out);
 	}
+
+	/* Function:
+	 *   makeImcsMove
+	 * Description:
+	 *   Takes a String in the form "a1-b1" and attempts to execute it as a move.
+	 *   Columns (x) are parsed as A-E (1-5), and rows (y) are parsed as 1-6.
+	 * Inputs:
+	 *   rawmove : A String object containing a textual representation of the move to execute.
+	 *             Expects the format L#-L# where L is a letter and # is a number as defined above.
+	 * Outputs:
+	 *   The return values.
+	 * Return values:
+	 *   A new State object containing the altered state of the game after the move
+	 *   has been executed.
+	 */
+	public State makeImcsMove(String rawmove) throws Exception {
+		if (rawmove == null) {
+			throw new Exception("Invalid Move.");
+		} else if (!rawmove.matches("\\w\\d-\\w\\d")) {
+			throw new Exception("Improperly formatted move.");
+		} else if (gameOver()) {
+			throw new Exception("Game is over.");
+		}
+		
+		String[] move = rawmove.split("-");
+		
+		String fromCol = move[0].substring(0,1).toLowerCase();
+		String toCol = move[1].substring(0,1).toLowerCase();
+		
+		int from_x;
+		int to_x;
+		int from_y = Integer.parseInt(move[0].substring(1,2)) - 1;
+		int to_y = Integer.parseInt(move[1].substring(1,2)) - 1;
+		
+		switch(fromCol) {
+		case "a":
+			from_x = 0;
+			break;
+		case "b":
+			from_x = 1;
+			break;
+		case "c":
+			from_x = 2;
+			break;
+		case "d":
+			from_x = 3;
+			break;
+		case "e":
+			from_x = 4;
+			break;
+		default:
+			throw new Exception("Failed to parse column letter.");
+		}
+		
+		switch(toCol) {
+		case "a":
+			to_x = 0;
+			break;
+		case "b":
+			to_x = 1;
+			break;
+		case "c":
+			to_x = 2;
+			break;
+		case "d":
+			to_x = 3;
+			break;
+		case "e":
+			to_x = 4;
+			break;
+		default:
+			throw new Exception("Failed to parse row letter.");
+		}
+		
+		Move imcsMove = new Move(new Square(from_x, from_y), new Square(to_x, to_y));
+		return executeMove(imcsMove);
+	}
 	
+	/* Function:
+	 *   getImcsMove()
+	 * Description:
+	 *   Uses the negamax algorithm to explore move possibilities, then selects and returns a good
+	 *   move for the current side in IMCS move format.
+	 * Inputs:
+	 *   None.
+	 * Outputs:
+	 *   The return values.
+	 * Return values:
+	 *   A new String containing the move to be made in IMCS move format (A1-B1).
+	 */
+	public String getImcsMove() throws Exception {
+		if (gameOver()) {
+			throw new Exception("Game is over.");
+		}
+		
+		num_states_evaluated = 0;
+		State curState = this;
+		int searchDepth = 1;
+		searchElapsedTime = 0.0;
+		searchStartTime = System.nanoTime();
+		do {
+			negamax(curState,searchDepth,true);
+			searchDepth++;
+		} while (searchElapsedTime < 1.0); // This gets updated within the recursive function.
+		System.out.println("Search depth: " + searchDepth);
+		System.out.println("Number of states evaluated: " + num_states_evaluated);
+		System.out.println("Time elapsed: " + searchElapsedTime + " sec");
+		
+		return best_move.toString();
+	}
+
 	/* Function:
 	 *   makeHumanMove
 	 * Description:
@@ -401,8 +511,8 @@ public class State implements Cloneable {
 		
 		String[] move = rawmove.split("-");
 		
-		String fromCol = move[0].substring(0,1).toUpperCase();
-		String toCol = move[1].substring(0,1).toUpperCase();
+		String fromCol = move[0].substring(0,1).toLowerCase();
+		String toCol = move[1].substring(0,1).toLowerCase();
 		
 		int from_x;
 		int to_x;
@@ -410,19 +520,19 @@ public class State implements Cloneable {
 		int to_y = Integer.parseInt(move[1].substring(1,2));
 		
 		switch(fromCol) {
-		case "A":
+		case "a":
 			from_x = 0;
 			break;
-		case "B":
+		case "b":
 			from_x = 1;
 			break;
-		case "C":
+		case "c":
 			from_x = 2;
 			break;
-		case "D":
+		case "d":
 			from_x = 3;
 			break;
-		case "E":
+		case "e":
 			from_x = 4;
 			break;
 		default:
@@ -430,19 +540,19 @@ public class State implements Cloneable {
 		}
 		
 		switch(toCol) {
-		case "A":
+		case "a":
 			to_x = 0;
 			break;
-		case "B":
+		case "b":
 			to_x = 1;
 			break;
-		case "C":
+		case "c":
 			to_x = 2;
 			break;
-		case "D":
+		case "d":
 			to_x = 3;
 			break;
-		case "E":
+		case "e":
 			to_x = 4;
 			break;
 		default:

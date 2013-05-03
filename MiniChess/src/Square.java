@@ -16,8 +16,30 @@ public class Square {
 		y = newy;
 	}
 	public String toString() {
-		String str = "(" + x + "," + y + ")";
-		return str;
+		String col;
+		String row;
+		switch (x) {
+		case 0:
+			col = "a";
+			break;
+		case 1:
+			col = "b";
+			break;
+		case 2:
+			col = "c";
+			break;
+		case 3:
+			col = "d";
+			break;
+		case 4:
+			col = "e";
+			break;
+		default:
+			col = "?";
+			break;
+		}
+		row = Integer.toString(y + 1);
+		return col + row;
 	}
 	/* Had some trouble with Vector.contains() working as expected, so to fix it I've
 	 * borrowed some suggested code for overriding the default .equals() function from:
