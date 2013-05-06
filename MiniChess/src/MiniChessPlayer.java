@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.util.Vector;*/
 import java.io.IOException;
 import java.util.Scanner;
+import java.util.Vector;
 
 public class MiniChessPlayer {
 
@@ -33,7 +34,11 @@ public class MiniChessPlayer {
 		
 		try {
 			Client connection = new Client(server,port,user,pass);
-			connection.list();
+			Vector<Game> available_games = connection.list();
+			System.out.println("Games:");
+			for (int i = 0; i < available_games.size(); i++) {
+				System.out.println(available_games.elementAt(i));
+			}
 			//connection.offer('B');			
 			/*while (!gamestate.gameOver()) {
 				String opp_move = connection.getMove();

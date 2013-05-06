@@ -269,6 +269,7 @@ public class Client {
     	    throw new IOException("accept: unknown response code");
     	
     	char ch;
+    	Vector<Game> available_games = new Vector<Game>(10);
     	while (true) {
     	    line = in.readLine();
     	    if (line == null)
@@ -279,12 +280,21 @@ public class Client {
     	    
     	    // assemble list of games and return them.
     	    // example game: 7140 mcwurst B 5:00 5:00 985 [offer]
-    	    
     	    ch = line.charAt(0);
     	    if (ch == '.')
-    		break;
+    	    	break;
+    	    else {
+    	    	String[] game_info = line.split(" ");
+        	    if (game_info[7].equals("[offer]")) {
+        	    	int game_id = Integer.parseInt(game_info[1]);
+            	    char opponent_color = game_info[3].charAt(0);
+        	    	Game new_game = new Game(game_id,opponent_color);
+        	    	available_games.add(new_game);
+        	    }
+    	    }
+    	    
     	}
-    	return null;
+    	return available_games;
     }
 
     /**

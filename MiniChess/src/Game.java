@@ -16,4 +16,8 @@ public class Game {
 		id = newid;
 		color = newcolor;
 	}
+	public String toString() {
+		String str = "(" + id + "," + color + ")";
+		return str;
+	}
 }
