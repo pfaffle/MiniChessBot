@@ -4,6 +4,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Vector;*/
 import java.io.IOException;
+import java.util.Random;
 import java.util.Scanner;
 import java.util.Vector;
 
@@ -31,39 +32,77 @@ public class MiniChessPlayer {
 	public static void playSmartVsImcs() {
 		System.out.println("Connecting to server.");
 		State gamestate = new State();
+		char my_color;
 		
 		try {
 			Client connection = new Client(server,port,user,pass);
 			Vector<Game> available_games = connection.list();
-			System.out.println("Games:");
-			for (int i = 0; i < available_games.size(); i++) {
-				System.out.println(available_games.elementAt(i));
+			if (available_games.size() == 0) {
+				my_color = connection.offer('B');
+			} else {
+				Random generator = new Random();
+				int randomIndex = generator.nextInt(available_games.size());
+				Game selected_game = available_games.elementAt(randomIndex);
+				String game_id = String.valueOf(selected_game.id);
+				if (selected_game.color == 'B') {
+					my_color = 'W';
+					System.out.println("I am White!");
+				} else {
+					my_color = 'B';
+					System.out.println("I am Black!");
+				}
+				connection.accept(game_id,my_color);
 			}
-			//connection.offer('B');			
-			/*while (!gamestate.gameOver()) {
-				String opp_move = connection.getMove();
-				System.out.println("White moves: " + opp_move);
-				gamestate = gamestate.makeImcsMove(opp_move);
+			
+			while (!gamestate.gameOver()) {
+				if (my_color == 'W') {
+					if (gamestate.whiteOnMove()) {
+						// make a move
+						String my_move = gamestate.getImcsMove();
+						System.out.println("My move: " + my_move);
+						gamestate = gamestate.makeImcsMove(my_move);
+						connection.sendMove(my_move);
+					} else {
+						// wait for opponent's move.
+						String opp_move = connection.getMove();
+						System.out.println("Black moves: " + opp_move);
+						gamestate = gamestate.makeImcsMove(opp_move);
+					}
+				} else {
+					if (gamestate.blackOnMove()) {
+						// make a move
+						String my_move = gamestate.getImcsMove();
+						System.out.println("My move: " + my_move);
+						gamestate = gamestate.makeImcsMove(my_move);
+						connection.sendMove(my_move);
+					} else {
+						// wait for opponent's move.
+						String opp_move = connection.getMove();
+						System.out.println("White moves: " + opp_move);
+						gamestate = gamestate.makeImcsMove(opp_move);
+					}	
+				}
 				//gamestate.writeBoard();
-				String my_move = gamestate.getImcsMove();
-				System.out.println("My move: " + my_move);
-				gamestate = gamestate.makeImcsMove(my_move);
-				connection.sendMove(my_move);
-				gamestate.writeBoard();
-			}*/
+			}
 			connection.close();
+			System.out.println("Game over!");
+			if (gamestate.whiteWins()) {
+				if (my_color == 'W')
+					System.out.println("I win!");
+				else
+					System.out.println("I lose!");
+			} else if (gamestate.blackWins()) {
+				if (my_color == 'B')
+					System.out.println("I win!");
+				else
+					System.out.println("I lose!");
+			} else {
+				System.out.println("Game is a draw.");
+			}
 		} catch (Exception e) {
 			System.out.println("Failed to connect to server.");
 			e.printStackTrace();
 		}
-		/*System.out.println("Game over!");
-		if (gamestate.whiteWins()) {
-			System.out.println("White wins!");
-		} else if (gamestate.blackWins()) {
-			System.out.println("Black wins!");
-		} else {
-			System.out.println("Game is a draw.");
-		}*/
 	}
 	
 	public static void playRandomVsHuman() {
