@@ -26,7 +26,7 @@ public class Piece {
 		/* Function:
 		 *   isDeveloped
 		 * Description:
-		 *   Returns true if this piece is off of its home square.
+		 *   Returns true if this piece is a bishop/knight/rook and is off of its home square.
 		 * Inputs:
 		 *   None.
 		 * Return values:
@@ -35,20 +35,12 @@ public class Piece {
 		 */
 		public boolean isDeveloped() {
 			switch(piece_ch) {
-			case 'K':
-				return !(position.x == 4 && position.y == 0); // x=4 y=0
-			case 'Q':
-				return !(position.x == 3 && position.y == 0); // x=3 y=0
 			case 'B':
 				return !(position.x == 2 && position.y == 0); // x=2 y=0
 			case 'N':
 				return !(position.x == 1 && position.y == 0); // x=1 y=0
 			case 'R':
 				return !(position.x == 0 && position.y == 0); // x=0 y=0
-			case 'k':
-				return !(position.x == 0 && position.y == 5); // x=0 y=5
-			case 'q':
-				return !(position.x == 1 && position.y == 5); // x=1 y=5
 			case 'b':
 				return !(position.x == 2 && position.y == 5); // x=2 y=5
 			case 'n':
