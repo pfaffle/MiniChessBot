@@ -38,20 +38,28 @@ public class MiniChessPlayer {
 			Client connection = new Client(server,port,user,pass);
 			Vector<Game> available_games = connection.list();
 			if (available_games.size() == 0) {
-				my_color = connection.offer('B');
+				// No game offers currently available to accept. Create one!
+				my_color = connection.offer('?');
 			} else {
+				// Find and accept one of the existing game offers.
 				Random generator = new Random();
 				int randomIndex = generator.nextInt(available_games.size());
 				Game selected_game = available_games.elementAt(randomIndex);
+				//Game selected_game = new Game(7315,'W',"custom_opponent");
 				String game_id = String.valueOf(selected_game.id);
+				String my_opponent = selected_game.opponent;
 				if (selected_game.color == 'B') {
-					my_color = 'W';
-					System.out.println("I am White!");
+					my_color = connection.accept(game_id,'W');
 				} else {
-					my_color = 'B';
-					System.out.println("I am Black!");
+					my_color = connection.accept(game_id,'B');
 				}
-				connection.accept(game_id,my_color);
+				System.out.println("My opponent: " + my_opponent + ".");
+			}
+			
+			if (my_color == 'W') {
+				System.out.println("I am White!");
+			} else {
+				System.out.println("I am Black!");
 			}
 			
 			gamestate.writeBoard();
@@ -105,7 +113,7 @@ public class MiniChessPlayer {
 				System.out.println("Game is a draw.");
 			}
 		} catch (Exception e) {
-			System.out.println("Failed to connect to server.");
+			System.out.println("An error occurred!");
 			e.printStackTrace();
 		}
 	}
