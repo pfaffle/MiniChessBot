@@ -279,16 +279,19 @@ public class Client {
     		continue;
     	    
     	    // assemble list of games and return them.
-    	    // example game: 7140 mcwurst B 5:00 5:00 985 [offer]
+    	    // example game:  7140 mcwurst B 5:00 5:00 985 [offer]
     	    ch = line.charAt(0);
     	    if (ch == '.')
     	    	break;
     	    else {
     	    	String[] game_info = line.split(" ");
-        	    if (game_info[7].equals("[offer]")) {
+    	    	if (game_info[6].equals("[in-progress]"))
+    	    		continue;
+    	    	else if (game_info[7].equals("[offer]")) {
         	    	int game_id = Integer.parseInt(game_info[1]);
             	    char opponent_color = game_info[3].charAt(0);
-        	    	Game new_game = new Game(game_id,opponent_color);
+            	    String opponent = new String(game_info[2]);
+        	    	Game new_game = new Game(game_id,opponent_color,opponent);
         	    	available_games.add(new_game);
         	    }
     	    }

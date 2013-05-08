@@ -54,6 +54,7 @@ public class MiniChessPlayer {
 				connection.accept(game_id,my_color);
 			}
 			
+			gamestate.writeBoard();
 			while (!gamestate.gameOver()) {
 				if (my_color == 'W') {
 					if (gamestate.whiteOnMove()) {
@@ -62,11 +63,13 @@ public class MiniChessPlayer {
 						System.out.println("My move: " + my_move);
 						gamestate = gamestate.makeImcsMove(my_move);
 						connection.sendMove(my_move);
+						//gamestate.writeBoard();
 					} else {
 						// wait for opponent's move.
 						String opp_move = connection.getMove();
 						System.out.println("Black moves: " + opp_move);
 						gamestate = gamestate.makeImcsMove(opp_move);
+						//gamestate.writeBoard();
 					}
 				} else {
 					if (gamestate.blackOnMove()) {
@@ -75,14 +78,16 @@ public class MiniChessPlayer {
 						System.out.println("My move: " + my_move);
 						gamestate = gamestate.makeImcsMove(my_move);
 						connection.sendMove(my_move);
+						//gamestate.writeBoard();
 					} else {
 						// wait for opponent's move.
 						String opp_move = connection.getMove();
 						System.out.println("White moves: " + opp_move);
 						gamestate = gamestate.makeImcsMove(opp_move);
+						//gamestate.writeBoard();
 					}	
 				}
-				//gamestate.writeBoard();
+				gamestate.writeBoard();
 			}
 			connection.close();
 			System.out.println("Game over!");

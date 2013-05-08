@@ -40,8 +40,8 @@ public class State implements Cloneable {
 	public State() {
 		num_rows = 6;
 		num_columns = 5;
-		num_turns = 0;
-		max_turns = 80;
+		num_turns = 1;
+		max_turns = 40;
 		num_states_evaluated = 0;
 		searchStartTime = 0;
 		searchElapsedTime = 0;
@@ -1301,8 +1301,9 @@ public class State implements Cloneable {
 		State new_gamestate = this.clone(); 
 		new_gamestate.board[to_x][to_y] = src_piece;
 		new_gamestate.board[from_x][from_y] = '.';
-		new_gamestate.num_turns += 1;
 		new_gamestate.white_is_next = !new_gamestate.white_is_next;
+		if (new_gamestate.white_is_next)
+			new_gamestate.num_turns += 1;
 		
 		/* Check for victory/draw. */
 		/* Draw condition: Too many moves. */ 

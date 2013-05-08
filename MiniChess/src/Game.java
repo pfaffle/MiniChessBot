@@ -7,14 +7,17 @@
 public class Game {
 	public int id;
 	public char color;
+	public String opponent;
 	
 	public Game() {
 		id = 0;
 		color = 'W';
+		opponent = "nobody";
 	}
-	public Game(int newid, char newcolor) {
+	public Game(int newid, char newcolor, String newopponent) {
 		id = newid;
 		color = newcolor;
+		opponent = newopponent;
 	}
 	public String toString() {
 		String str = "(" + id + "," + color + ")";
