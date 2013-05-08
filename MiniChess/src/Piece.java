@@ -5,21 +5,21 @@
  *   them simpler to work with.
  */
 public class Piece {
-		private char piece;       // The character representation of this piece.
-		private Square position;  // The square that this piece resides on.
+		public char piece_ch;          // The character representation of this piece.
+		public Square position;  // The square that this piece resides on.
 		
 		public Piece() {
-			piece = 'P';
+			piece_ch = 'P';
 			position = new Square(0,1);
 		}
 		
 		public Piece(char newpiece, Square newpos) {
-			piece = newpiece;
+			piece_ch = newpiece;
 			position = new Square(newpos.x, newpos.y);
 		}
 		
 		public Piece(char newpiece, int x, int y) {
-			piece = newpiece;
+			piece_ch = newpiece;
 			position = new Square(x,y);
 		}
 		
@@ -34,7 +34,7 @@ public class Piece {
 		 *   False : Returned if this piece is in the same square it starts in in a new game of MiniChess.
 		 */
 		public boolean isDeveloped() {
-			switch(piece) {
+			switch(piece_ch) {
 			case 'K':
 				return !(position.x == 4 && position.y == 0); // x=4 y=0
 			case 'Q':
@@ -85,7 +85,7 @@ public class Piece {
 		 *   False : Returned if this piece is Black (lower case).
 		 */
 		public boolean isWhite() {
-			return Character.isUpperCase(piece);
+			return Character.isUpperCase(piece_ch);
 		}
 		
 		/* Function:
@@ -113,6 +113,6 @@ public class Piece {
 		 *   False : Returned if this piece is White (upper case).
 		 */
 		public boolean isBlack() {
-			return Character.isLowerCase(piece);
+			return Character.isLowerCase(piece_ch);
 		}
 }

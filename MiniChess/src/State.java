@@ -814,6 +814,7 @@ public class State implements Cloneable {
 		int rookValue = 500;
 		int queenValue = 900;
 		int centerPieceValue = 10;
+		int developedPieceValue = 250;
 		boolean black_king_taken = true;
 		boolean white_king_taken = true;
 		
@@ -821,11 +822,11 @@ public class State implements Cloneable {
 			for (int j = 0; j < num_columns; j++) {
 				Square cur_square = new Square(j,i);
 				try {
-					char cur_piece = getPieceAtSquare(cur_square);
+					Piece cur_piece = new Piece(getPieceAtSquare(cur_square),cur_square);
 					
 					/* Sum up the values of all pieces left on the board. */
-					if (cur_piece != '.') {
-						switch (cur_piece) {
+					if (cur_piece.piece_ch != '.') {
+						switch (cur_piece.piece_ch) {
 						case 'K':
 							white_king_taken = false;
 							break;
@@ -833,64 +834,74 @@ public class State implements Cloneable {
 							black_king_taken = false;
 							break;
 						case 'Q':
-							if (whiteOnMove())
+							if (whiteOnMove()) {
 								stateValue += queenValue;
-							else
+							} else {
 								stateValue -= queenValue;
+							}
 							break;
 						case 'q':
-							if (blackOnMove())
+							if (blackOnMove()) {
 								stateValue += queenValue;
-							else
+							} else {
 								stateValue -= queenValue;
+							}
 							break;
 						case 'R':
-							if (whiteOnMove())
+							if (whiteOnMove()) {
 								stateValue += rookValue;
-							else
+							} else {
 								stateValue -= rookValue;
+							}
 							break;
 						case 'r':
-							if (blackOnMove())
+							if (blackOnMove()) {
 								stateValue += rookValue;
-							else
+							} else {
 								stateValue -= rookValue;
+							}
 							break;
 						case 'B':
-							if (whiteOnMove())
+							if (whiteOnMove()) {
 								stateValue += bishopValue;
-							else
+							} else {
 								stateValue -= bishopValue;
+							}
 							break;
 						case 'b':
-							if (blackOnMove())
+							if (blackOnMove()) {
 								stateValue += bishopValue;
-							else
+							} else {
 								stateValue -= bishopValue;
+							}
 							break;
 						case 'N':
-							if (whiteOnMove())
+							if (whiteOnMove()) {
 								stateValue += knightValue;
-							else
+							} else {
 								stateValue -= knightValue;
+							}
 							break;
 						case 'n':
-							if (blackOnMove())
+							if (blackOnMove()) {
 								stateValue += knightValue;
-							else
+							} else {
 								stateValue -= knightValue;
+							}
 							break;
 						case 'P':
-							if (whiteOnMove())
+							if (whiteOnMove()) {
 								stateValue += pawnValue;
-							else
+							} else {
 								stateValue -= pawnValue;
+							}
 							break;
 						case 'p':
-							if (blackOnMove())
+							if (blackOnMove()) {
 								stateValue += pawnValue;
-							else
+							} else {
 								stateValue -= pawnValue;
+							}
 							break;
 						}
 						
@@ -898,16 +909,33 @@ public class State implements Cloneable {
 						if (cur_square.y > 1 && cur_square.y < 4) {
 							if (cur_square.x > 0 && cur_square.x < 4) {
 								if (whiteOnMove()) {
-									if (Piece.isWhite(cur_piece))
+									if (cur_piece.isWhite())
 										stateValue += centerPieceValue;
 									else
 										stateValue -= centerPieceValue;
 								} else {
-									if (Piece.isBlack(cur_piece))
+									if (cur_piece.isBlack())
 										stateValue += centerPieceValue;
 									else
 										stateValue -= centerPieceValue;
 								}								
+							}
+						}
+						
+						/* Add value for developed major pieces. */
+						if (cur_piece.isDeveloped()) {
+							if(whiteOnMove()) {
+								if (cur_piece.isWhite()) {
+									stateValue += developedPieceValue;
+								} else {
+									stateValue -= developedPieceValue;
+								}
+							} else {
+								if (cur_piece.isBlack()) {
+									stateValue += developedPieceValue;
+								} else {
+									stateValue -= developedPieceValue;
+								}
 							}
 						}
 						
