@@ -25,6 +25,7 @@ public class State implements Cloneable {
 	private Move best_move;            // Best move found in the time elapsed.
 	private long searchStartTime;      // When the move search timer was started.
 	private double searchElapsedTime;  // How much time has elapsed since the move search timer was started.
+	private double moveTimeLimit;      // How much time to allow the bot to come up with a move.
 	
 	/* Function:
 	 *   State
@@ -45,6 +46,7 @@ public class State implements Cloneable {
 		num_states_evaluated = 0;
 		searchStartTime = 0;
 		searchElapsedTime = 0;
+		moveTimeLimit = 5.0;
 		white_is_next = true;
 		game_is_over = false;
 		white_wins = false;
@@ -1355,7 +1357,7 @@ public class State implements Cloneable {
 	private int negamax(State s, int depth, boolean top) {
 		num_states_evaluated++;
 		searchElapsedTime = (System.nanoTime() - searchStartTime) * 1.0e-9;
-		if (s.gameOver() || depth <= 0 || searchElapsedTime >= 1.0)
+		if (s.gameOver() || depth <= 0 || searchElapsedTime >= moveTimeLimit)
 			return s.getStateValue();
 		
 		Vector<Move> possibleMoves = s.getAllValidMoves();
