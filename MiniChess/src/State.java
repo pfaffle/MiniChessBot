@@ -23,6 +23,7 @@ public class State implements Cloneable {
 	private boolean white_wins;        // White has won this game.
 	private boolean black_wins;        // Black has won this game.
 	private Move best_move;            // Best move found in the time elapsed.
+	private Move temp_best_move;       // Work-in-progress best move for the negamax function. 
 	private long searchStartTime;      // When the move search timer was started.
 	private double searchElapsedTime;  // How much time has elapsed since the move search timer was started.
 	private double moveTimeLimit;      // How much time to allow the bot to come up with a move.
@@ -52,6 +53,7 @@ public class State implements Cloneable {
 		white_wins = false;
 		black_wins = false;
 		best_move = null;
+		temp_best_move = null;
 		board = new char[num_columns][num_rows];
 		
 		/* Initialize board
@@ -479,8 +481,10 @@ public class State implements Cloneable {
 		searchStartTime = System.nanoTime();
 		do {
 			negamax(curState,searchDepth,true);
+			if (searchElapsedTime < moveTimeLimit)
+				best_move = temp_best_move;
 			searchDepth++;
-		} while (searchElapsedTime < 1.0); // This gets updated within the recursive function.
+		} while (searchElapsedTime < moveTimeLimit); // This gets updated within the recursive function.
 		System.out.println("Search depth: " + searchDepth);
 		System.out.println("Number of states evaluated: " + num_states_evaluated);
 		System.out.println("Time elapsed: " + searchElapsedTime + " sec");
@@ -669,8 +673,10 @@ public class State implements Cloneable {
 		searchStartTime = System.nanoTime();
 		do {
 			negamax(curState,searchDepth,true);
+			if (searchElapsedTime < moveTimeLimit)
+				best_move = temp_best_move;
 			searchDepth++;
-		} while (searchElapsedTime < 1.0); // This gets updated within the recursive function.
+		} while (searchElapsedTime < moveTimeLimit); // This gets updated within the recursive function.
 		System.out.println("Search depth: " + searchDepth);
 		System.out.println("Number of states evaluated: " + num_states_evaluated);
 		State returnState = executeMove(best_move);
@@ -1397,7 +1403,7 @@ public class State implements Cloneable {
 			newState = s.executeMove(curMove);
 			value = -(negamax(newState,depth - 1, false));
 			if (top)
-				best_move = curMove;
+				temp_best_move = curMove;
 			for (int i = 1; i < possibleMoves.size(); i++) {
 				curMove = possibleMoves.elementAt(i);
 				newState = s.executeMove(curMove);
@@ -1405,7 +1411,7 @@ public class State implements Cloneable {
 				if (curValue > value) { 
 					value = curValue;
 					if (top) 
-						best_move = curMove;
+						temp_best_move = curMove;
 				}
 			}
 		} catch (Exception e) {

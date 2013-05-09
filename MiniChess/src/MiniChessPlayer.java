@@ -25,8 +25,6 @@ public class MiniChessPlayer {
 		//playRandomVsHuman();
 		//playRandomVsRandom();
 		playSmartVsImcs();
-		
-		
 	}
 	
 	public static void playSmartVsImcs() {
