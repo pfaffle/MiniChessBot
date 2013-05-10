@@ -43,7 +43,7 @@ public class MiniChessPlayer {
 				Random generator = new Random();
 				int randomIndex = generator.nextInt(available_games.size());
 				Game selected_game = available_games.elementAt(randomIndex);
-				//Game selected_game = new Game(7315,'W',"custom_opponent");
+				//Game selected_game = new Game(,'W',"custom_opponent");
 				String game_id = String.valueOf(selected_game.id);
 				String my_opponent = selected_game.opponent;
 				if (selected_game.color == 'B') {

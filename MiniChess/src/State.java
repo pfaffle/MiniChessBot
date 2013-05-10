@@ -47,7 +47,7 @@ public class State implements Cloneable {
 		num_states_evaluated = 0;
 		searchStartTime = 0;
 		searchElapsedTime = 0;
-		moveTimeLimit = 5.0;
+		moveTimeLimit = 1.0;
 		white_is_next = true;
 		game_is_over = false;
 		white_wins = false;
@@ -809,8 +809,8 @@ public class State implements Cloneable {
 	 * Outputs:
 	 *   The return values.
 	 * Return values:
-	 *   An integer value between -10,000 and 10,000. A higher number means the game state is more
-	 *   advantageous to the player that is on move. A 10,000 (or -10,000) means a sure win (or loss).
+	 *   An integer value between -100,000 and 100,000. A higher number means the game state is more
+	 *   advantageous to the player that is on move. A 100,000 (or -100,000) means a sure win (or loss).
 	 */
 	private int getStateValue() {
 		int stateValue = 0;
@@ -821,6 +821,8 @@ public class State implements Cloneable {
 		int queenValue = 900;
 		int centerPieceValue = 10;
 		int developedPieceValue = 250;
+		int advancedPawnValue = 100; // multiplied by how far up it is.
+		int gameWinValue = 100000;
 		boolean black_king_taken = true;
 		boolean white_king_taken = true;
 		
@@ -915,15 +917,17 @@ public class State implements Cloneable {
 						if (cur_square.y > 1 && cur_square.y < 4) {
 							if (cur_square.x > 0 && cur_square.x < 4) {
 								if (whiteOnMove()) {
-									if (cur_piece.isWhite())
+									if (cur_piece.isWhite()) {
 										stateValue += centerPieceValue;
-									else
+									} else {
 										stateValue -= centerPieceValue;
+									}
 								} else {
-									if (cur_piece.isBlack())
+									if (cur_piece.isBlack()) {
 										stateValue += centerPieceValue;
-									else
+									} else {
 										stateValue -= centerPieceValue;
+									}
 								}								
 							}
 						}
@@ -945,6 +949,24 @@ public class State implements Cloneable {
 							}
 						}
 						
+						/* Add value to advanced pawns. */
+						if (cur_square.y > 0 && cur_square.y < 5) {
+							if (cur_piece.piece_ch == 'P') {
+								int modifier = cur_square.y - 1;
+								if (whiteOnMove()) {
+									stateValue += (advancedPawnValue * modifier);
+								} else {
+									stateValue -= (advancedPawnValue * modifier);
+								}
+							} else if (cur_piece.piece_ch == 'p') {
+								int modifier = 4 - cur_square.y;
+								if (blackOnMove()) {
+									stateValue += (advancedPawnValue * modifier);
+								} else {
+									stateValue -= (advancedPawnValue * modifier);
+								}
+							}
+						}
 						/* Add any other state valuations here... */
 					}
 				} catch (Exception e) {
@@ -958,14 +980,14 @@ public class State implements Cloneable {
 		/* Check for game-winning states. */
 		if (white_king_taken) {
 			if (blackOnMove())
-				stateValue = 10000;
+				stateValue = gameWinValue;
 			else
-				stateValue = -10000;
+				stateValue = -gameWinValue;
 		} else if (black_king_taken) {
 			if (whiteOnMove())
-				stateValue = 10000;
+				stateValue = gameWinValue;
 			else
-				stateValue = -10000;
+				stateValue = -gameWinValue;
 		}
 		
 		return stateValue;
