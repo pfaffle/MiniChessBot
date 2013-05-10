@@ -814,14 +814,14 @@ public class State implements Cloneable {
 	 */
 	private int getStateValue() {
 		int stateValue = 0;
-		int pawnValue = 100;
-		int knightValue = 300;
-		int bishopValue = 300;
-		int rookValue = 500;
-		int queenValue = 900;
-		int centerPieceValue = 10;
-		int developedPieceValue = 250;
-		int advancedPawnValue = 100; // multiplied by how far up it is.
+		int pawnValue = 200;
+		int knightValue = 600;
+		int bishopValue = 600;
+		int rookValue = 1000;
+		int queenValue = 1800;
+		int centerPieceValue = 50;
+		int developedPieceValue = 300;
+		int advancedPawnValue = 150; // multiplied by how far up it is.
 		int gameWinValue = 100000;
 		boolean black_king_taken = true;
 		boolean white_king_taken = true;
