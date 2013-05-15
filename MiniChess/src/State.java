@@ -823,6 +823,7 @@ public class State implements Cloneable {
 		int developedPieceValue = 200;
 		int advancedPawnValue = 150; // multiplied by how far up it is.
 		int doubledPawnValue = -100;
+		int pawnChainValue = 100;
 		int gameWinValue = 100000;
 		boolean black_king_taken = true;
 		boolean white_king_taken = true;
@@ -992,6 +993,43 @@ public class State implements Cloneable {
 											stateValue += doubledPawnValue;
 										} else {
 											stateValue -= doubledPawnValue;
+										}
+									}
+								}
+							}
+						}
+						
+						/* Add value of pawn-chains. */
+						if (cur_square.y > 0 && cur_square.y < 5) {
+							if (cur_piece.piece_ch == 'P') {
+								int new_y = cur_square.y + 1;
+								for (int x_offset = -1; x_offset <= 1; x_offset += 2) {
+									int new_x = cur_square.x + x_offset;
+									if (new_x >= 0 && new_x <= 5) {
+										Square next_square = new Square(new_x,new_y);
+										Piece next_piece = new Piece(getPieceAtSquare(next_square),next_square);
+										if(next_piece.piece_ch == 'P') {
+											if (whiteOnMove()) {
+												stateValue += pawnChainValue;
+											} else {
+												stateValue -= pawnChainValue;
+											}
+										}
+									}
+								}
+							} else if (cur_piece.piece_ch == 'p') {
+								int new_y = cur_square.y - 1;
+								for (int x_offset = -1; x_offset <= 1; x_offset += 2) {
+									int new_x = cur_square.x + x_offset;
+									if (new_x >= 0 && new_x <= 5) {
+										Square next_square = new Square(new_x,new_y);
+										Piece next_piece = new Piece(getPieceAtSquare(next_square),next_square);
+										if(next_piece.piece_ch == 'p') {
+											if (blackOnMove()) {
+												stateValue += pawnChainValue;
+											} else {
+												stateValue -= pawnChainValue;
+											}
 										}
 									}
 								}
