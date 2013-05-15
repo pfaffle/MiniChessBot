@@ -485,9 +485,9 @@ public class State implements Cloneable {
 				best_move = temp_best_move;
 			searchDepth++;
 		} while (searchElapsedTime < moveTimeLimit); // This gets updated within the recursive function.
-		System.out.println("Search depth: " + searchDepth);
+		/*System.out.println("Search depth: " + searchDepth);
 		System.out.println("Number of states evaluated: " + num_states_evaluated);
-		System.out.println("Time elapsed: " + searchElapsedTime + " sec");
+		System.out.println("Time elapsed: " + searchElapsedTime + " sec"); */
 		
 		return best_move.toString();
 	}
@@ -677,11 +677,11 @@ public class State implements Cloneable {
 				best_move = temp_best_move;
 			searchDepth++;
 		} while (searchElapsedTime < moveTimeLimit); // This gets updated within the recursive function.
-		System.out.println("Search depth: " + searchDepth);
-		System.out.println("Number of states evaluated: " + num_states_evaluated);
 		State returnState = executeMove(best_move);
-		System.out.println("Value of selected state: " + returnState.getStateValue());
-		System.out.println("Time elapsed: " + searchElapsedTime + " sec");
+		/* System.out.println("Search depth: " + searchDepth);
+		System.out.println("Number of states evaluated: " + num_states_evaluated);
+		System.out.println("Value of selected state: " + returnState.getStateValue());*
+		System.out.println("Time elapsed: " + searchElapsedTime + " sec");*/
 		return returnState;
 	}
 	
@@ -814,14 +814,15 @@ public class State implements Cloneable {
 	 */
 	private int getStateValue() {
 		int stateValue = 0;
-		int pawnValue = 200;
-		int knightValue = 600;
-		int bishopValue = 600;
-		int rookValue = 1000;
-		int queenValue = 1800;
+		int pawnValue = 300;
+		int knightValue = 800;
+		int bishopValue = 800;
+		int rookValue = 1200;
+		int queenValue = 2000;
 		int centerPieceValue = 50;
-		int developedPieceValue = 300;
+		int developedPieceValue = 200;
 		int advancedPawnValue = 150; // multiplied by how far up it is.
+		int doubledPawnValue = -100;
 		int gameWinValue = 100000;
 		boolean black_king_taken = true;
 		boolean white_king_taken = true;
@@ -967,6 +968,36 @@ public class State implements Cloneable {
 								}
 							}
 						}
+						
+						/* Add negative value of doubled pawns. */
+						if (cur_square.y > 0 && cur_square.y < 5) {
+							if (cur_piece.piece_ch == 'P') {
+								for (int new_y = cur_square.y + 1; new_y < 6; new_y++) {
+									Square next_square = new Square(cur_square.x,new_y);
+									Piece next_piece = new Piece(getPieceAtSquare(next_square),next_square);
+									if(next_piece.piece_ch == 'P') {
+										if (whiteOnMove()) {
+											stateValue += doubledPawnValue;
+										} else {
+											stateValue -= doubledPawnValue;
+										}
+									}
+								}
+							} else if (cur_piece.piece_ch == 'p') {
+								for (int new_y = cur_square.y - 1; new_y > 0; new_y--) {
+									Square next_square = new Square(cur_square.x,new_y);
+									Piece next_piece = new Piece(getPieceAtSquare(next_square),next_square);
+									if(next_piece.piece_ch == 'p') {
+										if (blackOnMove()) {
+											stateValue += doubledPawnValue;
+										} else {
+											stateValue -= doubledPawnValue;
+										}
+									}
+								}
+							}
+						}
+						
 						/* Add any other state valuations here... */
 					}
 				} catch (Exception e) {
@@ -1411,7 +1442,7 @@ public class State implements Cloneable {
 	 *   will be for the current player.
 	 */
 	private int negamax(State s, int depth, boolean top) {
-		num_states_evaluated++;
+		//num_states_evaluated++;
 		searchElapsedTime = (System.nanoTime() - searchStartTime) * 1.0e-9;
 		if (s.gameOver() || depth <= 0 || searchElapsedTime >= moveTimeLimit)
 			return s.getStateValue();
