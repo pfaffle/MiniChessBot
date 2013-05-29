@@ -23,8 +23,6 @@ public class State implements Cloneable {
 	private boolean white_wins;        // White has won this game.
 	private boolean black_wins;        // Black has won this game.
 	private Move best_move;            // Best move found in the time elapsed.
-	private Move temp_best_move;       // Work-in-progress best move for the negamax function. 
-	private Move worst_move;           // Worst move found in time elapsed.
 	private long searchStartTime;      // When the move search timer was started.
 	private double searchElapsedTime;  // How much time has elapsed since the move search timer was started.
 	private double moveTimeLimit;      // How much time to allow the bot to come up with a move.
@@ -56,8 +54,6 @@ public class State implements Cloneable {
 		white_wins = false;
 		black_wins = false;
 		best_move = null;
-		temp_best_move = null;
-		worst_move = null;
 		board = new char[num_columns][num_rows];
 		
 		/* Initialize board
@@ -810,7 +806,7 @@ public class State implements Cloneable {
 		int knightValue = 800;
 		int bishopValue = 800;
 		int rookValue = 1200;
-		int queenValue = 2000;
+		int queenValue = 4000;
 		int centerPieceValue = 50;
 		int developedPieceValue = 200;
 		int advancedPawnValue = 150; // multiplied by how far up it is.
@@ -1460,11 +1456,13 @@ public class State implements Cloneable {
 	 *   move is for now. Returns that State's integer valuation. Uses alpha-beta pruning
 	 *   to drop portions of the tree of states that it deems aren't worth pursuing.
 	 * Inputs:
-	 *       s : A State object to examine.
-	 *   depth : The maximum depth to traverse before evaluating a State's value early
-	 *           (i.e. before game-end).
-	 *     top : A boolean value indicating if this is the top of the "tree" of possible
-	 *           States.
+	 *          s : A State object to examine.
+	 *      depth : The maximum depth to traverse before evaluating a State's value early
+	 *              (i.e. before the end of the entire move tree).
+	 * worstValue : The current worst move value for the current player. For alpha-beta
+	 *              pruning
+	 *  bestValue : The current best move value for the current player. For alpha-beta
+	 *              pruning.
 	 * Outputs:
 	 *   The return values.
 	 * Return values:
@@ -1509,20 +1507,14 @@ public class State implements Cloneable {
 	/* Function:
 	 *   getBestMove
 	 * Description:
-	 *   Recursively looks ahead at future possible moves to determine what the best
-	 *   move is for now. Returns that State's integer valuation. Uses alpha-beta pruning
-	 *   to drop portions of the tree of states that it deems aren't worth pursuing.
+	 *   Initiates the recursive negamax search to seek out the best possible move.  
 	 * Inputs:
 	 *       s : A State object to examine.
-	 *   depth : The maximum depth to traverse before evaluating a State's value early
-	 *           (i.e. before game-end).
-	 *     top : A boolean value indicating if this is the top of the "tree" of possible
-	 *           States.
 	 * Outputs:
 	 *   The return values.
 	 * Return values:
-	 *   An integer value representing how advantageous pursuing this direction of moves
-	 *   will be for the current player.
+	 *   A Move object that contains the source square and target square of the
+	 *   piece to move.
 	 */
 	Move getBestMove(State s) {
 		int curDepth = 0;
@@ -1552,8 +1544,6 @@ public class State implements Cloneable {
 					}
 				}
 			} catch (Exception e) {
-				/* This should not be possible, because if it were, gameOver()
-				 * should have returned true. */
 				e.getStackTrace();
 			}
 		}

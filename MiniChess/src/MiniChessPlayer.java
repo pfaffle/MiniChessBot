@@ -12,8 +12,8 @@ public class MiniChessPlayer {
 
 	public static String server = "imcs.svcs.cs.pdx.edu";
 	public static String port = "3589";
-	public static String user = "pfaffle";
-	public static String pass = "foo";
+	public static String user = "ser_rodrik_castle";
+	public static String pass = "foobar";
 	
 	/**
 	 * @param args
@@ -21,10 +21,10 @@ public class MiniChessPlayer {
 	public static void main(String[] args) {
 		
 		//playSmartVsHuman();
-		playSmartVsSmart();
+		//playSmartVsSmart();
 		//playRandomVsHuman();
 		//playRandomVsRandom();
-		//playSmartVsImcs();
+		playSmartVsImcs();
 	}
 	
 	public static void playSmartVsImcs() {
@@ -42,8 +42,8 @@ public class MiniChessPlayer {
 				// Find and accept one of the existing game offers.
 				Random generator = new Random();
 				int randomIndex = generator.nextInt(available_games.size());
-				//Game selected_game = available_games.elementAt(randomIndex);
-				Game selected_game = new Game(7619,'W',"custom_opponent");
+				Game selected_game = available_games.elementAt(randomIndex);
+				//Game selected_game = new Game(7619,'W',"custom_opponent");
 				String game_id = String.valueOf(selected_game.id);
 				String my_opponent = selected_game.opponent;
 				if (selected_game.color == 'B') {
