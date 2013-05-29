@@ -666,15 +666,14 @@ public class State implements Cloneable {
 		}
 		num_states_evaluated = 0;
 		State curState = this;
-		int searchDepth = 1;
 		searchElapsedTime = 0.0;
 		searchStartTime = System.nanoTime();
 		best_move = getBestMove(curState);
 		State returnState = executeMove(best_move);
-		/* System.out.println("Search depth: " + searchDepth);
+		//System.out.println("Search depth: " + searchDepth);
 		System.out.println("Number of states evaluated: " + num_states_evaluated);
-		System.out.println("Value of selected state: " + returnState.getStateValue());*
-		System.out.println("Time elapsed: " + searchElapsedTime + " sec");*/
+		System.out.println("Value of selected state: " + returnState.getStateValue());
+		System.out.println("Time elapsed: " + searchElapsedTime + " sec");
 		return returnState;
 	}
 	
@@ -1472,8 +1471,8 @@ public class State implements Cloneable {
 	 *   An integer value representing how advantageous pursuing this direction of moves
 	 *   will be for the current player.
 	 */
-	private int negamax(State s, int depth, boolean top, int worstValue, int bestValue) {
-		//num_states_evaluated++;
+	private int negamax(State s, int depth, int worstValue, int bestValue) {
+		num_states_evaluated++;
 		searchElapsedTime = (System.nanoTime() - searchStartTime) * 1.0e-9;
 		if (s.gameOver() || depth <= 0 || searchElapsedTime >= moveTimeLimit)
 			return s.getStateValue();
@@ -1481,6 +1480,7 @@ public class State implements Cloneable {
 		Move curMove = null;
 		State newState = null;
 		int value = -gameWinValue;
+		int curValue = value;
 		int curWorstValue = worstValue;
 		Vector<Move> possibleMoves = s.getAllValidMoves();
 		int numMoves = possibleMoves.size();
@@ -1489,8 +1489,12 @@ public class State implements Cloneable {
 			for (int i = 0; i < numMoves; i++) {
 				curMove = possibleMoves.elementAt(i);
 				newState = s.executeMove(curMove);
-				value = -(negamax(newState,depth - 1, false, -bestValue, -curWorstValue));
+				curValue = -(negamax(newState, depth - 1, -bestValue, -curWorstValue));
+				if (curValue >= value)
+					value = curValue;
 				if (value >= curWorstValue)
+					curWorstValue = value;
+				if (value >= bestValue)
 					return value;
 			}
 		} catch (Exception e) {
@@ -1499,7 +1503,7 @@ public class State implements Cloneable {
 			e.getStackTrace();
 		}
 		
-		return value;	
+		return value;
 	}
 	
 	/* Function:
@@ -1528,17 +1532,18 @@ public class State implements Cloneable {
 		State newState = null;
 		Move curMove = null;
 		Move bestMove = null;
+		Move tempBestMove = null;
 		Vector<Move> possibleMoves = s.getAllValidMoves();
 		int numMoves = possibleMoves.size();
 		
 		searchElapsedTime = (System.nanoTime() - searchStartTime) * 1.0e-9;
-		while (!s.gameOver() && searchElapsedTime < moveTimeLimit) {
+		while (searchElapsedTime < moveTimeLimit) {
 			try {
 				curDepth++;
 				for (int i = 0; i < numMoves; i++) {
 					curMove = possibleMoves.elementAt(i);
 					newState = s.executeMove(curMove);
-					curValue = -(negamax(newState,curDepth, false, -gameWinValue, -curWorstValue));
+					curValue = -(negamax(newState, curDepth, -gameWinValue, -curWorstValue));
 					if (curValue > curWorstValue)
 						curWorstValue = curValue;
 					if (curValue > value) {
@@ -1551,9 +1556,7 @@ public class State implements Cloneable {
 				 * should have returned true. */
 				e.getStackTrace();
 			}
-			
 		}
-		
 		return bestMove;
 	}
 	
