@@ -24,9 +24,11 @@ public class State implements Cloneable {
 	private boolean black_wins;        // Black has won this game.
 	private Move best_move;            // Best move found in the time elapsed.
 	private Move temp_best_move;       // Work-in-progress best move for the negamax function. 
+	private Move worst_move;           // Worst move found in time elapsed.
 	private long searchStartTime;      // When the move search timer was started.
 	private double searchElapsedTime;  // How much time has elapsed since the move search timer was started.
 	private double moveTimeLimit;      // How much time to allow the bot to come up with a move.
+	private int gameWinValue;          // State value for winning the game.
 	
 	/* Function:
 	 *   State
@@ -48,12 +50,14 @@ public class State implements Cloneable {
 		searchStartTime = 0;
 		searchElapsedTime = 0;
 		moveTimeLimit = 1.0;
+		gameWinValue = 100000;
 		white_is_next = true;
 		game_is_over = false;
 		white_wins = false;
 		black_wins = false;
 		best_move = null;
 		temp_best_move = null;
+		worst_move = null;
 		board = new char[num_columns][num_rows];
 		
 		/* Initialize board
@@ -476,15 +480,9 @@ public class State implements Cloneable {
 		
 		num_states_evaluated = 0;
 		State curState = this;
-		int searchDepth = 1;
 		searchElapsedTime = 0.0;
 		searchStartTime = System.nanoTime();
-		do {
-			negamax(curState,searchDepth,true);
-			if (searchElapsedTime < moveTimeLimit)
-				best_move = temp_best_move;
-			searchDepth++;
-		} while (searchElapsedTime < moveTimeLimit); // This gets updated within the recursive function.
+		best_move = getBestMove(curState);
 		/*System.out.println("Search depth: " + searchDepth);
 		System.out.println("Number of states evaluated: " + num_states_evaluated);
 		System.out.println("Time elapsed: " + searchElapsedTime + " sec"); */
@@ -671,12 +669,7 @@ public class State implements Cloneable {
 		int searchDepth = 1;
 		searchElapsedTime = 0.0;
 		searchStartTime = System.nanoTime();
-		do {
-			negamax(curState,searchDepth,true);
-			if (searchElapsedTime < moveTimeLimit)
-				best_move = temp_best_move;
-			searchDepth++;
-		} while (searchElapsedTime < moveTimeLimit); // This gets updated within the recursive function.
+		best_move = getBestMove(curState);
 		State returnState = executeMove(best_move);
 		/* System.out.println("Search depth: " + searchDepth);
 		System.out.println("Number of states evaluated: " + num_states_evaluated);
@@ -824,7 +817,6 @@ public class State implements Cloneable {
 		int advancedPawnValue = 150; // multiplied by how far up it is.
 		int doubledPawnValue = -100;
 		int pawnChainValue = 100;
-		int gameWinValue = 100000;
 		boolean black_king_taken = true;
 		boolean white_king_taken = true;
 		
@@ -1461,12 +1453,13 @@ public class State implements Cloneable {
 		
 		return new_gamestate;
 	}
-	
+
 	/* Function:
 	 *   negamax
 	 * Description:
 	 *   Recursively looks ahead at future possible moves to determine what the best
-	 *   move is for now. Returns that State's integer valuation.
+	 *   move is for now. Returns that State's integer valuation. Uses alpha-beta pruning
+	 *   to drop portions of the tree of states that it deems aren't worth pursuing.
 	 * Inputs:
 	 *       s : A State object to examine.
 	 *   depth : The maximum depth to traverse before evaluating a State's value early
@@ -1479,31 +1472,26 @@ public class State implements Cloneable {
 	 *   An integer value representing how advantageous pursuing this direction of moves
 	 *   will be for the current player.
 	 */
-	private int negamax(State s, int depth, boolean top) {
+	private int negamax(State s, int depth, boolean top, int worstValue, int bestValue) {
 		//num_states_evaluated++;
 		searchElapsedTime = (System.nanoTime() - searchStartTime) * 1.0e-9;
 		if (s.gameOver() || depth <= 0 || searchElapsedTime >= moveTimeLimit)
 			return s.getStateValue();
 		
-		Vector<Move> possibleMoves = s.getAllValidMoves();
-		Move curMove = possibleMoves.elementAt(0);
+		Move curMove = null;
 		State newState = null;
-		int value = 0;
+		int value = -gameWinValue;
+		int curWorstValue = worstValue;
+		Vector<Move> possibleMoves = s.getAllValidMoves();
+		int numMoves = possibleMoves.size();
 		
-		try {
-			newState = s.executeMove(curMove);
-			value = -(negamax(newState,depth - 1, false));
-			if (top)
-				temp_best_move = curMove;
-			for (int i = 1; i < possibleMoves.size(); i++) {
+		try {			
+			for (int i = 0; i < numMoves; i++) {
 				curMove = possibleMoves.elementAt(i);
 				newState = s.executeMove(curMove);
-				int curValue = -(negamax(newState,depth - 1, false)); 
-				if (curValue > value) { 
-					value = curValue;
-					if (top) 
-						temp_best_move = curMove;
-				}
+				value = -(negamax(newState,depth - 1, false, -bestValue, -curWorstValue));
+				if (value >= curWorstValue)
+					return value;
 			}
 		} catch (Exception e) {
 			/* This should not be possible, because if it were, gameOver()
@@ -1512,6 +1500,61 @@ public class State implements Cloneable {
 		}
 		
 		return value;	
+	}
+	
+	/* Function:
+	 *   getBestMove
+	 * Description:
+	 *   Recursively looks ahead at future possible moves to determine what the best
+	 *   move is for now. Returns that State's integer valuation. Uses alpha-beta pruning
+	 *   to drop portions of the tree of states that it deems aren't worth pursuing.
+	 * Inputs:
+	 *       s : A State object to examine.
+	 *   depth : The maximum depth to traverse before evaluating a State's value early
+	 *           (i.e. before game-end).
+	 *     top : A boolean value indicating if this is the top of the "tree" of possible
+	 *           States.
+	 * Outputs:
+	 *   The return values.
+	 * Return values:
+	 *   An integer value representing how advantageous pursuing this direction of moves
+	 *   will be for the current player.
+	 */
+	Move getBestMove(State s) {
+		int curDepth = 0;
+		int value = -gameWinValue;
+		int curValue = value;
+		int curWorstValue = value;
+		State newState = null;
+		Move curMove = null;
+		Move bestMove = null;
+		Vector<Move> possibleMoves = s.getAllValidMoves();
+		int numMoves = possibleMoves.size();
+		
+		searchElapsedTime = (System.nanoTime() - searchStartTime) * 1.0e-9;
+		while (!s.gameOver() && searchElapsedTime < moveTimeLimit) {
+			try {
+				curDepth++;
+				for (int i = 0; i < numMoves; i++) {
+					curMove = possibleMoves.elementAt(i);
+					newState = s.executeMove(curMove);
+					curValue = -(negamax(newState,curDepth, false, -gameWinValue, -curWorstValue));
+					if (curValue > curWorstValue)
+						curWorstValue = curValue;
+					if (curValue > value) {
+						value = curValue;
+						bestMove = curMove;
+					}
+				}
+			} catch (Exception e) {
+				/* This should not be possible, because if it were, gameOver()
+				 * should have returned true. */
+				e.getStackTrace();
+			}
+			
+		}
+		
+		return bestMove;
 	}
 	
 }
