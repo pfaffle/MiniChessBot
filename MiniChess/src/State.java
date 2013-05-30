@@ -11,7 +11,7 @@ import java.util.Random;
  *   Tracks the current state of the chess board, what turn it is and who is next
  *   to play. Also decides when there is a winner and who it is.
  */
-public class State implements Cloneable {
+public class State implements Cloneable,Comparable<State> {
 	private char[][] board;  // Array grid representation of the chess board.
 	private int num_rows;    // Number of rows in the chess board.
 	private int num_columns; // Number of columns in the chess board.
@@ -1482,7 +1482,9 @@ public class State implements Cloneable {
 		int curWorstValue = worstValue;
 		Vector<Move> possibleMoves = s.getAllValidMoves();
 		int numMoves = possibleMoves.size();
+		State[] nextStates = new State[numMoves];
 		
+
 		try {			
 			for (int i = 0; i < numMoves; i++) {
 				curMove = possibleMoves.elementAt(i);
@@ -1550,4 +1552,15 @@ public class State implements Cloneable {
 		return bestMove;
 	}
 	
+	public int compareTo(State s) {
+		int myStateValue = getStateValue();
+		int otherStateValue = s.getStateValue();
+		
+		if (myStateValue > otherStateValue)
+			return 1;
+		else if (myStateValue < otherStateValue)
+			return -1;
+		else
+			return 0;
+	}
 }
