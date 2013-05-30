@@ -1,9 +1,3 @@
-/*import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.util.Vector;*/
-import java.io.IOException;
 import java.util.Random;
 import java.util.Scanner;
 import java.util.Vector;
@@ -21,10 +15,10 @@ public class MiniChessPlayer {
 	public static void main(String[] args) {
 		
 		//playSmartVsHuman();
-		//playSmartVsSmart();
+		playSmartVsSmart();
 		//playRandomVsHuman();
 		//playRandomVsRandom();
-		playSmartVsImcs();
+		//playSmartVsImcs();
 	}
 	
 	public static void playSmartVsImcs() {

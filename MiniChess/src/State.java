@@ -1,5 +1,7 @@
 import java.io.InputStream;
 import java.io.PrintStream;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.Scanner;
 import java.util.Vector;
 import java.util.regex.Pattern;
@@ -1485,10 +1487,23 @@ public class State implements Cloneable,Comparable<State> {
 		State[] nextStates = new State[numMoves];
 		
 
-		try {			
+		try {
+			/* Arrange the states to be evaluated by negamax in descending order by
+			 * state value, to improve the performance of alpha-beta pruning. */
 			for (int i = 0; i < numMoves; i++) {
 				curMove = possibleMoves.elementAt(i);
-				newState = s.executeMove(curMove);
+				nextStates[i] = s.executeMove(curMove);
+			}
+			Arrays.sort(nextStates, Collections.reverseOrder());
+			//Arrays.sort(nextStates);
+			
+			/*for (int i = 0; i < numMoves; i++) {
+				int curVal = nextStates[i].getStateValue();
+				System.out.println("State value of State #" + i + ": " + curVal);
+			}*/
+			
+			for (int i = 0; i < numMoves; i++) {
+				newState = nextStates[i];
 				curValue = -(negamax(newState, depth - 1, -bestValue, -curWorstValue));
 				if (curValue >= value)
 					value = curValue;
@@ -1526,17 +1541,25 @@ public class State implements Cloneable,Comparable<State> {
 		State newState = null;
 		Move curMove = null;
 		Move bestMove = null;
-		Move tempBestMove = null;
 		Vector<Move> possibleMoves = s.getAllValidMoves();
 		int numMoves = possibleMoves.size();
-		
+		State[] nextStates = new State[numMoves];
+
 		searchElapsedTime = (System.nanoTime() - searchStartTime) * 1.0e-9;
 		while (searchElapsedTime < moveTimeLimit) {
 			try {
 				curDepth++;
+				/* Arrange the states to be evaluated by negamax in descending order by
+				 * state value, to improve the performance of alpha-beta pruning. */
 				for (int i = 0; i < numMoves; i++) {
 					curMove = possibleMoves.elementAt(i);
-					newState = s.executeMove(curMove);
+					nextStates[i] = s.executeMove(curMove);
+				}
+				Arrays.sort(nextStates, Collections.reverseOrder());
+				
+				for (int i = 0; i < numMoves; i++) {
+					curMove = possibleMoves.elementAt(i);
+					newState = nextStates[i];
 					curValue = -(negamax(newState, curDepth, -gameWinValue, -curWorstValue));
 					if (curValue > curWorstValue)
 						curWorstValue = curValue;
