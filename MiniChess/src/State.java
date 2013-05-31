@@ -477,10 +477,9 @@ public class State implements Cloneable,Comparable<State> {
 		}
 		
 		num_states_evaluated = 0;
-		State curState = this;
 		searchElapsedTime = 0.0;
 		searchStartTime = System.nanoTime();
-		best_move = getBestMove(curState);
+		best_move = getBestMove();
 		/*System.out.println("Search depth: " + searchDepth);
 		System.out.println("Number of states evaluated: " + num_states_evaluated);
 		System.out.println("Time elapsed: " + searchElapsedTime + " sec"); */
@@ -663,10 +662,9 @@ public class State implements Cloneable,Comparable<State> {
 			throw new Exception("Game is over.");
 		}
 		num_states_evaluated = 0;
-		State curState = this;
 		searchElapsedTime = 0.0;
 		searchStartTime = System.nanoTime();
-		best_move = getBestMove(curState);
+		best_move = getBestMove();
 		State returnState = executeMove(best_move);
 		//System.out.println("Search depth: " + searchDepth);
 		System.out.println("Number of states evaluated: " + num_states_evaluated);
@@ -1461,64 +1459,67 @@ public class State implements Cloneable,Comparable<State> {
 	 *          s : A State object to examine.
 	 *      depth : The maximum depth to traverse before evaluating a State's value early
 	 *              (i.e. before the end of the entire move tree).
-	 * worstValue : The current worst move value for the current player. For alpha-beta
-	 *              pruning
-	 *  bestValue : The current best move value for the current player. For alpha-beta
-	 *              pruning.
+	 *      alpha : The lowest score that the current player is guaranteed to get. For
+	 *              alpha-beta pruning.
+	 *       beta : The highest score that the opposing player is guaranteed to get. For
+	 *              alpha-beta pruning.
+	 *     myTurn : Boolean value that is True if the current state represents the bot's
+	 *              position, and False if it is the opponent's.
 	 * Outputs:
 	 *   The return values.
 	 * Return values:
 	 *   An integer value representing how advantageous pursuing this direction of moves
 	 *   will be for the current player.
 	 */
-	private int negamax(State s, int depth, int worstValue, int bestValue) {
+	private int negamax(State s, int depth, int alpha, int beta, boolean myTurn) {
 		num_states_evaluated++;
 		searchElapsedTime = (System.nanoTime() - searchStartTime) * 1.0e-9;
-		if (s.gameOver() || depth <= 0 || searchElapsedTime >= moveTimeLimit)
+		//if (s.gameOver() || depth <= 0 || searchElapsedTime >= moveTimeLimit)
+		if (s.gameOver() || depth <= 0)
 			return s.getStateValue();
 		
-		Move curMove = null;
-		State newState = null;
-		int value = -gameWinValue;
-		int curValue = value;
-		int curWorstValue = worstValue;
+		int newAlpha = 0;
+		int newBeta = 0;
+		
+		/* Get all possible next moves. */
 		Vector<Move> possibleMoves = s.getAllValidMoves();
 		int numMoves = possibleMoves.size();
 		State[] nextStates = new State[numMoves];
 		
-
+		/* Get all possible next states to be evaluated by negamax, then arrange
+		 * them in descending order by state value, to improve the performance of
+		 * alpha-beta pruning. */
 		try {
-			/* Arrange the states to be evaluated by negamax in descending order by
-			 * state value, to improve the performance of alpha-beta pruning. */
+			Move curMove = null;
 			for (int i = 0; i < numMoves; i++) {
 				curMove = possibleMoves.elementAt(i);
 				nextStates[i] = s.executeMove(curMove);
 			}
 			Arrays.sort(nextStates, Collections.reverseOrder());
-			//Arrays.sort(nextStates);
-			
-			/*for (int i = 0; i < numMoves; i++) {
-				int curVal = nextStates[i].getStateValue();
-				System.out.println("State value of State #" + i + ": " + curVal);
-			}*/
-			
-			for (int i = 0; i < numMoves; i++) {
-				newState = nextStates[i];
-				curValue = -(negamax(newState, depth - 1, -bestValue, -curWorstValue));
-				if (curValue >= value)
-					value = curValue;
-				if (value >= curWorstValue)
-					curWorstValue = value;
-				if (value >= bestValue)
-					return value;
-			}
 		} catch (Exception e) {
-			/* This should not be possible, because if it were, gameOver()
-			 * should have returned true. */
-			e.getStackTrace();
+			e.printStackTrace();
 		}
-		
-		return value;
+
+		/* Begin negamax search down the tree of possible moves. */
+		if (myTurn) {
+			for (int i = 0; i < numMoves; i++) {
+				newAlpha = negamax(nextStates[i], depth - 1, alpha, beta, !myTurn);
+				if (newAlpha > alpha)
+					alpha = newAlpha;
+				if (beta <= alpha)
+					break;
+			}
+			return alpha;
+		} else {
+			for (int i = 0; i < numMoves; i++) {
+				newBeta = negamax(nextStates[i], depth - 1, alpha, beta, !myTurn);
+				if (newBeta < beta)
+					beta = newBeta;
+				if (beta <= alpha)
+					break;
+			}
+			return beta;
+		}
 	}
 	
 	/* Function:
@@ -1533,45 +1534,46 @@ public class State implements Cloneable,Comparable<State> {
 	 *   A Move object that contains the source square and target square of the
 	 *   piece to move.
 	 */
-	Move getBestMove(State s) {
-		int curDepth = 0;
+	Move getBestMove() {
 		int value = -gameWinValue;
-		int curValue = value;
-		int curWorstValue = value;
-		State newState = null;
-		Move curMove = null;
+		int curValue = 0;
 		Move bestMove = null;
-		Vector<Move> possibleMoves = s.getAllValidMoves();
+		
+		/* Get all possible next moves. */
+		Vector<Move> possibleMoves = getAllValidMoves();
 		int numMoves = possibleMoves.size();
 		State[] nextStates = new State[numMoves];
-
-		searchElapsedTime = (System.nanoTime() - searchStartTime) * 1.0e-9;
-		while (searchElapsedTime < moveTimeLimit) {
-			try {
-				curDepth++;
-				/* Arrange the states to be evaluated by negamax in descending order by
-				 * state value, to improve the performance of alpha-beta pruning. */
+		
+		try {
+			/* Get all possible next states to be evaluated by negamax, then arrange
+			 * them in descending order by state value, to improve the performance of
+			 * alpha-beta pruning. */
+			Move curMove = null;
+			for (int i = 0; i < numMoves; i++) {
+				curMove = possibleMoves.elementAt(i);
+				nextStates[i] = executeMove(curMove);
+			}
+			Arrays.sort(nextStates, Collections.reverseOrder());
+			
+			/* Begin an iterative deepening negamax search for the next best move, while
+			 * remaining within the time limit. */
+			int curDepth = 0;
+			searchElapsedTime = (System.nanoTime() - searchStartTime) * 1.0e-9;
+			while (searchElapsedTime < moveTimeLimit) {
+				curDepth++;				
 				for (int i = 0; i < numMoves; i++) {
 					curMove = possibleMoves.elementAt(i);
-					nextStates[i] = s.executeMove(curMove);
-				}
-				Arrays.sort(nextStates, Collections.reverseOrder());
-				
-				for (int i = 0; i < numMoves; i++) {
-					curMove = possibleMoves.elementAt(i);
-					newState = nextStates[i];
-					curValue = -(negamax(newState, curDepth, -gameWinValue, -curWorstValue));
-					if (curValue > curWorstValue)
-						curWorstValue = curValue;
+					curValue = negamax(nextStates[i], curDepth, -gameWinValue, gameWinValue, true);
 					if (curValue > value) {
 						value = curValue;
 						bestMove = curMove;
 					}
 				}
-			} catch (Exception e) {
-				e.getStackTrace();
 			}
+		} catch (Exception e) {
+			e.printStackTrace();
 		}
+		
 		return bestMove;
 	}
 	
