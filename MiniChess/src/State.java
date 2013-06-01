@@ -1471,7 +1471,7 @@ public class State implements Cloneable,Comparable<State> {
 	 *   An integer value representing how advantageous pursuing this direction of moves
 	 *   will be for the current player.
 	 */
-	private int negamax(State s, int depth, int alpha, int beta, boolean myTurn) {
+	private int negamax(State s, int depth, int alpha, int beta) {
 		num_states_evaluated++;
 		searchElapsedTime = (System.nanoTime() - searchStartTime) * 1.0e-9;
 		//if (s.gameOver() || depth <= 0 || searchElapsedTime >= moveTimeLimit)
@@ -1479,7 +1479,6 @@ public class State implements Cloneable,Comparable<State> {
 			return s.getStateValue();
 		
 		int newAlpha = 0;
-		int newBeta = 0;
 		
 		/* Get all possible next moves. */
 		Vector<Move> possibleMoves = s.getAllValidMoves();
@@ -1501,25 +1500,14 @@ public class State implements Cloneable,Comparable<State> {
 		}
 
 		/* Begin negamax search down the tree of possible moves. */
-		if (myTurn) {
-			for (int i = 0; i < numMoves; i++) {
-				newAlpha = negamax(nextStates[i], depth - 1, alpha, beta, !myTurn);
-				if (newAlpha > alpha)
-					alpha = newAlpha;
-				if (beta <= alpha)
-					break;
-			}
-			return alpha;
-		} else {
-			for (int i = 0; i < numMoves; i++) {
-				newBeta = negamax(nextStates[i], depth - 1, alpha, beta, !myTurn);
-				if (newBeta < beta)
-					beta = newBeta;
-				if (beta <= alpha)
-					break;
-			}
-			return beta;
+		for (int i = 0; i < numMoves; i++) {
+			newAlpha = -(negamax(nextStates[i], depth - 1, alpha, beta));
+			if (newAlpha >= beta)
+				return newAlpha;
+			if (newAlpha > alpha)
+				alpha = newAlpha;
 		}
+		return alpha;
 	}
 	
 	/* Function:
@@ -1563,13 +1551,14 @@ public class State implements Cloneable,Comparable<State> {
 				curDepth++;				
 				for (int i = 0; i < numMoves; i++) {
 					curMove = possibleMoves.elementAt(i);
-					curValue = negamax(nextStates[i], curDepth, -gameWinValue, gameWinValue, true);
+					curValue = -(negamax(nextStates[i], curDepth, -gameWinValue, gameWinValue));
 					if (curValue > value) {
 						value = curValue;
 						bestMove = curMove;
 					}
 				}
 			}
+			System.out.println("Search depth: " + curDepth);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
