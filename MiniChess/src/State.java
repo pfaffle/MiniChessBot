@@ -1462,8 +1462,6 @@ public class State implements Cloneable,Comparable<State> {
 	 *              alpha-beta pruning.
 	 *       beta : The highest score that the opposing player is guaranteed to get. For
 	 *              alpha-beta pruning.
-	 *     myTurn : Boolean value that is True if the current state represents the bot's
-	 *              position, and False if it is the opponent's.
 	 * Outputs:
 	 *   The return values.
 	 * Return values:
@@ -1493,7 +1491,7 @@ public class State implements Cloneable,Comparable<State> {
 				curMove = possibleMoves.elementAt(i);
 				nextStates[i] = s.executeMove(curMove);
 			}
-			Arrays.sort(nextStates, Collections.reverseOrder());
+			//Arrays.sort(nextStates, Collections.reverseOrder());
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -1540,8 +1538,15 @@ public class State implements Cloneable,Comparable<State> {
 			for (int i = 0; i < numMoves; i++) {
 				curMove = possibleMoves.elementAt(i);
 				nextStates[i] = executeMove(curMove);
+				stateScores[i] = nextStates[i].getStateValue();
 			}
-			Arrays.sort(nextStates, Collections.reverseOrder());
+			System.out.println("Moves considered (before negamax):");
+			for (int i = 0; i < numMoves; i++) {
+				System.out.println(possibleMoves.elementAt(i) + " Value: " + stateScores[i]);
+			}
+			
+			//Arrays.sort(nextStates, Collections.reverseOrder());
+			
 			
 			/* Begin an iterative deepening negamax search for the next best move, while
 			 * remaining within the time limit. */
@@ -1560,7 +1565,7 @@ public class State implements Cloneable,Comparable<State> {
 				}
 			}
 			System.out.println("Search depth: " + curDepth);
-			System.out.println("Moves considered:");
+			System.out.println("Moves considered (after negamax):");
 			for (int i = 0; i < numMoves; i++) {
 				System.out.println(possibleMoves.elementAt(i) + " Value: " + stateScores[i]);
 			}
