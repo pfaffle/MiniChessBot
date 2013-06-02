@@ -666,7 +666,6 @@ public class State implements Cloneable,Comparable<State> {
 		searchStartTime = System.nanoTime();
 		best_move = getBestMove();
 		State returnState = executeMove(best_move);
-		//System.out.println("Search depth: " + searchDepth);
 		System.out.println("Number of states evaluated: " + num_states_evaluated);
 		System.out.println("Value of selected state: " + returnState.getStateValue());
 		System.out.println("Time elapsed: " + searchElapsedTime + " sec");
@@ -800,13 +799,13 @@ public class State implements Cloneable,Comparable<State> {
 	 *   An integer value between -100,000 and 100,000. A higher number means the game state is more
 	 *   advantageous to the player that is on move. A 100,000 (or -100,000) means a sure win (or loss).
 	 */
-	private int getStateValue() {
+	public int getStateValue() {
 		int stateValue = 0;
-		int pawnValue = 300;
-		int knightValue = 800;
-		int bishopValue = 800;
-		int rookValue = 1200;
-		int queenValue = 4000;
+		int pawnValue = 1000;
+		int knightValue = 3000;
+		int bishopValue = 3000;
+		int rookValue = 5000;
+		int queenValue = 9000;
 		int centerPieceValue = 50;
 		int developedPieceValue = 200;
 		int advancedPawnValue = 150; // multiplied by how far up it is.
@@ -1501,7 +1500,7 @@ public class State implements Cloneable,Comparable<State> {
 
 		/* Begin negamax search down the tree of possible moves. */
 		for (int i = 0; i < numMoves; i++) {
-			newAlpha = -(negamax(nextStates[i], depth - 1, alpha, beta));
+			newAlpha = -(negamax(nextStates[i], depth - 1, -beta, -alpha));
 			if (newAlpha >= beta)
 				return newAlpha;
 			if (newAlpha > alpha)
@@ -1531,6 +1530,7 @@ public class State implements Cloneable,Comparable<State> {
 		Vector<Move> possibleMoves = getAllValidMoves();
 		int numMoves = possibleMoves.size();
 		State[] nextStates = new State[numMoves];
+		int[] stateScores = new int[numMoves];
 		
 		try {
 			/* Get all possible next states to be evaluated by negamax, then arrange
@@ -1551,7 +1551,8 @@ public class State implements Cloneable,Comparable<State> {
 				curDepth++;				
 				for (int i = 0; i < numMoves; i++) {
 					curMove = possibleMoves.elementAt(i);
-					curValue = -(negamax(nextStates[i], curDepth, -gameWinValue, gameWinValue));
+					curValue = -(negamax(nextStates[i], curDepth, gameWinValue, -gameWinValue));
+					stateScores[i] = curValue;
 					if (curValue > value) {
 						value = curValue;
 						bestMove = curMove;
@@ -1559,6 +1560,10 @@ public class State implements Cloneable,Comparable<State> {
 				}
 			}
 			System.out.println("Search depth: " + curDepth);
+			System.out.println("Moves considered:");
+			for (int i = 0; i < numMoves; i++) {
+				System.out.println(possibleMoves.elementAt(i) + " Value: " + stateScores[i]);
+			}
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

@@ -1,3 +1,7 @@
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.Random;
 import java.util.Scanner;
 import java.util.Vector;
@@ -19,6 +23,7 @@ public class MiniChessPlayer {
 		//playRandomVsHuman();
 		//playRandomVsRandom();
 		//playSmartVsImcs();
+		//testStateEval();
 	}
 	
 	public static void playSmartVsImcs() {
@@ -244,4 +249,30 @@ public class MiniChessPlayer {
 			System.out.println("Game is a draw.");
 		}
 	}
+	
+	public static void testStateEval() {
+		//Print board starting state.
+		State s = new State();
+		
+		String test_file_path;
+		File test_file;
+		FileInputStream test_stream;
+		int value = 0;
+		test_file_path = ".\\tests\\board\\valid_board.txt";
+		test_file = new File(test_file_path);
+		try {
+			test_stream = new FileInputStream(test_file);
+			s.readBoard(test_stream);
+			test_stream.close();
+		} catch (FileNotFoundException e) {
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		s.writeBoard();
+		value = s.getStateValue();
+		System.out.println("State value: " + value);
+		
+		//Print ending starting state.
+	}
 }
+

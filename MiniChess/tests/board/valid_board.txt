@@ -1,7 +1,7 @@
 10 B
 kq.nr
-p.ppp
-bp...
-.PN..
+pppN.
+P...p
+.....
 P.PPP
 R.BQK
