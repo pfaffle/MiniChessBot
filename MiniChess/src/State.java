@@ -799,7 +799,7 @@ public class State implements Cloneable,Comparable<State> {
 	 *   An integer value between -100,000 and 100,000. A higher number means the game state is more
 	 *   advantageous to the player that is on move. A 100,000 (or -100,000) means a sure win (or loss).
 	 */
-	public int getStateValue() {
+	private int getStateValue() {
 		int stateValue = 0;
 		int pawnValue = 1000;
 		int knightValue = 3000;
@@ -1322,7 +1322,7 @@ public class State implements Cloneable,Comparable<State> {
 	 * Return values:
 	 *   A Vector object containing all valid moves for all pieces belonging to the player on move.
 	 */
-	private Vector<Move> getAllValidMoves() {
+	public Vector<Move> getAllValidMoves() {
 		/* Scan the board for all the pieces belonging to the player that is on move. */
 		Vector<Square> occupied_squares = new Vector<Square>();
 		for (int i = 0; i < num_rows; i++) {
@@ -1519,9 +1519,10 @@ public class State implements Cloneable,Comparable<State> {
 	 */
 	Move getBestMove() {
 		int bestValue = -gameWinValue;
-		Move bestMove = null;
+		Vector<Move> bestMoves = new Vector<Move>();
 		int curBestValue = bestValue;
-		Move curBestMove = null;
+		Vector<Move> curBestMoves = null;
+		Move bestMove = null;
 		
 		/* Get all possible next moves. */
 		Vector<Move> possibleMoves = getAllValidMoves();
@@ -1551,7 +1552,7 @@ public class State implements Cloneable,Comparable<State> {
 			int curDepth = 0;
 			searchElapsedTime = (System.nanoTime() - searchStartTime) * 1.0e-9;
 			while (searchElapsedTime < moveTimeLimit) {
-				curBestMove = null;
+				curBestMoves = new Vector<Move>();
 				curBestValue = -gameWinValue;
 				curDepth++;
 				for (int i = 0; i < numMoves; i++) {
@@ -1559,13 +1560,23 @@ public class State implements Cloneable,Comparable<State> {
 					stateScores[i] = -(negamax(nextStates[i], curDepth, -gameWinValue, gameWinValue));
 					if (stateScores[i] > curBestValue) {
 						curBestValue = stateScores[i];
-						curBestMove = curMove;
+						curBestMoves = new Vector<Move>();
+					}
+					if (stateScores[i] == curBestValue) {
+						curBestMoves.add(curMove);
 					}
 				}
 				/* Commit new search results. */
-				bestMove = curBestMove;
+				bestMoves.clear();
+				bestMoves.addAll(curBestMoves);
 				bestValue = curBestValue;
 			}
+			
+			/* Pick a random move from the best options available. */
+			Random generator = new Random();
+			int randomIndex = generator.nextInt(bestMoves.size());
+			bestMove = bestMoves.elementAt(randomIndex);
+			
 			System.out.println("Search depth: " + curDepth);
 			/*System.out.println("Moves considered (after negamax):");
 			for (int i = 0; i < numMoves; i++) {

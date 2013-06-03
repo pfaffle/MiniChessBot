@@ -23,7 +23,7 @@ public class MiniChessPlayer {
 		//playRandomVsHuman();
 		//playRandomVsRandom();
 		//playSmartVsImcs();
-		//testStateEval();
+		//testMoveGen();
 	}
 	
 	public static void playSmartVsImcs() {
@@ -250,15 +250,14 @@ public class MiniChessPlayer {
 		}
 	}
 	
-	public static void testStateEval() {
+	public static void testMoveGen() {
 		//Print board starting state.
 		State s = new State();
 		
 		String test_file_path;
 		File test_file;
 		FileInputStream test_stream;
-		int value = 0;
-		test_file_path = ".\\tests\\board\\valid_board.txt";
+		test_file_path = ".\\tests\\board\\endgame.txt";
 		test_file = new File(test_file_path);
 		try {
 			test_stream = new FileInputStream(test_file);
@@ -269,8 +268,11 @@ public class MiniChessPlayer {
 			e.printStackTrace();
 		}
 		s.writeBoard();
-		value = s.getStateValue();
-		System.out.println("State value: " + value);
+		Vector<Move> possibleMoves = s.getAllValidMoves();
+		System.out.println("Possible moves:");
+		for (int i = 0; i < possibleMoves.size(); i++) {
+			System.out.println(possibleMoves.elementAt(i));			
+		}
 		
 		//Print ending starting state.
 	}
