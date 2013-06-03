@@ -476,13 +476,9 @@ public class State implements Cloneable,Comparable<State> {
 			throw new Exception("Game is over.");
 		}
 		
-		num_states_evaluated = 0;
 		searchElapsedTime = 0.0;
 		searchStartTime = System.nanoTime();
 		best_move = getBestMove();
-		/*System.out.println("Search depth: " + searchDepth);
-		System.out.println("Number of states evaluated: " + num_states_evaluated);
-		System.out.println("Time elapsed: " + searchElapsedTime + " sec"); */
 		
 		return best_move.toString();
 	}
@@ -661,14 +657,11 @@ public class State implements Cloneable,Comparable<State> {
 		if (gameOver()) {
 			throw new Exception("Game is over.");
 		}
-		num_states_evaluated = 0;
 		searchElapsedTime = 0.0;
 		searchStartTime = System.nanoTime();
 		best_move = getBestMove();
 		State returnState = executeMove(best_move);
-		/*System.out.println("Number of states evaluated: " + num_states_evaluated);
-		System.out.println("Value of selected state: " + returnState.getStateValue());
-		System.out.println("Time elapsed: " + searchElapsedTime + " sec");*/
+		
 		return returnState;
 	}
 	
@@ -1489,7 +1482,7 @@ public class State implements Cloneable,Comparable<State> {
 			for (int i = 0; i < numMoves; i++) {
 				nextStates[i] = s.executeMove(possibleMoves.elementAt(i));
 			}
-			//Arrays.sort(nextStates, Collections.reverseOrder());
+			Arrays.sort(nextStates, Collections.reverseOrder());
 			/* Begin negamax search down the tree of possible moves. */
 			for (int i = 0; i < numMoves; i++) {
 				newAlpha = -(negamax(nextStates[i], depth - 1, -beta, -alpha));
@@ -1518,6 +1511,7 @@ public class State implements Cloneable,Comparable<State> {
 	 *   piece to move.
 	 */
 	Move getBestMove() {
+		num_states_evaluated = 0;
 		int bestValue = -gameWinValue;
 		Vector<Move> bestMoves = new Vector<Move>();
 		int curBestValue = bestValue;
@@ -1531,10 +1525,7 @@ public class State implements Cloneable,Comparable<State> {
 		int[] stateScores = new int[numMoves];
 		
 		try {
-			/* Get all possible next states to be evaluated by negamax, then arrange
-			 * them in descending order by state value, to improve the performance of
-			 * alpha-beta pruning. */
-			Move curMove = null;
+			/* Get all possible next states to be evaluated by negamax. */
 			for (int i = 0; i < numMoves; i++) {
 				nextStates[i] = executeMove(possibleMoves.elementAt(i));
 				stateScores[i] = -(nextStates[i].getStateValue());
@@ -1542,13 +1533,24 @@ public class State implements Cloneable,Comparable<State> {
 				if (stateScores[i] == gameWinValue)
 					return possibleMoves.elementAt(i);
 			}
-			/*System.out.println("Moves considered (before negamax):");
-			for (int i = 0; i < numMoves; i++) {
-				System.out.println(possibleMoves.elementAt(i) + " Value: " + stateScores[i]);
-			}*/
 			
-			//Arrays.sort(nextStates, Collections.reverseOrder());
-			
+			/* Sort moves in descending order by state value, to improve the
+			 * performance of alpha-beta pruning. */
+			for (int i = 1; i < numMoves; i++) {
+				Move curMove = possibleMoves.elementAt(i);
+				State curState = nextStates[i];
+				int curValue = stateScores[i];
+				int j = i;
+				while (j > 0 && stateScores[j] < curValue) {
+					stateScores[j] = stateScores[j-1];
+					nextStates[j] = nextStates[j-1];
+					possibleMoves.set(j, possibleMoves.elementAt(j-1));
+					j--;
+				}
+				stateScores[j] = curValue;
+				nextStates[j] = curState;
+				possibleMoves.set(j, curMove);
+			}			
 			
 			/* Begin an iterative deepening negamax search for the next best move, while
 			 * remaining within the time limit. */
@@ -1559,14 +1561,13 @@ public class State implements Cloneable,Comparable<State> {
 				curBestValue = -gameWinValue;
 				curDepth++;
 				for (int i = 0; i < numMoves; i++) {
-					curMove = possibleMoves.elementAt(i);
 					stateScores[i] = -(negamax(nextStates[i], curDepth, -gameWinValue, gameWinValue));
 					if (stateScores[i] > curBestValue) {
 						curBestValue = stateScores[i];
 						curBestMoves = new Vector<Move>();
 					}
 					if (stateScores[i] == curBestValue) {
-						curBestMoves.add(curMove);
+						curBestMoves.add(possibleMoves.elementAt(i));
 					}
 				}
 				/* Commit new search results. */
@@ -1574,19 +1575,14 @@ public class State implements Cloneable,Comparable<State> {
 				bestMoves.addAll(curBestMoves);
 				bestValue = curBestValue;
 			}
-			
+			System.out.println("Search depth: " + curDepth);
+			System.out.println("Number of states evaluated: " + num_states_evaluated);
+			System.out.println("Time elapsed: " + searchElapsedTime);
 			/* Pick a random move from the best options available. */
 			Random generator = new Random();
 			int randomIndex = generator.nextInt(bestMoves.size());
 			bestMove = bestMoves.elementAt(randomIndex);
 			
-			/*System.out.println("Search depth: " + curDepth);
-			System.out.println("Moves considered (after negamax):");
-			for (int i = 0; i < numMoves; i++) {
-				System.out.println(possibleMoves.elementAt(i) + " Value: " + stateScores[i]);
-			}
-			System.out.println("Best Move: " + bestMove);
-			System.out.println("Value: " + bestValue);*/
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

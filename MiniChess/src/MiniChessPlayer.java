@@ -19,10 +19,10 @@ public class MiniChessPlayer {
 	public static void main(String[] args) {
 		
 		//playSmartVsHuman();
-		playSmartVsSmart();
+		//playSmartVsSmart();
 		//playRandomVsHuman();
 		//playRandomVsRandom();
-		//playSmartVsImcs();
+		playSmartVsImcs();
 		//testMoveGen();
 	}
 	
