@@ -1486,24 +1486,22 @@ public class State implements Cloneable,Comparable<State> {
 		 * them in descending order by state value, to improve the performance of
 		 * alpha-beta pruning. */
 		try {
-			Move curMove = null;
 			for (int i = 0; i < numMoves; i++) {
-				curMove = possibleMoves.elementAt(i);
-				nextStates[i] = s.executeMove(curMove);
+				nextStates[i] = s.executeMove(possibleMoves.elementAt(i));
 			}
 			//Arrays.sort(nextStates, Collections.reverseOrder());
+			/* Begin negamax search down the tree of possible moves. */
+			for (int i = 0; i < numMoves; i++) {
+				newAlpha = -(negamax(nextStates[i], depth - 1, -beta, -alpha));
+				if (newAlpha > alpha)
+					alpha = newAlpha;
+				if (alpha >= beta)
+					break;
+			}
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 
-		/* Begin negamax search down the tree of possible moves. */
-		for (int i = 0; i < numMoves; i++) {
-			newAlpha = -(negamax(nextStates[i], depth - 1, -beta, -alpha));
-			if (newAlpha >= beta)
-				return newAlpha;
-			if (newAlpha > alpha)
-				alpha = newAlpha;
-		}
 		return alpha;
 	}
 	
@@ -1520,9 +1518,10 @@ public class State implements Cloneable,Comparable<State> {
 	 *   piece to move.
 	 */
 	Move getBestMove() {
-		int value = -gameWinValue;
-		int curValue = 0;
+		int bestValue = -gameWinValue;
 		Move bestMove = null;
+		int curBestValue = bestValue;
+		Move curBestMove = null;
 		
 		/* Get all possible next moves. */
 		Vector<Move> possibleMoves = getAllValidMoves();
@@ -1536,14 +1535,13 @@ public class State implements Cloneable,Comparable<State> {
 			 * alpha-beta pruning. */
 			Move curMove = null;
 			for (int i = 0; i < numMoves; i++) {
-				curMove = possibleMoves.elementAt(i);
-				nextStates[i] = executeMove(curMove);
-				stateScores[i] = nextStates[i].getStateValue();
+				nextStates[i] = executeMove(possibleMoves.elementAt(i));
+				stateScores[i] = -(nextStates[i].getStateValue());
 			}
-			System.out.println("Moves considered (before negamax):");
+			/*System.out.println("Moves considered (before negamax):");
 			for (int i = 0; i < numMoves; i++) {
 				System.out.println(possibleMoves.elementAt(i) + " Value: " + stateScores[i]);
-			}
+			}*/
 			
 			//Arrays.sort(nextStates, Collections.reverseOrder());
 			
@@ -1553,22 +1551,28 @@ public class State implements Cloneable,Comparable<State> {
 			int curDepth = 0;
 			searchElapsedTime = (System.nanoTime() - searchStartTime) * 1.0e-9;
 			while (searchElapsedTime < moveTimeLimit) {
-				curDepth++;				
+				curBestMove = null;
+				curBestValue = -gameWinValue;
+				curDepth++;
 				for (int i = 0; i < numMoves; i++) {
 					curMove = possibleMoves.elementAt(i);
-					curValue = -(negamax(nextStates[i], curDepth, gameWinValue, -gameWinValue));
-					stateScores[i] = curValue;
-					if (curValue > value) {
-						value = curValue;
-						bestMove = curMove;
+					stateScores[i] = -(negamax(nextStates[i], curDepth, -gameWinValue, gameWinValue));
+					if (stateScores[i] > curBestValue) {
+						curBestValue = stateScores[i];
+						curBestMove = curMove;
 					}
 				}
+				/* Commit new search results. */
+				bestMove = curBestMove;
+				bestValue = curBestValue;
 			}
 			System.out.println("Search depth: " + curDepth);
-			System.out.println("Moves considered (after negamax):");
+			/*System.out.println("Moves considered (after negamax):");
 			for (int i = 0; i < numMoves; i++) {
 				System.out.println(possibleMoves.elementAt(i) + " Value: " + stateScores[i]);
-			}
+			}*/
+			System.out.println("Best Move: " + bestMove);
+			System.out.println("Value: " + bestValue);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
