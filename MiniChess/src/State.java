@@ -666,9 +666,9 @@ public class State implements Cloneable,Comparable<State> {
 		searchStartTime = System.nanoTime();
 		best_move = getBestMove();
 		State returnState = executeMove(best_move);
-		System.out.println("Number of states evaluated: " + num_states_evaluated);
+		/*System.out.println("Number of states evaluated: " + num_states_evaluated);
 		System.out.println("Value of selected state: " + returnState.getStateValue());
-		System.out.println("Time elapsed: " + searchElapsedTime + " sec");
+		System.out.println("Time elapsed: " + searchElapsedTime + " sec");*/
 		return returnState;
 	}
 	
@@ -1538,6 +1538,9 @@ public class State implements Cloneable,Comparable<State> {
 			for (int i = 0; i < numMoves; i++) {
 				nextStates[i] = executeMove(possibleMoves.elementAt(i));
 				stateScores[i] = -(nextStates[i].getStateValue());
+				/* If we find a winning move, use it. */
+				if (stateScores[i] == gameWinValue)
+					return possibleMoves.elementAt(i);
 			}
 			/*System.out.println("Moves considered (before negamax):");
 			for (int i = 0; i < numMoves; i++) {
@@ -1577,13 +1580,13 @@ public class State implements Cloneable,Comparable<State> {
 			int randomIndex = generator.nextInt(bestMoves.size());
 			bestMove = bestMoves.elementAt(randomIndex);
 			
-			System.out.println("Search depth: " + curDepth);
-			/*System.out.println("Moves considered (after negamax):");
+			/*System.out.println("Search depth: " + curDepth);
+			System.out.println("Moves considered (after negamax):");
 			for (int i = 0; i < numMoves; i++) {
 				System.out.println(possibleMoves.elementAt(i) + " Value: " + stateScores[i]);
-			}*/
+			}
 			System.out.println("Best Move: " + bestMove);
-			System.out.println("Value: " + bestValue);
+			System.out.println("Value: " + bestValue);*/
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
