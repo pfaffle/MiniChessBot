@@ -29,7 +29,7 @@ public class State implements Cloneable,Comparable<State> {
 	private double searchElapsedTime;  // How much time has elapsed since the move search timer was started.
 	private double moveTimeLimit;      // How much time to allow the bot to come up with a move.
 	private int gameWinValue;          // State value for winning the game.
-	private long hash;                 // The Zobrist hash for this game state.
+	public long hash;                 // The Zobrist hash for this game state.
 	private long whiteHash;            // The long integer that indicates white is on move in a Zobrist hash.
 	private long blackHash;            // The long integer that indicates black is on move in a Zobrist hash.
 	private ZobristTable zob;          // The Zobrist hash generator.
@@ -130,6 +130,10 @@ public class State implements Cloneable,Comparable<State> {
 				newState.board[i][j] = this.board[i][j];
 			}
 		}
+		newState.zob = this.zob;
+		newState.hash = this.hash;
+		newState.whiteHash = this.whiteHash;
+		newState.blackHash = this.blackHash;
 		
 		return newState;
 	}
