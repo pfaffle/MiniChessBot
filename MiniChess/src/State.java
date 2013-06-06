@@ -1506,7 +1506,8 @@ public class State implements Cloneable,Comparable<State> {
 			}
 		}
 		
-		int newAlpha = 0;
+		int value = -gameWinValue;
+		int newAlpha = alpha;
 		
 		/* Get all possible next moves. */
 		Vector<Move> possibleMoves = s.getAllValidMoves();
@@ -1523,11 +1524,13 @@ public class State implements Cloneable,Comparable<State> {
 			Arrays.sort(nextStates, Collections.reverseOrder());
 			/* Begin negamax search down the tree of possible moves. */
 			for (int i = 0; i < numMoves; i++) {
-				newAlpha = -(negamax(nextStates[i], depth - 1, -beta, -alpha));
-				if (newAlpha > alpha)
-					alpha = newAlpha;
-				if (alpha >= beta)
-					break;
+				int newValue = -(negamax(nextStates[i], depth - 1, -beta, -newAlpha));
+				if (newValue > value)
+					value = newValue;
+				if (value > newAlpha)
+					newAlpha = value;
+				if (value >= beta)
+					return beta;
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -1535,7 +1538,7 @@ public class State implements Cloneable,Comparable<State> {
 		
 		//entry = new TTableEntry(s.hash, depth, alpha, beta, value); 
 		//tt.storeEntry(entry); 
-		return alpha;
+		return value;
 	}
 	
 	/* Function:
