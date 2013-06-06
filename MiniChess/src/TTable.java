@@ -10,7 +10,7 @@ public class TTable {
 	private int numEntries;
 	
 	public TTable() {
-		numEntries = 256;
+		numEntries = 512;
 		entries = new TTableEntry[numEntries];
 		for (int i = 0; i < numEntries; i++) {
 			entries[i] = new TTableEntry();
@@ -38,9 +38,9 @@ public class TTable {
 	/* Takes a hash and returns the array index in the TTable
 	 * that it corresponds to. */
 	private int getIndex(long tgtHash) {
-		// 256 is 2^8 (8 bits), long is 64 bits, mask 56 bits.
+		// 512 is 2^9 (9 bits), long is 64 bits, mask 55 bits.
 		long tgtIndex = tgtHash;
-		for (int i = 0; i < 56; i++)
+		for (int i = 0; i < 55; i++)
 			tgtIndex = tgtIndex >> 1;
 		if (tgtIndex < 0)
 			tgtIndex = -tgtIndex;
