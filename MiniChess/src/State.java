@@ -29,6 +29,8 @@ public class State implements Cloneable,Comparable<State> {
 	private double searchElapsedTime;  // How much time has elapsed since the move search timer was started.
 	private double moveTimeLimit;      // How much time to allow the bot to come up with a move.
 	private int gameWinValue;          // State value for winning the game.
+	private long hash;                 // The Zobrist hash for this game state.
+	private ZobristTable zob;          // The Zobrist hash generator.
 	
 	/* Function:
 	 *   State
@@ -57,6 +59,8 @@ public class State implements Cloneable,Comparable<State> {
 		black_wins = false;
 		best_move = null;
 		board = new char[num_columns][num_rows];
+		hash = 0L;
+		zob = new ZobristTable();
 		
 		/* Initialize board
 		 *	      4
