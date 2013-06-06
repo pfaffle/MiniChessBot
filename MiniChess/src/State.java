@@ -1536,8 +1536,8 @@ public class State implements Cloneable,Comparable<State> {
 			e.printStackTrace();
 		}
 		
-		//entry = new TTableEntry(s.hash, depth, alpha, beta, value); 
-		//tt.storeEntry(entry); 
+		entry = new TTableEntry(s.hash, depth, alpha, beta, value); 
+		tt.storeEntry(entry); 
 		return value;
 	}
 	

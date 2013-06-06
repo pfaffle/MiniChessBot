@@ -21,8 +21,9 @@ public class TTable {
 	 * if it exists. Returns null if the entry is not valid. */
 	public TTableEntry getEntry(long tgtHash) {
 		int tgtIndex = getIndex(tgtHash);
-		if (entries[tgtIndex].valid)
+		if (entries[tgtIndex].valid) {
 			return entries[tgtIndex];
+		}
 		
 		return null;
 	}
