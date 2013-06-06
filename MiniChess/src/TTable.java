@@ -12,6 +12,9 @@ public class TTable {
 	public TTable() {
 		numEntries = 256;
 		entries = new TTableEntry[numEntries];
+		for (int i = 0; i < numEntries; i++) {
+			entries[i] = new TTableEntry();
+		}
 	}
 	
 	/* Takes a hash and gives the TTable entry that it corresponds to,
@@ -35,8 +38,9 @@ public class TTable {
 	 * that it corresponds to. */
 	private int getIndex(long tgtHash) {
 		// 256 is 2^8 (8 bits), long is 64 bits, mask 56 bits.
+		long tgtIndex = tgtHash;
 		for (int i = 0; i < 56; i++)
-			tgtHash = tgtHash >> 1;
-		return (int)tgtHash;
+			tgtIndex = tgtIndex >> 1;
+		return (int)tgtIndex;
 	}
 }
