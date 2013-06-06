@@ -29,10 +29,11 @@ public class State implements Cloneable,Comparable<State> {
 	private double searchElapsedTime;  // How much time has elapsed since the move search timer was started.
 	private double moveTimeLimit;      // How much time to allow the bot to come up with a move.
 	private int gameWinValue;          // State value for winning the game.
-	public long hash;                 // The Zobrist hash for this game state.
+	private long hash;                 // The Zobrist hash for this game state.
 	private long whiteHash;            // The long integer that indicates white is on move in a Zobrist hash.
 	private long blackHash;            // The long integer that indicates black is on move in a Zobrist hash.
 	private ZobristTable zob;          // The Zobrist hash generator.
+	private TTable tt;                 // The transposition table.
 	
 	/* Function:
 	 *   State
@@ -66,6 +67,7 @@ public class State implements Cloneable,Comparable<State> {
 		Random rnd = new Random();
 		whiteHash = rnd.nextLong();
 		blackHash = rnd.nextLong();
+		tt = new TTable();
 		
 		/* Initialize board
 		 *	      4
@@ -99,7 +101,7 @@ public class State implements Cloneable,Comparable<State> {
 		board[2][5] = 'b';
 		board[3][5] = 'n';
 		board[4][5] = 'r';
-		updateHash();
+		genHash();
 	}
 
 	/* Function:
@@ -131,6 +133,7 @@ public class State implements Cloneable,Comparable<State> {
 			}
 		}
 		newState.zob = this.zob;
+		newState.tt = this.tt;
 		newState.hash = this.hash;
 		newState.whiteHash = this.whiteHash;
 		newState.blackHash = this.blackHash;
@@ -339,7 +342,7 @@ public class State implements Cloneable,Comparable<State> {
 		num_turns = new_num_turns;
 		
 		in.close();
-		updateHash();
+		genHash();
 		return 0;
 	}
 	
@@ -1493,6 +1496,16 @@ public class State implements Cloneable,Comparable<State> {
 		if (s.gameOver() || depth <= 0)
 			return s.getStateValue();
 		
+		/* Check transposition table for a saved entry. */
+		TTableEntry entry = tt.getEntry(s.hash);
+		if (entry != null) {
+			if (entry.d >= depth) {
+				if ((entry.a < entry.v && entry.v < entry.b) || (entry.a <= alpha && beta <= entry.b)) {
+					return entry.v;
+				}
+			}
+		}
+		
 		int newAlpha = 0;
 		
 		/* Get all possible next moves. */
@@ -1519,7 +1532,9 @@ public class State implements Cloneable,Comparable<State> {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-
+		
+		//entry = new TTableEntry(s.hash, depth, alpha, beta, value); 
+		//tt.storeEntry(entry); 
 		return alpha;
 	}
 	
@@ -1627,7 +1642,8 @@ public class State implements Cloneable,Comparable<State> {
 			return 0;
 	}
 	
-	private void updateHash() {
+	/* Generates a new Zobrist hash for the current State. */
+	private void genHash() {
 		long newHash = 0L;
 		char p = ' ';
 		Square sq = null;

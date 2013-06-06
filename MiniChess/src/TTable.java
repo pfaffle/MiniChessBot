@@ -25,9 +25,9 @@ public class TTable {
 	}
 	
 	/* Stores a new TTable Entry into the TTable. */
-	public void storeEntry(TTableEntry newEntry, long newHash) {
+	public void storeEntry(TTableEntry newEntry) {
 		newEntry.valid = true;
-		int tgtIndex = getIndex(newHash);
+		int tgtIndex = getIndex(newEntry.hash);
 		entries[tgtIndex] = newEntry;
 	}
 	
