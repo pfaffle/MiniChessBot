@@ -1452,7 +1452,16 @@ public class State implements Cloneable,Comparable<State> {
 			new_gamestate.white_wins = false;
 			new_gamestate.black_wins = true;
 		}
-		new_gamestate.updateHash();
+		
+		/* Iteratively generate the new hash value for the new state. */
+		long newHash = hash;
+		newHash = newHash ^ zob.getHash(end_square,tgt_piece);
+		newHash = newHash ^ zob.getHash(end_square, src_piece);
+		newHash = newHash ^ zob.getHash(start_square,src_piece);
+		newHash = newHash ^ zob.getHash(start_square, '.');
+		newHash = newHash ^ whiteHash;
+		newHash = newHash ^ blackHash;
+		new_gamestate.hash = newHash;
 		
 		return new_gamestate;
 	}
