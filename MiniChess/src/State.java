@@ -30,6 +30,8 @@ public class State implements Cloneable,Comparable<State> {
 	private double moveTimeLimit;      // How much time to allow the bot to come up with a move.
 	private int gameWinValue;          // State value for winning the game.
 	private long hash;                 // The Zobrist hash for this game state.
+	private long whiteHash;            // The long integer that indicates white is on move in a Zobrist hash.
+	private long blackHash;            // The long integer that indicates black is on move in a Zobrist hash.
 	private ZobristTable zob;          // The Zobrist hash generator.
 	
 	/* Function:
@@ -61,6 +63,9 @@ public class State implements Cloneable,Comparable<State> {
 		board = new char[num_columns][num_rows];
 		hash = 0L;
 		zob = new ZobristTable();
+		Random rnd = new Random();
+		whiteHash = rnd.nextLong();
+		blackHash = rnd.nextLong();
 		
 		/* Initialize board
 		 *	      4
@@ -94,6 +99,7 @@ public class State implements Cloneable,Comparable<State> {
 		board[2][5] = 'b';
 		board[3][5] = 'n';
 		board[4][5] = 'r';
+		updateHash();
 	}
 
 	/* Function:
@@ -329,6 +335,7 @@ public class State implements Cloneable,Comparable<State> {
 		num_turns = new_num_turns;
 		
 		in.close();
+		updateHash();
 		return 0;
 	}
 	
@@ -1441,6 +1448,7 @@ public class State implements Cloneable,Comparable<State> {
 			new_gamestate.white_wins = false;
 			new_gamestate.black_wins = true;
 		}
+		new_gamestate.updateHash();
 		
 		return new_gamestate;
 	}
@@ -1604,5 +1612,28 @@ public class State implements Cloneable,Comparable<State> {
 			return -1;
 		else
 			return 0;
+	}
+	
+	private void updateHash() {
+		long newHash = 0L;
+		char p = ' ';
+		Square sq = null;
+		try {
+			for (int i = 0; i < num_rows; i++) {
+				for (int j = 0; j < num_columns; j++) {
+					sq = new Square(j,i);
+					p = getPieceAtSquare(sq);
+					newHash = newHash ^ zob.getHash(sq, p);
+				}
+			}
+			if (whiteOnMove()) {
+				newHash = newHash ^ whiteHash;
+			} else {
+				newHash = newHash ^ blackHash;
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		hash = newHash;
 	}
 }
