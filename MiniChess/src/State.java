@@ -1618,9 +1618,6 @@ public class State implements Cloneable,Comparable<State> {
 				bestMoves.addAll(curBestMoves);
 				bestValue = curBestValue;
 			}
-			System.out.println("Search depth: " + curDepth);
-			System.out.println("Number of states evaluated: " + num_states_evaluated);
-			System.out.println("Time elapsed: " + searchElapsedTime);
 			/* Pick a random move from the best options available. */
 			Random generator = new Random();
 			int randomIndex = generator.nextInt(bestMoves.size());

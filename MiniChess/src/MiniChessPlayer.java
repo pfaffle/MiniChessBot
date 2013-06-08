@@ -15,43 +15,182 @@ public class MiniChessPlayer {
 	
 	/**
 	 * @param args
+	 * @throws Exception 
 	 */
-	public static void main(String[] args) {
-		
+	public static void main(String[] args) throws Exception {
+		Client connection = new Client(server,port,user,pass);
+		Game selectedGame = mainMenu(connection);
+		System.out.println("Selected game: " + selectedGame);
 		//playSmartVsHuman();
 		//playSmartVsSmart();
 		//playRandomVsHuman();
 		//playRandomVsRandom();
-		playSmartVsImcs();
+		//playSmartVsImcs();
 		//testMoveGen();
 	}
 	
-	public static void playSmartVsImcs() {
-		System.out.println("Connecting to server.");
-		State gamestate = new State();
-		char my_color;
-		
-		try {
-			Client connection = new Client(server,port,user,pass);
-			Vector<Game> available_games = connection.list();
-			if (available_games.size() == 0) {
+	public static long nextLong(Random rng, long n) {
+	   // error checking and 2^x checking removed for simplicity.
+	   long bits, val;
+	   do {
+	      bits = (rng.nextLong() << 1) >>> 1;
+	      val = bits % n;
+	   } while (bits-val+(n-1) < 0L);
+	   return val;
+	}
+	
+	public static Game mainMenu(Client connection) throws IOException {
+		Vector<Game> availableGames = null;
+		Scanner scan = new Scanner(System.in);
+		char opponentColor = '?';
+		String myOpponent = "unknown";
+		Game selectedGame = null;
+		System.out.println("a : accept an existing game offer.");
+		System.out.println("o : offer a game.");
+		System.out.println("r : start or accept a random game.");
+		System.out.println("s : play against self.");
+		System.out.println("h : play against human.");
+		System.out.println("q : quit.");
+		System.out.print("Choose an action:");
+		String input = scan.nextLine();
+
+		switch(input) {
+		case "a":
+			// prompt for game id
+			availableGames = connection.list();
+			System.out.print("Enter id of game to join: ");
+			input = scan.nextLine();
+			int gameId;
+			try {
+				gameId = Integer.parseInt(input);
+			} catch (NumberFormatException e) {
+				System.out.println("Invalid game id.");
+				break;
+			}
+			if (gameId < 1) {
+				System.out.println("Invalid game id.");
+				break;
+			}
+			for (int i = 0; i < availableGames.size(); i++) {
+				 if (availableGames.elementAt(i).id == gameId) {
+					 myOpponent = availableGames.elementAt(i).opponent;
+					 opponentColor = availableGames.elementAt(i).color;
+				 }
+			}
+			if (opponentColor == '?') {
+				System.out.print("Enter side to play (? for auto): ");
+				input = scan.nextLine();
+				char myColor = input.toUpperCase().charAt(0);
+				if (myColor == 'W') {
+					opponentColor = 'B';
+				} else if (myColor == 'B') {
+					opponentColor = 'W';
+				} else if (myColor == '?') {
+					// Do nothing.
+				} else {
+					System.out.println("Invalid color selection.");
+					break;
+				}
+			}
+			selectedGame = new Game(gameId, opponentColor, myOpponent);
+			break;
+		case "o":
+			// start a new game, show game id.
+			selectedGame = new Game();
+			break;
+		case "r":
+			// auto-accept or offer
+			availableGames = connection.list();
+			if (availableGames.size() == 0) {
 				// No game offers currently available to accept. Create one!
-				my_color = connection.offer('?');
+				System.out.println("No games available to join. Offering new game.");
+				selectedGame = new Game();
 			} else {
 				// Find and accept one of the existing game offers.
 				Random generator = new Random();
-				int randomIndex = generator.nextInt(available_games.size());
-				Game selected_game = available_games.elementAt(randomIndex);
-				//Game selected_game = new Game(7619,'W',"custom_opponent");
-				String game_id = String.valueOf(selected_game.id);
-				String my_opponent = selected_game.opponent;
-				if (selected_game.color == 'B') {
-					my_color = connection.accept(game_id,'W');
-				} else {
-					my_color = connection.accept(game_id,'B');
-				}
-				System.out.println("My opponent: " + my_opponent + ".");
+				int randomIndex = generator.nextInt(availableGames.size());
+				selectedGame = availableGames.elementAt(randomIndex);
 			}
+			break;
+		case "s":
+			selectedGame = new Game(-1,'?',"self");
+			break;
+		case "h":
+			System.out.print("Enter your side (? for auto): ");
+			input = scan.nextLine();
+			opponentColor = input.toUpperCase().charAt(0);
+			if (opponentColor != 'W' && opponentColor != 'B' && opponentColor != '?') {
+				System.out.println("Invalid color selection.");
+				break;
+			}
+			selectedGame = new Game(-2,opponentColor,"human");
+			break;
+		case "q":
+			break;
+		default:
+			// error, quit.
+			System.out.println("Invalid input.");
+			break;
+		}
+		scan.close();
+		
+		return selectedGame;
+	}
+	
+	public static void playSmartVsImcs() {
+		State gamestate = new State();
+		char my_color;
+		
+		System.out.println("Connecting to server.");
+		try {
+			Client connection = new Client(server,port,user,pass);
+			Scanner scan = new Scanner(System.in);
+			System.out.println("a : accept an existing game offer.");
+			System.out.println("o : offer a game.");
+			System.out.println("r : start or accept a random game.");
+			System.out.print("Choose an action:");
+			String input = scan.nextLine();
+			String game_id = null;
+			String my_opponent = null;
+			Game selected_game = null;
+			Vector<Game> available_games = connection.list();
+			
+			switch(input) {
+			case "a":
+				// prompt for game id
+				System.out.print("Enter game id: ");
+				input = scan.nextLine();
+				int game_idnum = Integer.parseInt(input);
+				selected_game = new Game(game_idnum,'?',"unknown");
+				break;
+			case "o":
+				// start a new game, show game id.
+				break;
+			case "r":
+				// auto-accept or offer
+				if (available_games.size() == 0) {
+					// No game offers currently available to accept. Create one!
+					my_color = connection.offer('?');
+				} else {
+					// Find and accept one of the existing game offers.
+					Random generator = new Random();
+					int randomIndex = generator.nextInt(available_games.size());
+					selected_game = available_games.elementAt(randomIndex);
+				}
+				break;
+			default:
+				// error, quit.
+			}
+			
+			game_id = String.valueOf(selected_game.id);
+			my_opponent = selected_game.opponent;
+			if (selected_game.color == 'B') {
+				my_color = connection.accept(game_id,'W');
+			} else {
+				my_color = connection.accept(game_id,'?');
+			}
+			System.out.println("My opponent: " + my_opponent + ".");
+			
 			
 			if (my_color == 'W') {
 				System.out.println("I am White!");

@@ -11,8 +11,8 @@ public class Game {
 	
 	public Game() {
 		id = 0;
-		color = 'W';
-		opponent = "nobody";
+		color = '?';
+		opponent = "";
 	}
 	public Game(int newid, char newcolor, String newopponent) {
 		id = newid;
@@ -20,7 +20,7 @@ public class Game {
 		opponent = newopponent;
 	}
 	public String toString() {
-		String str = "(" + id + "," + color + ")";
+		String str = "(" + id + "," + color + "," + opponent + ")";
 		return str;
 	}
 }
