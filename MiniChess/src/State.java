@@ -517,9 +517,9 @@ public class State implements Cloneable,Comparable<State> {
 	 */
 	public State makeHumanMove(String rawmove) throws Exception {
 		if (rawmove == null) {
-			throw new Exception("Invalid Move.");
+			throw new IllegalArgumentException("Invalid Move.");
 		} else if (!rawmove.matches("\\w\\d-\\w\\d")) {
-			throw new Exception("Improperly formatted move.");
+			throw new IllegalArgumentException("Improperly formatted move.");
 		} else if (gameOver()) {
 			throw new Exception("Game is over.");
 		}
