@@ -1380,7 +1380,7 @@ public class State implements Cloneable,Comparable<State> {
 	 */
 	private State executeMove(Move move) throws Exception {
 		if (move == null) {
-			throw new Exception("Invalid Move.");
+			throw new IllegalArgumentException("Invalid Move.");
 		}
 		
 		/* Check that additional moves are allowed. */
@@ -1394,19 +1394,19 @@ public class State implements Cloneable,Comparable<State> {
 		char src_piece = getPieceAtSquare(start_square);
 		char tgt_piece = getPieceAtSquare(end_square);
 		if (src_piece == '.') {
-			throw new Exception("No piece at location.");
+			throw new IllegalArgumentException("No piece at location.");
 		}
 		
 		/* Check that the piece in the originating square is on move. */
 		if (!pieceIsOnMove(src_piece)) {
-			throw new Exception("Piece not on move.");
+			throw new IllegalArgumentException("Piece not on move.");
 		}
 		
 		/* Check that the piece in the originating square can move to the target location. */
 		Vector<Move> valid_moves = new Vector<Move>();
 		valid_moves = getMovesForPieceAtSquare(start_square);
 		if (!valid_moves.contains(move)) {
-			throw new Exception("Move not allowed for given piece.");
+			throw new IllegalArgumentException("Move not allowed for given piece.");
 		}
 		
 		int from_x = move.from_Square.x;

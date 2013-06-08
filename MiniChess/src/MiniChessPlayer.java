@@ -220,33 +220,37 @@ public class MiniChessPlayer {
 	
 	public static void playVsHuman(Game selectedGame) {
 		State gamestate = new State();
-		char myColor = 'B';
+		boolean myMove;
 		if (selectedGame.color == 'B') {
-			myColor = 'W';
 			System.out.println("You are Black!");
+			myMove = true;
 		} else {
 			System.out.println("You are White!");
+			myMove = false;
 		}
 		
 		// Play the game.
 		gamestate.writeBoard();
 		while (!gamestate.gameOver()) {
-			if (gamestate.whiteOnMove()) {
-				System.out.print("Please enter a move in the form A1-B2: ");
-				String input = in.nextLine();
+			if (myMove) {
+				System.out.println("My move...");
 				try {
-					gamestate = gamestate.makeImcsMove(input);
-				} catch (IllegalArgumentException e) {
-					System.out.println("Invalid move.");
+					String move = gamestate.getImcsMove(); 
+					gamestate = gamestate.makeImcsMove(move);
+					myMove = !myMove;
 				} catch (Exception e) {
 					e.printStackTrace();
 					break;
 				}
 			} else {
-				System.out.println("Black moves...");
+				System.out.println("Your move...");
+				System.out.print("Please enter a move in the form A1-B2: ");
+				String input = in.nextLine();
 				try {
-					String move = gamestate.getImcsMove(); 
-					gamestate = gamestate.makeImcsMove(move);
+					gamestate = gamestate.makeImcsMove(input);
+					myMove = !myMove;
+				} catch (IllegalArgumentException e) {
+					System.out.println("Invalid move: " + e.getMessage());
 				} catch (Exception e) {
 					e.printStackTrace();
 					break;
