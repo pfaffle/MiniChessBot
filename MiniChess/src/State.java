@@ -551,7 +551,7 @@ public class State implements Cloneable,Comparable<State> {
 			from_x = 4;
 			break;
 		default:
-			throw new Exception("Failed to parse column letter.");
+			throw new IllegalArgumentException("Failed to parse column letter.");
 		}
 		
 		switch(toCol) {
@@ -571,7 +571,7 @@ public class State implements Cloneable,Comparable<State> {
 			to_x = 4;
 			break;
 		default:
-			throw new Exception("Failed to parse row letter.");
+			throw new IllegalArgumentException("Failed to parse row letter.");
 		}
 		Move humansMove = new Move(new Square(from_x, from_y), new Square(to_x, to_y));
 		return executeMove(humansMove);
@@ -771,7 +771,7 @@ public class State implements Cloneable,Comparable<State> {
 	 */
 	private char getPieceAtIndex(int x, int y) throws Exception {
 		if (!indexIsValid(x,y)) {
-			throw new Exception("Invalid coordinates.");
+			throw new IllegalArgumentException("Invalid coordinates.");
 		} else {
 			return board[x][y];
 		}
@@ -791,7 +791,7 @@ public class State implements Cloneable,Comparable<State> {
 	 */
 	private char getPieceAtSquare(Square sq) throws Exception {
 		if (!squareIsValid(sq)) {
-			throw new Exception("Invalid square.");
+			throw new IllegalArgumentException("Invalid square.");
 		} else {
 			return getPieceAtIndex(sq.x,sq.y);
 		}
