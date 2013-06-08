@@ -12,7 +12,7 @@ public class Game {
 	public Game() {
 		id = 0;
 		color = '?';
-		opponent = "";
+		opponent = "unknown";
 	}
 	public Game(int newid, char newcolor, String newopponent) {
 		id = newid;

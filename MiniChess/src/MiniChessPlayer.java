@@ -18,7 +18,7 @@ public class MiniChessPlayer {
 	 * @throws Exception 
 	 */
 	public static void main(String[] args) throws Exception {
-		Client connection = new Client(server,port,user,pass);
+		Client connection = null;
 		Game selectedGame = mainMenu(connection);
 		System.out.println("Selected game: " + selectedGame);
 		//playSmartVsHuman();
@@ -45,17 +45,19 @@ public class MiniChessPlayer {
 		char opponentColor = '?';
 		String myOpponent = "unknown";
 		Game selectedGame = null;
-		System.out.println("a : accept an existing game offer.");
-		System.out.println("o : offer a game.");
-		System.out.println("r : start or accept a random game.");
+		System.out.println("a : accept an offered IMCS game.");
+		System.out.println("o : offer an IMCS game.");
+		System.out.println("r : start or accept a random IMCS game.");
 		System.out.println("s : play against self.");
 		System.out.println("h : play against human.");
 		System.out.println("q : quit.");
 		System.out.print("Choose an action:");
 		String input = scan.nextLine();
-
+		
 		switch(input) {
 		case "a":
+			// connect to server
+			connection = new Client(server,port,user,pass);
 			// prompt for game id
 			availableGames = connection.list();
 			System.out.print("Enter id of game to join: ");
@@ -95,10 +97,14 @@ public class MiniChessPlayer {
 			selectedGame = new Game(gameId, opponentColor, myOpponent);
 			break;
 		case "o":
+			// connect to server
+			connection = new Client(server,port,user,pass);
 			// start a new game, show game id.
 			selectedGame = new Game();
 			break;
 		case "r":
+			// connect to server
+			connection = new Client(server,port,user,pass);
 			// auto-accept or offer
 			availableGames = connection.list();
 			if (availableGames.size() == 0) {
