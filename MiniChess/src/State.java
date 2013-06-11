@@ -54,7 +54,7 @@ public class State implements Cloneable,Comparable<State> {
 		num_states_evaluated = 0;
 		searchStartTime = 0;
 		searchElapsedTime = 0;
-		moveTimeLimit = 1.0;
+		moveTimeLimit = 5.0;
 		gameWinValue = 100000;
 		white_is_next = true;
 		game_is_over = false;
@@ -1492,8 +1492,7 @@ public class State implements Cloneable,Comparable<State> {
 	private int negamax(State s, int depth, int alpha, int beta) {
 		num_states_evaluated++;
 		searchElapsedTime = (System.nanoTime() - searchStartTime) * 1.0e-9;
-		//if (s.gameOver() || depth <= 0 || searchElapsedTime >= moveTimeLimit)
-		if (s.gameOver() || depth <= 0)
+		if (s.gameOver() || depth <= 0 || searchElapsedTime >= moveTimeLimit)
 			return s.getStateValue();
 		
 		/* Check transposition table for a saved entry. */
@@ -1573,8 +1572,11 @@ public class State implements Cloneable,Comparable<State> {
 				nextStates[i] = executeMove(possibleMoves.elementAt(i));
 				stateScores[i] = -(nextStates[i].getStateValue());
 				/* If we find a winning move, use it. */
-				if (stateScores[i] == gameWinValue)
-					return possibleMoves.elementAt(i);
+				if (stateScores[i] == gameWinValue) {
+					bestMove = possibleMoves.elementAt(i);
+					return bestMove;
+				}
+					
 			}
 			
 			/* Sort moves in descending order by state value, to improve the
@@ -1593,7 +1595,11 @@ public class State implements Cloneable,Comparable<State> {
 				stateScores[j] = curValue;
 				nextStates[j] = curState;
 				possibleMoves.set(j, curMove);
-			}			
+			}
+			
+			/* Select the best move from this list so we have a move to return
+			 * just in case negamax takes too long. */
+			bestMove = possibleMoves.elementAt(0);
 			
 			/* Begin an iterative deepening negamax search for the next best move, while
 			 * remaining within the time limit. */
@@ -1614,15 +1620,18 @@ public class State implements Cloneable,Comparable<State> {
 					}
 				}
 				/* Commit new search results. */
-				bestMoves.clear();
-				bestMoves.addAll(curBestMoves);
-				bestValue = curBestValue;
+				if (searchElapsedTime < moveTimeLimit) {
+					bestMoves.clear();
+					bestMoves.addAll(curBestMoves);
+					bestValue = curBestValue;	
+				}
 			}
 			/* Pick a random move from the best options available. */
-			Random generator = new Random();
-			int randomIndex = generator.nextInt(bestMoves.size());
-			bestMove = bestMoves.elementAt(randomIndex);
-			
+			if (bestMoves.size() > 0) {
+				Random generator = new Random();
+				int randomIndex = generator.nextInt(bestMoves.size());
+				bestMove = bestMoves.elementAt(randomIndex);	
+			}
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
