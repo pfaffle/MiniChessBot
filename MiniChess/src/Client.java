@@ -1,6 +1,6 @@
 // Copyright (c) 2012 Bart Massey <bart@cs.pdx.edu>
 // Licensed under the "MIT License"
-// Copyright ¦ 2009 Bart Massey
+// Copyright 2009 Bart Massey
 // ALL RIGHTS RESERVED
 // 
 // [This program is licensed under the "MIT License"]
